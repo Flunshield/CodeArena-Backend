@@ -1,0 +1,28 @@
+version: '3.5'
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - ${MONGO_PATH}:/var/lib/mongoDb/data
+    ports:
+      - ${MONGO_PORTS}:27017
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest
+    environment:
+      - PORT=${PORT}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
+    volumes:
+      - ./src:/app/src
