@@ -32,6 +32,46 @@ Pour exécuter les tests unitaires et d'intégration :
 npm run test
 ```
 
+## Section Prisma
+
+Pas d'injection SQL grâce à prisma. :-)
+
+**Video youtube a regarder**
+```
+https://www.youtube.com/watch?v=akP9E1vURBU&ab_channel=AKDEV
+```
+Installer les dépendances (si pas déja fait) :
+```
+npm install prisma -D
+npm install @prisma/client
+```
+
+Pour créer une migration après avoir modifier le fichier **schema.prisma**
+```
+npx prisma migrate dev --name nomDeVotreMigration
+```
+
+Pour généré les migrations non joué (a utiliser à chaque lancement du projet) :
+```
+npx prisma migrate up
+```
+
+Pour jouer une migration spécifique :
+```
+npx prisma migrate up --nomDeVotreMigration
+```
+
+Pour annuler une migration spécifique :
+```
+npx prisma migrate down --nomDeVotreMigration
+```
+
+Pour lancer prisma studio (Port par défault 5555) :
+```
+npx prisma studio
+```
+
+
 ## Section commit
 
 Les messages de commit doivent suivre des conventions précises pour une meilleure traçabilité et compréhension :
@@ -47,6 +87,7 @@ fix(server): resolve memory leak issue
 
 # Bonnes Pratiques
 
+- Penser à créer un fichier .ts dans le dossier entity lorsque vous créer une nouvelle table dans la base de donnée.
 - Documenter un maximum les fonctions créés comme ceci :
 ```js
 /*

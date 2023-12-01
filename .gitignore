@@ -1,38 +1,143 @@
-# compiled output
-/dist
-/node_modules
+# Node.js
+node_modules/
+
+# NestJS
+dist/
+coverage/
+
+# Docker
+.docker/
+
+# Prisma
+prisma/.prisma/client/
+
+# VSCode
+.vscode/
+
+# Logs
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# NestJS Temp files
+.nest/
+
+# Docker Compose
+docker-compose.override.yml
+docker-compose.override.yml.override
+docker-compose.yml.override
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# JetBrains
+.idea/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Visual Studio Code folders
+.vscode/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Yarn
+yarn-error.log
 
 # Logs
 logs
 *.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 
-# OS
-.DS_Store
+# Dependency directories
+/jspm_packages/
+/node_modules/
+/packagelock.json
+/yarn-error.log
 
-# Tests
-/coverage
-/.nyc_output
-
-# IDEs and editors
+# IDE
 /.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+ehthumbs_vista.db
 
-#secret
+# NestJS
+dist
 .env
+npm-debug.log*
+.env.local
+.env.test
+.env.development
+.env.production
+
+# Docker
+.docker
+
+# Prisma
+prisma/.prisma/client
+
+# TypeScript
+*.tsbuildinfo
+
+# TSLint
+tslint-report*
+
+# Yarn
+yarn-error.log
+.pnp.*
+
+# Jest
+coverage/
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
+# Debug logs
+debug.log
+
+# .vscode
+.vscode/
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

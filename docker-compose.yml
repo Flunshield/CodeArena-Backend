@@ -1,28 +1,38 @@
 version: '3.5'
 
 services:
-  mongodb:
-    image: mongo
+  mariadb:
+    image: mariadb
     restart: always
-    container_name: mongodb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${DB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-    volumes:
-      - ${MONGO_PATH}:/var/lib/mongoDb/data
+      MARIADB_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: frenchcodearena
     ports:
-      - ${MONGO_PORTS}:27017
+      - ${MARIADB_PORTS}:3306
+    volumes:
+      - ${MARIADB_PATH}:/var/lib/mariadb
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    container_name: phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: nest
-    environment:
-      - PORT=${PORT}
     ports:
       - '3000:3000'
     depends_on:
-      - mongodb
+      - mariadb
     volumes:
       - ./src:/app/src
+
+volumes:
+  nestjsVolume:
