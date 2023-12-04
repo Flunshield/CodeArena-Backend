@@ -8,24 +8,16 @@ Ce document fournit toutes les informations nécessaires pour installer, lancer,
 
 Renommer le fichier ``.env.example`` en ``.env``
 
+Puis lancer la commande : **A lancer depuis la racine du projet**
 ```bash
-npm install
+# Commande pour windows
+script/lancement/script.ps1
+
+# Commande pour linux ou Max
+script/lancement/script.sh
 ```
 
-Pour démarrer l'environnement de développement (assurez-vous que docker soit lancé), exécutez :
 
-Pour build les containers.
-```bash
-docker build
-```
-Pour lancer les containers.
-```bash
-docker compose up
-```
-Pour initialiser la bdd. **(A lancer dans le container App !!!!!!)**
-```bash
-npx prisma migrate dev
-```
 
 ## Section commandes utiles
 
@@ -40,10 +32,19 @@ npm run lint
 
 - Lancer les Tests Localement :
 
-Pour exécuter les tests unitaires et d'intégration :
+Pour exécuter les tests end 2 end :
 ```bash
-npm run test
+npm run test:e2e
 ```
+
+### Migration
+Créer une migration et mettre à jour la Bdd : **A lancer depuis la racine du projet**
+````bash
+# Commande Windows :
+.\script\migrations\recupMigration.ps1 "nomDeLaMigration"
+# Commande Linux/Max :
+.\script\migrations\recupMigration.sh "nomDeLaMigration"
+````
 
 ## Section Prisma
 
