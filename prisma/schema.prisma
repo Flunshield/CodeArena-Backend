@@ -8,31 +8,37 @@ datasource db {
 }
 
 model User {
-  id                 Int      @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   userName           String
   password           String
   email              String
-  emailVerified      Boolean  @default(false)
-  createdAt          DateTime @default(now())
+  emailVerified      Boolean   @default(false)
+  createdAt          DateTime  @default(now())
   lastLogin          DateTime?
-  status             String   @default("inactive")
+  status             String    @default("inactive")
   avatar             String?
   firstName          String?
   lastName           String?
-  groupsId           Int      @default(1)
+  groupsId           Int       @default(1)
   languagePreference String?
-  groups             Groups   @relation(fields: [groupsId], references: [id])
+  groups             Groups    @relation(fields: [groupsId], references: [id])
 }
 
 model Groups {
-  id    Int    @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
   name  String
   roles String?
   users User[]
 }
 
 model Test {
-  id    Int    @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
+  name  String
+  roles String?
+}
+
+model Testa {
+  id    Int     @id @default(autoincrement())
   name  String
   roles String?
 }
