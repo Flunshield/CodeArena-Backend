@@ -1,6 +1,6 @@
 export interface User {
   id?: number;
-  username: string;
+  userName: string;
   password: string;
   email: string;
   emailVerified?: boolean;
@@ -19,4 +19,9 @@ export interface Groups {
   id: number;
   name: string;
   roles: string[];
+}
+
+export interface UserConnect {
+  userName: string;
+  password: string;
 }
