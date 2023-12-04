@@ -8,10 +8,23 @@ Ce document fournit toutes les informations nécessaires pour installer, lancer,
 
 Renommer le fichier ``.env.example`` en ``.env``
 
+```bash
+npm install
+```
+
 Pour démarrer l'environnement de développement (assurez-vous que docker soit lancé), exécutez :
 
+Pour build les containers.
+```bash
+docker build
+```
+Pour lancer les containers.
 ```bash
 docker compose up
+```
+Pour initialiser la bdd. **(A lancer dans le container App !!!!!!)**
+```bash
+npx prisma migrate dev
 ```
 
 ## Section commandes utiles
@@ -49,6 +62,11 @@ npm install @prisma/client
 Pour créer une migration après avoir modifier le fichier **schema.prisma**
 ```
 npx prisma migrate dev --name nomDeVotreMigration
+```
+
+Pour récupérer le dossier migration depuis le container
+```
+docker cp IDdeVotreContainer:/app/prisma/migrations ./prisma
 ```
 
 Pour généré les migrations non joué (a utiliser à chaque lancement du projet) :

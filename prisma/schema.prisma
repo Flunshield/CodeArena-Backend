@@ -17,8 +17,8 @@ model User {
   lastLogin          DateTime?
   status             String   @default("inactive")
   avatar             String?
-  firstName          String
-  lastName           String
+  firstName          String?
+  lastName           String?
   groupsId           Int      @default(1)
   languagePreference String?
   groups             Groups   @relation(fields: [groupsId], references: [id])
@@ -33,4 +33,6 @@ model Groups {
 
 model Test {
   id    Int    @id @default(autoincrement())
+  name  String
+  roles String?
 }

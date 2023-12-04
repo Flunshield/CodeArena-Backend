@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   mariadb:
-    image: mariadb
+    image: mariadb:10.6.16
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: admin
@@ -29,10 +29,10 @@ services:
     container_name: nest
     ports:
       - '3000:3000'
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - mariadb
     volumes:
       - ./src:/app/src
 
-volumes:
-  nestjsVolume:
