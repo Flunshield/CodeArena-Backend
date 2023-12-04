@@ -56,7 +56,7 @@ export class AuthService {
    * console.log('Les mots de passe correspondent ?', passwordsMatch);
    * ```
    */
-  async comparePasswords(
+  static async comparePasswords(
     plainTextPassword: string,
     hashedPassword: string,
   ): Promise<boolean> {

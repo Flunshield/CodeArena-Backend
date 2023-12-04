@@ -21,7 +21,7 @@ import { UserService } from '../../services/user/user.service';
  * await userController.create(createUserDto);
  * ```
  */
-@Controller('/creatUser')
+@Controller('user')
 export class UserController {
   /**
    * Crée une instance du contrôleur utilisateur.
@@ -45,7 +45,7 @@ export class UserController {
    * console.log(result);
    * ```
    */
-  @Post()
+  @Post('/creatUser')
   async create(@Body() createUserDto: CreateUserDto): Promise<HttpException> {
     const response = await this.userService.create(createUserDto);
 

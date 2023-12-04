@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id                 Int       @id @default(autoincrement())
-  userName           String
+  userName           String    @unique
   password           String
   email              String
   emailVerified      Boolean   @default(false)
