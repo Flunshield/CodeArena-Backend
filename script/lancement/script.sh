@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Installer les dépendances npm
-npm install ci
+npm install
 
 # Construire et démarrer les conteneurs Docker avec Docker Compose
 docker compose build
