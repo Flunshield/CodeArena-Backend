@@ -30,15 +30,3 @@ model Groups {
   roles String?
   users User[]
 }
-
-model Test {
-  id    Int     @id @default(autoincrement())
-  name  String
-  roles String?
-}
-
-model Testa {
-  id    Int     @id @default(autoincrement())
-  name  String
-  roles String?
-}
