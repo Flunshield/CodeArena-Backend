@@ -17,7 +17,8 @@ script/lancement/script.ps1
 script/lancement/script.sh
 ```
 
-
+Pour alimenter la bdd, vous pouvez utiliser les requetes SQL se trouvant dans :
+**script/requeteSql/script**
 
 ## Section commandes utiles
 
