@@ -143,19 +143,19 @@ export class UserService {
             return { access_token: token };
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
-            throw new HttpException(
+            new HttpException(
               'Erreur interne du serveur',
               HttpStatus.INTERNAL_SERVER_ERROR,
             );
           }
         } else {
-          throw new HttpException(
+          return new HttpException(
             'Le nom de compte et/ou le mot de passe est/sont érroné',
             HttpStatus.BAD_REQUEST,
           );
         }
       } else {
-        throw new HttpException(
+        return new HttpException(
           'Le nom de compte et/ou le mot de passe est/sont érroné',
           HttpStatus.BAD_REQUEST,
         );
