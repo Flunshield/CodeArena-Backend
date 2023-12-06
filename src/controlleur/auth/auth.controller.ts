@@ -8,7 +8,8 @@ import {
   Res,
 } from '@nestjs/common';
 import { UserConnect } from '../../interfaces/userInterface';
-import { UserService } from '../../services/user/user.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { AuthService } from '../../services/auth.service';
 
 /**
  * Contrôleur pour gérer les opérations d'authentification.
@@ -20,9 +21,9 @@ export class AuthController {
   /**
    * Crée une nouvelle instance de AuthController.
    *
-   * @param userService - Le service utilisateur utilisé pour les opérations d'authentification.
+   * @param AuthService
    */
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly AuthService: AuthService) {}
   /**
    * Gère la demande de connexion en appelant le service utilisateur pour authentifier les informations d'identification fournies.
    *
@@ -35,7 +36,7 @@ export class AuthController {
    */
   @Post('/login')
   async login(@Body() userLogin: UserConnect, @Req() request, @Res() response) {
-    response.send(await this.userService.connect(userLogin, response, request));
+    response.send(await this.AuthService.connect(userLogin, response, request));
   }
   catch(error: any): void {
     console.error("Erreur lors de la création de l'utilisateur :", error);
