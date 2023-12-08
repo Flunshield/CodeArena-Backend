@@ -30,7 +30,11 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      - DATABASE_URL=${DATABASE_URL}
+      - MAIL=${MAIL}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_TO=${MAIL_TO}
     depends_on:
       - mariadb
     volumes:

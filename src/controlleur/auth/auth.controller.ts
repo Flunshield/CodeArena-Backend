@@ -1,15 +1,19 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
 import { UserConnect } from '../../interfaces/userInterface';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AuthService } from '../../services/auth.service';
+
+//TODO: Implémenter le refreshToken.
 
 /**
  * Contrôleur pour gérer les opérations d'authentification.
@@ -35,8 +39,28 @@ export class AuthController {
    * @throws HttpException - En cas d'erreur lors de la connexion.
    */
   @Post('/login')
-  async login(@Body() userLogin: UserConnect, @Req() request, @Res() response) {
-    response.send(await this.AuthService.connect(userLogin, response, request));
+  async login(
+    @Body() userLogin: UserConnect,
+    @Req() request,
+    @Res({ passthrough: true }) response,
+  ) {
+    const frenchCodeAreaCookie = request.cookies.frenchcodeareatoken;
+    const loginResult = await this.AuthService.connect(
+      userLogin,
+      response,
+      frenchCodeAreaCookie,
+    );
+    response.send(loginResult);
+  }
+
+  @Get('/validMail')
+  async validMail(
+    @Query('id') id: number,
+    @Query('userName') userName: string,
+    @Res() response,
+  ) {
+    const test = await this.AuthService.validMail(userName, id);
+    response.send(test);
   }
   catch(error: any): void {
     console.error("Erreur lors de la création de l'utilisateur :", error);

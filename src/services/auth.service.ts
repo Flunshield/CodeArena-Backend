@@ -1,13 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User, UserConnect } from '../interfaces/userInterface';
-import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { createToken } from '../utils/tokenUtils';
 
 const prisma = new PrismaClient();
+
+//TODO: Mettre à jour la méthode validMail quand le front sera créé.
 
 /**
  * Service responsable de la gestion de l'authentification et du hachage des mots de passe.
@@ -76,27 +77,32 @@ export class AuthService {
    *
    * @param credentials - Les informations d'identification de l'utilisateur.
    * @param res - L'objet de réponse Express.
-   * @param req - L'objet de requête Express.
+   * @param frenchCodeAreaCookie
    * @returns Une réponse contenant un jeton d'accès ou un message d'erreur.
    *
    * @throws HttpException - En cas d'erreur lors de la génération ou de la vérification du jeton.
    */
-  async connect(credentials: UserConnect, res: Response, req: Request) {
+  async connect(credentials: UserConnect, @Res() res, frenchCodeAreaCookie) {
     try {
       // Vérifier si le cookie existe
-      const existingToken = req?.cookies?.frenchCodeAreaToken;
-
-      if (existingToken) {
+      const existingToken = frenchCodeAreaCookie;
+      if (existingToken !== undefined) {
         try {
           const publicKey = fs.readFileSync('public_key.pem', 'utf-8');
           // Vérifier la validité du token existant
           const decodedToken = jwt.verify(existingToken, publicKey) as {
             username: string;
           };
-          return {
-            message: 'Utilisateur déjà connecté',
-            username: decodedToken.username,
-          };
+          if (decodedToken) {
+            return {
+              message: 'Utilisateur déjà connecté',
+              username: decodedToken.username,
+            };
+          } else {
+            return {
+              message: 'Token non conforme',
+            };
+          }
         } catch (verifyError) {
           console.error('Error verifying existing token:', verifyError);
         }
@@ -136,6 +142,24 @@ export class AuthService {
           HttpStatus.BAD_REQUEST,
         );
       }
+    } catch (error) {
+      throw new HttpException(
+        'Erreur interne du serveur',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async validMail(userName: string, id: number) {
+    try {
+      console.log(userName, id);
+      prisma.user.update({
+        where: { id: id, userName: userName },
+        data: {
+          emailVerified: true,
+          status: 'actif',
+        },
+      });
     } catch (error) {
       throw new HttpException(
         'Erreur interne du serveur',
