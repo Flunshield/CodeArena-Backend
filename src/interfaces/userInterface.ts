@@ -23,5 +23,6 @@ export interface Groups {
 
 export interface UserConnect {
   userName: string;
-  password: string;
+  password?: string;
+  email?: string;
 }

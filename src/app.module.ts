@@ -11,11 +11,13 @@ import { UserService } from './services/user/user.service';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './controlleur/auth/auth.controller';
 import { VerifyJwtMiddleware } from './utils/jwt-utils';
+import { EmailModule } from './email/module/email.module';
+import { MailService } from './email/service/MailService';
 
 @Module({
-  imports: [],
+  imports: [EmailModule],
   controllers: [AppController, UserController, AuthController],
-  providers: [AppService, UserService, AuthService],
+  providers: [AppService, UserService, AuthService, MailService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
@@ -24,6 +26,7 @@ export class AppModule implements NestModule {
       .exclude(
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'user/creatUser', method: RequestMethod.POST },
+        { path: 'auth/validMail', method: RequestMethod.GET },
       )
       .forRoutes('*');
   }
