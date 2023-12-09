@@ -45,12 +45,12 @@ export class AuthController {
     @Res({ passthrough: true }) response,
   ) {
     const frenchCodeAreaCookie = request.cookies.frenchcodeareatoken;
-    const loginResult = await this.AuthService.connect(
+    const loginResult: any = await this.AuthService.connect(
       userLogin,
       response,
       frenchCodeAreaCookie,
     );
-    response.send(loginResult);
+    response.send(loginResult.token ?? loginResult);
   }
 
   @Get('/validMail')
