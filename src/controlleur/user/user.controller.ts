@@ -48,7 +48,6 @@ export class UserController {
   @Post('/creatUser')
   async create(@Body() createUserDto: CreateUserDto): Promise<HttpException> {
     const response = await this.userService.create(createUserDto);
-
     if (response) {
       // Si la création réussi, on envoie un code HTTP 200.
       return new HttpException('Utilisateur créé avec succès', HttpStatus.OK);

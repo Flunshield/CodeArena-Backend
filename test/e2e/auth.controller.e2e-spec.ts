@@ -1,66 +1,86 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { AuthController } from '../../src/controlleur/auth/auth.controller';
-import { AuthService } from '../../src/services/auth.service';
+import { RefreshTokenService } from '../../src/services/authentificationService/RefreshTokenService';
+import { AuthService } from '../../src/services/authentificationService/auth.service';
 import { UserConnect } from '../../src/interfaces/userInterface';
-import * as jwt from 'jsonwebtoken';
-import * as fs from 'fs';
 
-describe('AuthController', () => {
-  let controller: AuthController;
+describe('AuthController (E2E)', () => {
+  let authController: AuthController;
+  let authService: AuthService;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let refreshTokenService: RefreshTokenService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [AuthService, RefreshTokenService],
     }).compile();
 
-    controller = module.get<AuthController>(AuthController);
+    authController = module.get<AuthController>(AuthController);
+    authService = module.get<AuthService>(AuthService);
+    refreshTokenService = module.get<RefreshTokenService>(RefreshTokenService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+  describe('login', () => {
+    it('should authenticate user and return a refreshToken', async () => {
+      // Mock dependencies
+      const userLogin: UserConnect = {
+        email: 'j.bert@cacahete.fr',
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        username: 'newUser',
+        password: 'password123',
+      };
+      const requestMock = { cookies: { frenchcodeareatoken: 'mockToken' } };
+      const responseMock = {
+        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
 
-  it('should return a valid response on login', async () => {
-    const userLogin: UserConnect = {
-      userName: 'newUser',
-      password: 'password123',
-    };
-    const request = { cookies: { frenchcodeareatoken: null } };
-    const response = { send: jest.fn() };
+      jest.spyOn(authService, 'connect').mockResolvedValue('mockRefreshToken');
 
-    // Mock de la méthode connect pour qu'elle renvoie un objet contenant la clé 'access_token'
-    jest.spyOn(controller['AuthService'], 'connect').mockResolvedValueOnce({
-      access_token: generateTestToken(userLogin.userName),
+      // Execute the login method
+      await authController.login(userLogin, requestMock, responseMock);
+
+      // Assertions
+      expect(authService.connect).toHaveBeenCalledWith(
+        userLogin,
+        responseMock,
+        'mockToken',
+      );
+      expect(responseMock.send).toHaveBeenCalledWith('mockRefreshToken');
     });
 
-    // Appel de la méthode login du contrôleur
-    await controller.login(userLogin, request, response);
+    it('should handle NotFoundException and return 404 status', async () => {
+      // Mock dependencies
+      const userLogin: UserConnect = {
+        email: 'j.bert@cacahete.fr',
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        username: 'newUser',
+        password: 'password123',
+      };
+      const requestMock = { cookies: { frenchcodeareatoken: 'mockToken' } };
+      const responseMock = {
+        send: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
 
-    // Assurez-vous que la méthode connect a été appelée avec les bons paramètres
-    expect(controller['AuthService'].connect).toHaveBeenCalledWith(
-      userLogin,
-      response,
-      null,
-    );
+      jest
+        .spyOn(authService, 'connect')
+        .mockRejectedValue(new NotFoundException('User not found'));
 
-    // Assurez-vous que la réponse contient la chaîne "frenchcodeareatoken"
-    expect(response.send).toHaveBeenCalledWith(
-      expect.objectContaining({ access_token: expect.any(String) }),
-    );
+      // Execute the login method
+      await authController.login(userLogin, requestMock, responseMock);
+
+      // Assertions
+      expect(responseMock.status).toHaveBeenCalledWith(404);
+      expect(responseMock.json).toHaveBeenCalledWith({
+        message: 'User not found',
+      });
+    });
   });
 });
-
-// Fonction de test pour générer un token de test
-export function generateTestToken(userName: string): string {
-  // Chargement de la clé privée pour la signature du token
-  const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
-
-  // Génération du token JWT
-  const token = jwt.sign({ username: userName }, privateKey, {
-    algorithm: 'RS256',
-    expiresIn: '1h', // Spécifiez la durée de validité du token, par exemple, 1 heure
-  });
-
-  return token;
-}

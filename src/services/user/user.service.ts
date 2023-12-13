@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../authentificationService/auth.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MailService } from '../../email/service/MailService';
 import { User } from '../../interfaces/userInterface';
@@ -53,9 +53,7 @@ export class UserService {
       const userExist: boolean = userExistArray.some(
         (exists: boolean) => exists,
       );
-
       if (!userExist) {
-        // Si l'envoie du mail s'est bien déroulé
         const createUser = await prisma.user.create({
           data: {
             userName: data.userName,

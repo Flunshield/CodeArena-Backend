@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { User, UserConnect } from '../interfaces/userInterface';
+import { User, UserConnect } from '../../interfaces/userInterface';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { PrismaClient } from '@prisma/client';
-import { createToken } from '../utils/tokenUtils';
+import { RefreshTokenService } from './RefreshTokenService';
+import { Response } from 'express';
 
 const prisma = new PrismaClient();
 
@@ -26,6 +27,8 @@ const prisma = new PrismaClient();
  */
 @Injectable()
 export class AuthService {
+  constructor(private readonly refreshTokenService: RefreshTokenService) {}
+
   /**
    * Hache le mot de passe fourni en utilisant la bibliothèque bcrypt.
    *
@@ -73,16 +76,45 @@ export class AuthService {
   }
 
   /**
-   * Connecte un utilisateur en vérifiant les informations d'identification fournies.
+   * Méthode pour gérer la connexion de l'utilisateur.
    *
-   * @param credentials - Les informations d'identification de l'utilisateur.
+   * @param credentials - Les informations de connexion de l'utilisateur.
    * @param res - L'objet de réponse Express.
-   * @param frenchCodeAreaCookie
-   * @returns Une réponse contenant un jeton d'accès ou un message d'erreur.
+   * @param frenchCodeAreaCookie - Le cookie contenant le token de French Code Area.
+   * @returns {Promise<HttpException | string>} Une promesse qui résout soit avec le token de rafraîchissement généré,
+   * soit avec une instance de `HttpException` en cas d'erreur.
    *
-   * @throws HttpException - En cas d'erreur lors de la génération ou de la vérification du jeton.
+   * @throws {HttpException} - Une exception HTTP en cas d'erreur.
+   *
+   * @remarks
+   * Cette méthode gère la connexion de l'utilisateur en vérifiant d'abord la validité du token
+   * existant s'il est présent dans le cookie. Ensuite, elle vérifie les informations de connexion
+   * fournies par l'utilisateur, compare les mots de passe, génère un nouveau token de rafraîchissement
+   * en cas de succès, et renvoie une exception HTTP en cas d'erreur.
+   *
+   * @example
+   * // Exemple d'utilisation dans un contrôleur Nest.js
+   * @Controller('auth')
+   * export class AuthController {
+   *   @Post('connect')
+   *   async connect(
+   *     @Body() credentials: UserConnect,
+   *     @Res() res,
+   *     @Cookie('frenchCodeAreaCookie') frenchCodeAreaCookie,
+   *   ) {
+   *     try {
+   *       return await this.authService.connect(credentials, res, frenchCodeAreaCookie);
+   *     } catch (error) {
+   *       // Gérer l'erreur, par exemple, renvoyer une réponse HTTP appropriée
+   *     }
+   *   }
+   * }
    */
-  async connect(credentials: UserConnect, @Res() res, frenchCodeAreaCookie) {
+  async connect(
+    credentials: UserConnect,
+    @Res() res: Response,
+    frenchCodeAreaCookie: string,
+  ): Promise<HttpException | string> {
     try {
       // Vérifier si le cookie existe
       const existingToken = frenchCodeAreaCookie;
@@ -91,17 +123,15 @@ export class AuthService {
           const publicKey = fs.readFileSync('public_key.pem', 'utf-8');
           // Vérifier la validité du token existant
           const decodedToken = jwt.verify(existingToken, publicKey) as {
-            username: string;
+            id: number;
           };
           if (decodedToken) {
-            return {
-              message: 'Utilisateur déjà connecté',
-              username: decodedToken.username,
-            };
+            return new HttpException(
+              'Utilisateur déja connecté',
+              HttpStatus.FORBIDDEN,
+            );
           } else {
-            return {
-              message: 'Token non conforme',
-            };
+            return new HttpException('Token erroné', HttpStatus.FORBIDDEN);
           }
         } catch (verifyError) {
           console.error('Error verifying existing token:', verifyError);
@@ -122,7 +152,7 @@ export class AuthService {
 
         if (passwordsMatch) {
           try {
-            return createToken(res, credentials.userName);
+            return this.refreshTokenService.generateRefreshToken(user.id, res);
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
             new HttpException(
@@ -150,9 +180,36 @@ export class AuthService {
     }
   }
 
-  async validMail(userName: string, id: number) {
+  /**
+   * Méthode pour valider l'adresse e-mail d'un utilisateur.
+   *
+   * @param userName - Le nom d'utilisateur de l'utilisateur.
+   * @param id - L'identifiant unique de l'utilisateur.
+   * @returns {Promise<void>} Une promesse résolue une fois la mise à jour de l'utilisateur effectuée avec succès.
+   *
+   * @throws {HttpException} - Une exception HTTP en cas d'erreur interne du serveur.
+   *
+   * @remarks
+   * Cette méthode met à jour les informations de l'utilisateur, marquant son adresse e-mail comme vérifiée
+   * et changeant son statut en 'actif'. Elle prend en compte le nom d'utilisateur et l'identifiant unique
+   * de l'utilisateur pour effectuer la mise à jour.
+   *
+   * @example
+   * // Exemple d'utilisation dans un service Nest.js
+   * @Injectable()
+   * export class UserService {
+   *   async validateEmail(userName: string, id: number): Promise<void> {
+   *     try {
+   *       await this.validMail(userName, id);
+   *       // Logique supplémentaire après la validation de l'e-mail
+   *     } catch (error) {
+   *       // Gérer l'erreur, par exemple, renvoyer une réponse HTTP appropriée
+   *     }
+   *   }
+   * }
+   */
+  async validMail(userName: string, id: number): Promise<void> {
     try {
-      console.log(userName, id);
       prisma.user.update({
         where: { id: id, userName: userName },
         data: {
