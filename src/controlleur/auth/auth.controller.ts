@@ -4,7 +4,6 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  NotFoundException,
   Post,
   Query,
   Req,
@@ -52,22 +51,23 @@ export class AuthController {
     @Res({ passthrough: true }) response,
   ) {
     try {
-      const frenchCodeAreaCookie = request?.cookies?.frenchcodeareatoken;
+      const frenchCodeAreaCookie = request.cookies.frenchcodeareatoken;
       const reponse = await this.AuthService.connect(
         userLogin,
         response,
         frenchCodeAreaCookie,
       );
-      response.send(reponse);
-    } catch (error: any) {
-      if (error instanceof NotFoundException) {
-        return response.status(404).json({ message: error.message });
+      if (reponse === HttpStatus.OK) {
+        return response.status(HttpStatus.OK).send('Connecté');
+      } else {
+        throw new HttpException(
+          `Erreur de connexion : ${reponse}`,
+          HttpStatus.FORBIDDEN,
+        );
       }
-      console.error("Erreur lors de la connection de l'utilisateur :", error);
-      throw new HttpException(
-        'Erreur interne du serveur',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error: any) {
+      const status = error.status;
+      throw new HttpException(error.message, status);
     }
   }
 
@@ -94,14 +94,15 @@ export class AuthController {
    * }
    */
   @Post('refresh-access-token')
-  refreshAccessToken(@Req() request, @Res() response): void {
+  async refreshAccessToken(@Req() request, @Res() response): Promise<void> {
     try {
       const refreshToken = request.cookies.frenchcodeareatoken;
       const accessToken =
-        this.refreshTokenService.generateAccessTokenFromRefreshToken(
+        await this.refreshTokenService.generateAccessTokenFromRefreshToken(
           refreshToken,
         );
-      response.send(accessToken);
+      console.log('accessToken : ', accessToken);
+      response.send({ accessToken: accessToken });
     } catch (error: any) {
       console.error("Erreur lors de la récupération de l'accesToken :", error);
       throw new HttpException(

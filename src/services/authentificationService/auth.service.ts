@@ -114,11 +114,11 @@ export class AuthService {
     credentials: UserConnect,
     @Res() res: Response,
     frenchCodeAreaCookie: string,
-  ): Promise<HttpException | string> {
+  ): Promise<HttpException | HttpStatus> {
     try {
       // Vérifier si le cookie existe
       const existingToken = frenchCodeAreaCookie;
-      if (existingToken !== undefined) {
+      if (existingToken) {
         try {
           const publicKey = fs.readFileSync('public_key.pem', 'utf-8');
           // Vérifier la validité du token existant
@@ -134,7 +134,7 @@ export class AuthService {
             return new HttpException('Token erroné', HttpStatus.FORBIDDEN);
           }
         } catch (verifyError) {
-          console.error('Error verifying existing token:', verifyError);
+          throw new HttpException('Vérification érroné', HttpStatus.FORBIDDEN);
         }
       }
 
@@ -152,31 +152,30 @@ export class AuthService {
 
         if (passwordsMatch) {
           try {
-            return this.refreshTokenService.generateRefreshToken(user.id, res);
+            await this.refreshTokenService.generateRefreshToken(user.id, res);
+            return HttpStatus.OK;
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
-            new HttpException(
-              'Erreur interne du serveur',
-              HttpStatus.INTERNAL_SERVER_ERROR,
+            return new HttpException(
+              'Erreur sur la elcture de al private key',
+              HttpStatus.EXPECTATION_FAILED,
             );
           }
         } else {
           return new HttpException(
-            'Le nom de compte et/ou le mot de passe est/sont érroné',
+            'Le nom de compte et/ou le mot de passe est/sont erroné',
             HttpStatus.BAD_REQUEST,
           );
         }
       } else {
         return new HttpException(
-          'Le nom de compte et/ou le mot de passe est/sont érroné',
+          'Le nom de compte et/ou le mot de passe est/sont erroné',
           HttpStatus.BAD_REQUEST,
         );
       }
     } catch (error) {
-      throw new HttpException(
-        'Erreur interne du serveur',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.log(error);
+      return error.status;
     }
   }
 
