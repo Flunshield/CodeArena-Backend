@@ -2,11 +2,11 @@ version: '3.5'
 
 services:
   mariadb:
-    image: mariadb:10.6.16
+    image: mariadb:${MARIADBVERSION}
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: frenchcodearena
+      MYSQL_DATABASE: ${MARIADB}
     ports:
       - ${MARIADB_PORTS}:3306
     volumes:
@@ -35,6 +35,7 @@ services:
       - MAIL_PASSWORD=${MAIL_PASSWORD}
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_TO=${MAIL_TO}
+      - COOKIE=${COOKIE}
     depends_on:
       - mariadb
     volumes:

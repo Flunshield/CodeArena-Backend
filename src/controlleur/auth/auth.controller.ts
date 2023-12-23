@@ -13,8 +13,7 @@ import { UserConnect } from '../../interfaces/userInterface';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AuthService } from '../../services/authentificationService/auth.service';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
-
-//TODO: Implémenter le refreshToken.
+import * as cookie from 'cookie';
 
 /**
  * Contrôleur pour gérer les opérations d'authentification.
@@ -51,7 +50,7 @@ export class AuthController {
     @Res({ passthrough: true }) response,
   ) {
     try {
-      const frenchCodeAreaCookie = request.cookies.frenchcodeareatoken;
+      const frenchCodeAreaCookie = request.cookies['frenchcodeareatoken'];
       const reponse = await this.AuthService.connect(
         userLogin,
         response,
@@ -66,7 +65,7 @@ export class AuthController {
         );
       }
     } catch (error: any) {
-      const status = error.status;
+      const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
       throw new HttpException(error.message, status);
     }
   }
@@ -96,13 +95,41 @@ export class AuthController {
   @Post('refresh-access-token')
   async refreshAccessToken(@Req() request, @Res() response): Promise<void> {
     try {
-      const refreshToken = request.cookies.frenchcodeareatoken;
+      const refreshToken = request.cookies['frenchcodeareatoken'];
       const accessToken =
         await this.refreshTokenService.generateAccessTokenFromRefreshToken(
           refreshToken,
         );
-      console.log('accessToken : ', accessToken);
       response.send({ accessToken: accessToken });
+    } catch (error: any) {
+      console.error("Erreur lors de la récupération de l'accesToken :", error);
+      throw new HttpException(
+        'Erreur interne du serveur',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('logout')
+  async logout(@Req() request, @Res() response): Promise<void> {
+    try {
+      const refreshToken = request.cookies['frenchcodeareatoken'];
+      if (refreshToken) {
+        const nomDuCookie = 'frenchcodeareatoken';
+
+        // Suppression du cookie côté serveur
+        response.setHeader(
+          'Set-Cookie',
+          cookie.serialize(nomDuCookie, '', {
+            httpOnly: true,
+            maxAge: 0,
+            domain: 'localhost', // Assurez-vous de spécifier le même chemin que celui utilisé pour définir le cookie
+          }),
+        );
+
+        // Envoyez une réponse pour confirmer la suppression du cookie
+        response.send('Cookie supprimé avec succès');
+      }
     } catch (error: any) {
       console.error("Erreur lors de la récupération de l'accesToken :", error);
       throw new HttpException(

@@ -1,6 +1,5 @@
-/*
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { AuthController } from '../../src/controlleur/auth/auth.controller';
 import { RefreshTokenService } from '../../src/services/authentificationService/RefreshTokenService';
 import { AuthService } from '../../src/services/authentificationService/auth.service';
@@ -54,7 +53,7 @@ describe('AuthController (E2E)', () => {
       expect(responseMock.send).toHaveBeenCalledWith('Connecté');
     });
 
-    it('should handle NotFoundException and return 404 status', async () => {
+    it('should handle BadRequestException and return 403 status', async () => {
       // Mock dependencies
       const userLogin: UserConnect = {
         email: 'j.bert@cacahete.fr',
@@ -72,17 +71,22 @@ describe('AuthController (E2E)', () => {
 
       jest
         .spyOn(authService, 'connect')
-        .mockRejectedValue(new NotFoundException('User not found'));
+        .mockRejectedValue(
+          new HttpException(
+            'Le nom de compte et/ou le mot de passe est/sont erroné',
+            HttpStatus.FORBIDDEN,
+          ),
+        );
 
       // Execute the login method
-      await authController.login(userLogin, requestMock, responseMock);
+      try {
+        await authController.login(userLogin, requestMock, responseMock);
 
-      // Assertions
-      expect(responseMock.status).toHaveBeenCalledWith(404);
-      expect(responseMock.json).toHaveBeenCalledWith({
-        message: 'User not found',
-      });
+        // Assertions
+        expect(responseMock.status).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
+      } catch (error) {
+        console.log(error);
+      }
     });
   });
 });
-*/

@@ -32,6 +32,7 @@ export class AppModule implements NestModule {
       .apply(VerifyJwtMiddleware)
       .exclude(
         { path: 'auth/login', method: RequestMethod.POST },
+        { path: 'auth/logout', method: RequestMethod.POST },
         { path: 'auth/refresh-access-token', method: RequestMethod.POST },
         { path: 'user/creatUser', method: RequestMethod.POST },
         { path: 'auth/validMail', method: RequestMethod.GET },

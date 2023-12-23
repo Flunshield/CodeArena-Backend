@@ -126,15 +126,18 @@ export class AuthService {
             id: number;
           };
           if (decodedToken) {
-            return new HttpException(
+            throw new HttpException(
               'Utilisateur déja connecté',
-              HttpStatus.FORBIDDEN,
+              HttpStatus.NOT_FOUND,
             );
           } else {
-            return new HttpException('Token erroné', HttpStatus.FORBIDDEN);
+            throw new HttpException('Token erroné', HttpStatus.BAD_REQUEST);
           }
         } catch (verifyError) {
-          throw new HttpException('Vérification érroné', HttpStatus.FORBIDDEN);
+          throw new HttpException(
+            'Vérification érroné',
+            HttpStatus.BAD_REQUEST,
+          );
         }
       }
 
@@ -156,26 +159,25 @@ export class AuthService {
             return HttpStatus.OK;
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
-            return new HttpException(
-              'Erreur sur la elcture de al private key',
+            throw new HttpException(
+              'Erreur sur la lecture de la private key',
               HttpStatus.EXPECTATION_FAILED,
             );
           }
         } else {
-          return new HttpException(
+          throw new HttpException(
             'Le nom de compte et/ou le mot de passe est/sont erroné',
             HttpStatus.BAD_REQUEST,
           );
         }
       } else {
-        return new HttpException(
+        throw new HttpException(
           'Le nom de compte et/ou le mot de passe est/sont erroné',
           HttpStatus.BAD_REQUEST,
         );
       }
     } catch (error) {
-      console.log(error);
-      return error.status;
+      return error.status || HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
 
