@@ -103,10 +103,7 @@ export class AuthController {
       response.send({ accessToken: accessToken });
     } catch (error: any) {
       console.error("Erreur lors de la récupération de l'accesToken :", error);
-      throw new HttpException(
-        'Erreur interne du serveur',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Merci de vous authentifier', error.HttpStatus);
     }
   }
 
