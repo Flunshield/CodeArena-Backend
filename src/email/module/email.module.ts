@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
+//TODO: a modifier avec le nouveau nom de domaine
 @Module({
   imports: [
     MailerModule.forRoot({

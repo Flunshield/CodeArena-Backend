@@ -59,11 +59,4 @@ export class UserController {
       );
     }
   }
-  catch(error: any): void {
-    console.error("Erreur lors de la création de l'utilisateur :", error);
-    throw new HttpException(
-      'Erreur interne du serveur',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
-  }
 }

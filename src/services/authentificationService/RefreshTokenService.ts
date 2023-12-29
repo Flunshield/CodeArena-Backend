@@ -130,8 +130,7 @@ export class RefreshTokenService {
           expiresIn: '6m',
           header: { alg: 'RS256', typ: 'access' },
         };
-        const tokenSigned = sign(payload, privateKey, options);
-        return tokenSigned;
+        return sign(payload, privateKey, options);
       } else {
         return 'Nok';
       }
@@ -139,5 +138,36 @@ export class RefreshTokenService {
       // Gérer l'erreur, par exemple, le refresh token est invalide
       throw new Error('Invalid refresh token');
     }
+  }
+
+  /**
+   * Génère un jeton d'accès pour l'e-mail avec les informations spécifiées.
+   *
+   * @param id - L'identifiant numérique associé à l'utilisateur.
+   * @param userName - Le nom d'utilisateur lié à l'utilisateur.
+   * @returns Une chaîne représentant le jeton d'accès généré.
+   * @throws {Error} Une erreur est levée si la lecture de la clé privée échoue ou si la génération du jeton échoue.
+   *
+   * @remarks
+   * Cette fonction utilise l'algorithme de signature RS256 et expire après 5 minutes.
+   * La clé privée utilisée pour signer le jeton est lue à partir du fichier 'private_key.pem'.
+   * Le jeton généré a un en-tête indiquant l'algorithme ('RS256') et le type ('access').
+   *
+   * @example
+   * ```typescript
+   * const id = 123;
+   * const userName = 'john_doe';
+   * const accessToken = await generateAccessTokenEmail(id, userName);
+   * console.log(accessToken);
+   * ```
+   */
+  async generateAccesTokenEmail(id: number, userName: string): Promise<string> {
+    const options: SignOptions = {
+      algorithm: 'RS256',
+      expiresIn: '5m',
+      header: { alg: 'RS256', typ: 'access' },
+    };
+    const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
+    return jwt.sign({ id: id, userName: userName }, privateKey, options);
   }
 }

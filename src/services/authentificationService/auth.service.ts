@@ -1,6 +1,10 @@
 import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { User, UserConnect } from '../../interfaces/userInterface';
+import {
+  DecodedTokenController,
+  User,
+  UserConnect,
+} from '../../interfaces/userInterface';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { PrismaClient } from '@prisma/client';
@@ -184,8 +188,7 @@ export class AuthService {
   /**
    * Méthode pour valider l'adresse e-mail d'un utilisateur.
    *
-   * @param userName - Le nom d'utilisateur de l'utilisateur.
-   * @param id - L'identifiant unique de l'utilisateur.
+   * @param token
    * @returns {Promise<void>} Une promesse résolue une fois la mise à jour de l'utilisateur effectuée avec succès.
    *
    * @throws {HttpException} - Une exception HTTP en cas d'erreur interne du serveur.
@@ -209,20 +212,30 @@ export class AuthService {
    *   }
    * }
    */
-  async validMail(userName: string, id: number): Promise<void> {
+  async validMail(token: string): Promise<HttpStatus> {
     try {
-      prisma.user.update({
-        where: { id: id, userName: userName },
-        data: {
-          emailVerified: true,
-          status: 'actif',
-        },
-      });
+      const publicKey = fs.readFileSync('public_key.pem', 'utf-8'),
+        verifedToken: DecodedTokenController = jwt.verify(
+          token,
+          publicKey,
+        ) as unknown as DecodedTokenController;
+      console.log(verifedToken);
+      if (verifedToken?.exp - verifedToken?.iat > 0) {
+        await prisma.user.update({
+          where: {
+            id: verifedToken.aud[0].id,
+            userName: verifedToken.aud[0].userName,
+          },
+          data: {
+            emailVerified: true,
+            status: 'actif',
+          },
+        });
+        return HttpStatus.OK;
+      }
+      return HttpStatus.GATEWAY_TIMEOUT;
     } catch (error) {
-      throw new HttpException(
-        'Erreur interne du serveur',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
     }
   }
 }

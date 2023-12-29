@@ -15,6 +15,8 @@ import { AuthService } from '../../services/authentificationService/auth.service
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import * as cookie from 'cookie';
 
+//TODO: Ajouter une vérification au login pour l'email vérifier, si non, renvoyer un mail de validation
+
 /**
  * Contrôleur pour gérer les opérations d'authentification.
  *
@@ -107,6 +109,26 @@ export class AuthController {
     }
   }
 
+  /**
+   * Déconnecte l'utilisateur en supprimant le cookie de rafraîchissement.
+   *
+   * @param request - L'objet de requête express.
+   * @param response - L'objet de réponse express.
+   * @returns Une promesse résolue lorsque la déconnexion est effectuée avec succès.
+   *
+   * @throws {HttpException} - Erreur interne du serveur en cas d'échec de la déconnexion.
+   *
+   * @remarks
+   * Cette méthode gère la déconnexion en supprimant le cookie de rafraîchissement côté serveur.
+   * Elle renvoie une réponse confirmant la suppression du cookie.
+   *
+   * @example
+   * ```typescript
+   * await logout(request, response);
+   * ```
+   *
+   * @public
+   */
   @Post('logout')
   async logout(@Req() request, @Res() response): Promise<void> {
     try {
@@ -136,23 +158,62 @@ export class AuthController {
     }
   }
 
-  /*
-   * Ne fonctionne pas pour le moment
+  /**
+   * Endpoint pour la validation de l'adresse e-mail.
+   *
+   * @param token - Le jeton à utiliser pour la validation de l'adresse e-mail.
+   * @param response - L'objet de réponse express.
+   *
+   * @returns Une réponse HTTP représentant le statut de validation de l'adresse e-mail.
+   *
+   * @throws {HttpException} - Erreur interne du serveur en cas d'échec de la validation.
+   *
+   * @remarks
+   * Cette méthode permet de valider une adresse e-mail en utilisant un jeton spécifique.
+   * Elle renvoie le statut de la validation de l'adresse e-mail.
+   *
+   * @example
+   * ```typescript
+   * await validMail('votre_token', response);
+   * ```
+   *
+   * @public
    */
   @Get('/validMail')
-  async validMail(
-    @Query('id') id: number,
-    @Query('userName') userName: string,
-    @Res() response,
-  ) {
-    const test = await this.AuthService.validMail(userName, id);
-    response.send(test);
+  async validMail(@Query('token') token: string, @Res() response) {
+    try {
+      const validMail: HttpStatus = await this.AuthService.validMail(token);
+      response.send(validMail);
+    } catch (error: any) {
+      console.error("Erreur lors de la création de l'utilisateur :", error);
+      throw new HttpException(
+        'Erreur interne du serveur',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
-  catch(error: any): void {
-    console.error("Erreur lors de la création de l'utilisateur :", error);
-    throw new HttpException(
-      'Erreur interne du serveur',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
+
+  /**
+   * Cette fonction permet à l'utilisateur de vérifier son email à sa demande.
+   * @param request
+   * @param response
+   */
+  @Get('verifyMail')
+  async verifyMail(@Req() request, @Res() response) {
+    try {
+      const accesToken = request.headers.authorization;
+      if (accesToken) {
+        const token = accesToken.split(' ')[1];
+
+        try {
+          await this.AuthService.validMail(token);
+          response.send();
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

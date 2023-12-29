@@ -55,6 +55,6 @@ export class VerifyJwtMiddleware implements NestMiddleware {
   }
 }
 
-interface DecodedToken {
+export interface DecodedToken {
   userId: string;
 }

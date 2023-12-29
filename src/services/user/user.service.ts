@@ -5,9 +5,9 @@ import { AuthService } from '../authentificationService/auth.service';
 import { MailService } from '../../email/service/MailService';
 import { User } from '../../interfaces/userInterface';
 
-//TODO: Modifier l'url de la variable urlActive lorsque le front sera créé.
-
 const prisma = new PrismaClient();
+
+//TODO: Lorsque la page "mon compte" sera créé coté front, il faudra gérer la vérification du mail. OU obliger a valdier le mail avant la première connexion.
 
 /**
  * Service responsable de la gestion des utilisateurs.
@@ -54,21 +54,25 @@ export class UserService {
         (exists: boolean) => exists,
       );
       if (!userExist) {
-        const createUser = await prisma.user.create({
+        const password: string = await AuthService.hashPassword(data.password);
+        const createUser: User = await prisma.user.create({
           data: {
             userName: data.userName,
-            password: await AuthService.hashPassword(data.password),
+            password: password,
             email: data.email,
             firstName: data.firstName,
             lastName: data.lastName,
             groupsId: 1, //Par défaut groupe 1 qui équivaut au groupe utilisateur lambda
           },
         });
-        const sendMail: boolean = await this.MailService.sendActiveAccount(
+
+        // Realise les actions necessaire à l'envoie du mail de création de compte.
+        const responseSendMail = await this.MailService.prepareMail(
+          createUser.id,
           data,
-          `http://localhost:3000/auth/validMail?id=${createUser.id}&userName=${createUser.userName}`,
         );
-        return createUser && sendMail;
+
+        return createUser && responseSendMail;
       } else {
         //Si l'utilisateur existe déja
         return false;
