@@ -41,3 +41,21 @@ services:
     volumes:
       - ./src:/app/src
 
+  # PROD
+  #  app:
+  #    image: flusnhield/notre_projet_api:1.0.0
+  #    container_name: nest
+  #    ports:
+  #      - '3000:3000'
+  #    environment:
+  #      - DATABASE_URL=${DATABASE_URL}
+  #      - MAIL=${MAIL}
+  #      - MAIL_PASSWORD=${MAIL_PASSWORD}
+  #      - MAIL_HOST=${MAIL_HOST}
+  #      - MAIL_TO=${MAIL_TO}
+  #      - COOKIE=${COOKIE}
+  #    depends_on:
+  #      - mariadb
+  #    volumes:
+  #      - ./src:/app/src
+
