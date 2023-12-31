@@ -103,27 +103,29 @@ export class RefreshTokenService {
       const { sub: userId } = jwt.verify(refreshToken, publicKey);
       const user = await this.prisma.user.findUnique({
         where: { id: parseInt(userId as string, 10) },
+        include: {
+          groups: true,
+        },
       });
 
       const tokenHeader = jwt.decode(refreshToken, { complete: true })?.header;
       if (tokenHeader?.typ === 'refresh') {
         const payload = {
           sub: userId,
-          aud: [
-            {
-              userName: user.userName,
-              email: user.email,
-              emailVerifed: user.emailVerified,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              lastLogin: user.lastLogin,
-              createdAt: user.createdAt,
-              status: user.status,
-              avatar: user.avatar,
-              groups: user.groupsId,
-              languagePreference: user.languagePreference,
-            },
-          ],
+          aud: {
+            userName: user.userName,
+            email: user.email,
+            emailVerifed: user.emailVerified,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            lastLogin: user.lastLogin,
+            createdAt: user.createdAt,
+            status: user.status,
+            avatar: user.avatar,
+            groups: user.groupsId,
+            languagePreference: user.languagePreference,
+            group: user.groups,
+          },
         };
         const options: SignOptions = {
           algorithm: 'RS256',

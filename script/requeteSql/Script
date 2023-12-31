@@ -1,8 +1,8 @@
 -- Insérer des données dans la table Groups
 INSERT INTO Groups (name, roles) VALUES
-  ('Group1', 'Role1,Role2'),
-  ('Group2', 'Role3,Role4'),
-  ('Group3', 'Role5,Role6');
+  ('Group1', 'User'),
+  ('Group2', 'Admin'),
+  ('Group3', 'Entreprise');
 
 -- Insérer des données dans la table User
 INSERT INTO User (userName, password, email, emailVerified, createdAt, lastLogin, status, avatar, firstName, lastName, groupsId, languagePreference) VALUES

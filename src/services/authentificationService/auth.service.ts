@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import {
-  DecodedTokenController,
+  DecodedTokenMail,
   User,
   UserConnect,
 } from '../../interfaces/userInterface';
@@ -215,16 +215,15 @@ export class AuthService {
   async validMail(token: string): Promise<HttpStatus> {
     try {
       const publicKey = fs.readFileSync('public_key.pem', 'utf-8'),
-        verifedToken: DecodedTokenController = jwt.verify(
+        verifedToken: DecodedTokenMail = jwt.verify(
           token,
           publicKey,
-        ) as unknown as DecodedTokenController;
-      console.log(verifedToken);
+        ) as unknown as DecodedTokenMail;
       if (verifedToken?.exp - verifedToken?.iat > 0) {
         await prisma.user.update({
           where: {
-            id: verifedToken.aud[0].id,
-            userName: verifedToken.aud[0].userName,
+            id: verifedToken.id,
+            userName: verifedToken.userName,
           },
           data: {
             emailVerified: true,

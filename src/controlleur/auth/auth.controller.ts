@@ -8,14 +8,20 @@ import {
   Query,
   Req,
   Res,
+  SetMetadata,
+  UseGuards,
 } from '@nestjs/common';
 import { UserConnect } from '../../interfaces/userInterface';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AuthService } from '../../services/authentificationService/auth.service';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import * as cookie from 'cookie';
+import { RolesGuard } from '../../guards/roles.guard';
+import { ADMIN, ENTREPRISE, USER } from '../../Constantes/contante';
 
 //TODO: Ajouter une vérification au login pour l'email vérifier, si non, renvoyer un mail de validation
+
+export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
 /**
  * Contrôleur pour gérer les opérations d'authentification.
@@ -162,7 +168,7 @@ export class AuthController {
    * Endpoint pour la validation de l'adresse e-mail.
    *
    * @param token - Le jeton à utiliser pour la validation de l'adresse e-mail.
-   * @param response - L'objet de réponse express.
+   * @param response - Renvoie vers l'url approprié
    *
    * @returns Une réponse HTTP représentant le statut de validation de l'adresse e-mail.
    *
@@ -183,7 +189,11 @@ export class AuthController {
   async validMail(@Query('token') token: string, @Res() response) {
     try {
       const validMail: HttpStatus = await this.AuthService.validMail(token);
-      response.send(validMail);
+      if (validMail == 200) {
+        response.redirect('http://localhost:5173/login');
+      } else {
+        response.redirect('http://localhost:5173/notFound');
+      }
     } catch (error: any) {
       console.error("Erreur lors de la création de l'utilisateur :", error);
       throw new HttpException(
@@ -199,6 +209,8 @@ export class AuthController {
    * @param response
    */
   @Get('verifyMail')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
   async verifyMail(@Req() request, @Res() response) {
     try {
       const accesToken = request.headers.authorization;

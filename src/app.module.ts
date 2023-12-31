@@ -14,6 +14,7 @@ import { VerifyJwtMiddleware } from './midleWare/jwt-utils';
 import { EmailModule } from './email/module/email.module';
 import { MailService } from './email/service/MailService';
 import { RefreshTokenService } from './services/authentificationService/RefreshTokenService';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [EmailModule],
@@ -24,6 +25,7 @@ import { RefreshTokenService } from './services/authentificationService/RefreshT
     AuthService,
     MailService,
     RefreshTokenService,
+    RolesGuard,
   ],
 })
 export class AppModule implements NestModule {
