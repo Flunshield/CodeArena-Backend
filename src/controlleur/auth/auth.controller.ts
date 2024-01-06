@@ -189,7 +189,7 @@ export class AuthController {
   async validMail(@Query('token') token: string, @Res() response) {
     try {
       const validMail: HttpStatus = await this.AuthService.validMail(token);
-      if (validMail == 200) {
+      if (validMail === 200) {
         response.redirect('http://localhost:5173/login');
       } else {
         response.redirect('http://localhost:5173/notFound');

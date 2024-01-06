@@ -15,9 +15,30 @@ import { EmailModule } from './email/module/email.module';
 import { MailService } from './email/service/MailService';
 import { RefreshTokenService } from './services/authentificationService/RefreshTokenService';
 import { RolesGuard } from './guards/roles.guard';
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
+import * as path from 'path';
 
 @Module({
-  imports: [EmailModule],
+  imports: [
+    EmailModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'fr',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+        new HeaderResolver(['x-lang']),
+      ],
+    }),
+  ],
   controllers: [AppController, UserController, AuthController],
   providers: [
     AppService,
@@ -38,6 +59,7 @@ export class AppModule implements NestModule {
         { path: 'auth/refresh-access-token', method: RequestMethod.POST },
         { path: 'user/creatUser', method: RequestMethod.POST },
         { path: 'auth/validMail', method: RequestMethod.GET },
+        { path: '/traduction', method: RequestMethod.GET },
       )
       .forRoutes('*');
   }
