@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 
 services:
   mariadb:
@@ -10,7 +10,7 @@ services:
     ports:
       - ${MARIADB_PORTS}:3306
     volumes:
-      - ${MARIADB_PATH}:/var/lib/mariadb
+      - ${MARIADB_PATH}:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.2

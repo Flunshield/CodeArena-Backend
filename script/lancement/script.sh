@@ -9,7 +9,7 @@ docker compose build
 docker compose up -d
 
 # Attendre que les conteneurs soient prêts
-sleep 10
+sleep 20
 
 # Exécuter une commande dans le conteneur Docker (bash dans cet exemple)
 docker exec -it nest bash -c "npx prisma migrate dev"
