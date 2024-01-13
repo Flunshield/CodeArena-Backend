@@ -10,10 +10,9 @@ import * as fs from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { RefreshTokenService } from './RefreshTokenService';
 import { Response } from 'express';
+import { MailService } from '../../email/service/MailService';
 
 const prisma = new PrismaClient();
-
-//TODO: Mettre à jour la méthode validMail quand le front sera créé.
 
 /**
  * Service responsable de la gestion de l'authentification et du hachage des mots de passe.
@@ -31,7 +30,10 @@ const prisma = new PrismaClient();
  */
 @Injectable()
 export class AuthService {
-  constructor(private readonly refreshTokenService: RefreshTokenService) {}
+  constructor(
+    private readonly refreshTokenService: RefreshTokenService,
+    private readonly mailService: MailService,
+  ) {}
 
   /**
    * Hache le mot de passe fourni en utilisant la bibliothèque bcrypt.
@@ -233,6 +235,88 @@ export class AuthService {
         return HttpStatus.OK;
       }
       return HttpStatus.GATEWAY_TIMEOUT;
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+    }
+  }
+
+  async passwordForgot(email: string): Promise<HttpStatus> {
+    const userListe = await prisma.user.findMany();
+
+    let data = {
+      userName: '',
+      email: '',
+      id: null,
+    };
+
+    const userExistPromises: Promise<boolean>[] = userListe.map(
+      async (user) => {
+        if (user.email === email) {
+          data = {
+            id: user.id,
+            userName: user.userName,
+            email: user.email,
+          };
+        }
+        return user.email === email;
+      },
+    );
+
+    // Attendez que toutes les vérifications soient terminées
+    const userExistArray: boolean[] = await Promise.all(userExistPromises);
+
+    if (!userExistArray) {
+      return HttpStatus.BAD_REQUEST;
+    } else if (userExistArray) {
+      // Realise les actions necessaire à l'envoie du mail d'oublie de mot de passe.
+      console.log('data_authService : ', data);
+      const responseSendMail = await this.mailService.prepareMail(
+        data.id,
+        data,
+        2,
+      );
+
+      if (responseSendMail) {
+        return HttpStatus.OK;
+      } else {
+        return HttpStatus.NOT_FOUND;
+      }
+    }
+  }
+
+  async changePassword(data: UserConnect): Promise<HttpStatus> {
+    try {
+      const userListe = await prisma.user.findMany();
+
+      const userExistPromises: Promise<boolean>[] = userListe.map(
+        async (user) => {
+          return user.userName === data.userName;
+        },
+      );
+
+      // Attendez que toutes les vérifications soient terminées
+      const userExistArray: boolean[] = await Promise.all(userExistPromises);
+
+      // Vérifiez s'il y a un utilisateur existant
+      const userExist: boolean = userExistArray.some(
+        (exists: boolean) => exists,
+      );
+
+      if (userExist) {
+        const password: string = await AuthService.hashPassword(data.password);
+        await prisma.user.update({
+          where: {
+            userName: data.userName,
+          },
+          data: {
+            password: password,
+          },
+        });
+        return HttpStatus.OK;
+      }
+      if (!userExist) {
+        return HttpStatus.NOT_FOUND;
+      }
     } catch (error) {
       console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
     }

@@ -54,3 +54,13 @@ export interface DecodedTokenMail {
   iat: number;
   exp: number;
 }
+
+export interface UserMail {
+  id?: number;
+  userName?: string;
+  password?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  groupsId?: number;
+}

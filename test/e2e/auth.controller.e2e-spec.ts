@@ -4,22 +4,24 @@ import { AuthController } from '../../src/controlleur/auth/auth.controller';
 import { RefreshTokenService } from '../../src/services/authentificationService/RefreshTokenService';
 import { AuthService } from '../../src/services/authentificationService/auth.service';
 import { UserConnect } from '../../src/interfaces/userInterface';
+import { MailService } from '../../src/email/service/MailService';
 
 describe('AuthController (E2E)', () => {
   let authController: AuthController;
   let authService: AuthService;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let refreshTokenService: RefreshTokenService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService, RefreshTokenService],
+      providers: [
+        AuthService,
+        RefreshTokenService,
+        { provide: MailService, useValue: {} }, // Mock de MailService
+      ],
     }).compile();
 
     authController = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);
-    refreshTokenService = module.get<RefreshTokenService>(RefreshTokenService);
   });
 
   describe('login', () => {

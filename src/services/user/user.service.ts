@@ -42,7 +42,7 @@ export class UserService {
 
       const userExistPromises: Promise<boolean>[] = userListe.map(
         async (user) => {
-          return user.userName === data.userName;
+          return user.userName === data.userName || user.email === data.email;
         },
       );
 
@@ -53,6 +53,7 @@ export class UserService {
       const userExist: boolean = userExistArray.some(
         (exists: boolean) => exists,
       );
+
       if (!userExist) {
         const password: string = await AuthService.hashPassword(data.password);
         const createUser: User = await prisma.user.create({
@@ -70,6 +71,7 @@ export class UserService {
         const responseSendMail = await this.MailService.prepareMail(
           createUser.id,
           data,
+          1,
         );
 
         return createUser && responseSendMail;

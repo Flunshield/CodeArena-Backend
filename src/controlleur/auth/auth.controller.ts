@@ -17,7 +17,7 @@ import { AuthService } from '../../services/authentificationService/auth.service
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import * as cookie from 'cookie';
 import { RolesGuard } from '../../guards/roles.guard';
-import { ADMIN, ENTREPRISE, USER } from '../../Constantes/contante';
+import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 
 //TODO: Ajouter une vérification au login pour l'email vérifier, si non, renvoyer un mail de validation
 
@@ -226,6 +226,36 @@ export class AuthController {
       }
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  @Post('forgotPassWord')
+  async forgotPassWord(@Req() request, @Res() response) {
+    try {
+      const email = request.body.email;
+      try {
+        await this.AuthService.passwordForgot(email);
+        response.send();
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Post('/changePassword')
+  async changePassword(@Req() request, @Res() response) {
+    const data = request.body;
+    try {
+      await this.AuthService.changePassword(data);
+      response.send();
+    } catch (error: any) {
+      console.error("Erreur lors de la création de l'utilisateur :", error);
+      throw new HttpException(
+        'Erreur interne du serveur',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

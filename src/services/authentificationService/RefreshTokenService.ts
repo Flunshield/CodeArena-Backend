@@ -37,7 +37,7 @@ export class RefreshTokenService {
    *   }
    * }
    */
-  async generateRefreshToken(
+  public async generateRefreshToken(
     userId: number,
     res: Response,
   ): Promise<HttpException> {
@@ -167,6 +167,18 @@ export class RefreshTokenService {
     const options: SignOptions = {
       algorithm: 'RS256',
       expiresIn: '5m',
+      header: { alg: 'RS256', typ: 'access' },
+    };
+    const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
+    return jwt.sign({ id: id, userName: userName }, privateKey, options);
+  }
+  async generateAccesTokenPasswordChange(
+    id: number,
+    userName: string,
+  ): Promise<string> {
+    const options: SignOptions = {
+      algorithm: 'RS256',
+      expiresIn: '10m',
       header: { alg: 'RS256', typ: 'access' },
     };
     const privateKey = fs.readFileSync('private_key.pem', 'utf-8');

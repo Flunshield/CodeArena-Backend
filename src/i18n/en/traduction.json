@@ -1,5 +1,27 @@
 {
   "slogan": "Code your victory, experience developer esports",
   "connection": "Sing in",
-  "inscription": "Sing up"
+  "inscription": "Sing up",
+  "userName": "Username",
+  "signWith": "Sign in with",
+  "password": "Password",
+  "connect": "Connect",
+  "disonnect": "To Disonnect",
+  "email": "Email",
+  "register": "Create an account",
+  "signIntoCodeArena": "Sign in to GitHub",
+  "errorNdcMdp": "Account name and/or password is/are incorrect",
+  "errorConnection": "Connection error. Please try again.",
+  "ndcMandatory": "Username is mandatory",
+  "mdpMandatory": "Password is mandatory",
+  "ndcMdpMandatory": "Username and password are mandatory",
+  "forgotPassword": "Forgot your password ?",
+  "createAccount": "Create account",
+  "forgotPasswordTitle": "Password forgotten",
+  "submitRequest": "Submit your request",
+  "confirmePassword": "Confirm password",
+  "passwordChange": "Password changed",
+  "tokenchangePasswordExpired": "The time limit for changing your password has expired. Please renew your request.",
+  "mailConfirmMail": "An email to confirm your email address has been sent",
+  "mailOrUserNameExist": "Account name and/or e-mail address already exist"
 }

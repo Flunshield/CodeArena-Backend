@@ -33,7 +33,7 @@ import * as path from 'path';
         watch: true,
       },
       resolvers: [
-        { use: QueryResolver, options: ['lang'] },
+        { use: QueryResolver, options: ['pma_lang'] },
         AcceptLanguageResolver,
         new HeaderResolver(['x-lang']),
       ],
@@ -60,6 +60,7 @@ export class AppModule implements NestModule {
         { path: 'user/creatUser', method: RequestMethod.POST },
         { path: 'auth/validMail', method: RequestMethod.GET },
         { path: '/traduction', method: RequestMethod.GET },
+        { path: 'auth/forgotPassWord', method: RequestMethod.POST },
       )
       .forRoutes('*');
   }
