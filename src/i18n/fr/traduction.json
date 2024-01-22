@@ -23,5 +23,13 @@
   "passwordChange": "Le mot de passe a été changé",
   "tokenchangePasswordExpired": "Le délai autorisé pour la modification du mot de passe a expiré, veuillez renouveler votre demande.",
   "mailConfirmMail": "Un mail pour confirmer votre adresse mail a été envoyé",
-  "mailOrUserNameExist": "Le nom de compte et/ou l'adresse mail existe déja"
+  "mailOrUserNameExist": "Le nom de compte et/ou l'adresse mail existe déja",
+  "CodeArena": "CodeArena",
+  "entreprise": "Entreprises",
+  "partenaire": "Partenaires",
+  "contact": "Nous contacter",
+  "politiqueConfidentialite": "Politique de confidentialité",
+  "mentionLegal": "Mentions légales",
+  "cgv": "CGV",
+  "retrouverNous": "Retrouvez-nous" 
 }

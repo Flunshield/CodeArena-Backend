@@ -23,5 +23,13 @@
   "passwordChange": "Password changed",
   "tokenchangePasswordExpired": "The time limit for changing your password has expired. Please renew your request.",
   "mailConfirmMail": "An email to confirm your email address has been sent",
-  "mailOrUserNameExist": "Account name and/or e-mail address already exist"
+  "mailOrUserNameExist": "Account name and/or e-mail address already exist",
+  "CodeArena": "CodeArena",
+  "entreprise": "Companys",
+  "partenaire": "Partners",
+  "contact": "Contact us",
+  "politiqueConfidentialite": "Privacy policy",
+  "mentionLegal": "Terms of use",
+  "cgv": "CGV",
+  "retrouverNous": "Visit us at" 
 }
