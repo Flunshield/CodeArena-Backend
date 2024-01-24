@@ -7,26 +7,111 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                 Int       @id @default(autoincrement())
-  userName           String    @unique
-  password           String
-  email              String
-  emailVerified      Boolean   @default(false)
-  createdAt          DateTime  @default(now())
-  lastLogin          DateTime?
-  status             String    @default("inactive")
-  avatar             String?
+model user {
+  id                 Int              @id @default(autoincrement())
   firstName          String?
   lastName           String?
-  groupsId           Int       @default(1)
+  userName           String           @unique
+  password           String
+  email              String
+  emailVerified      Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  lastLogin          DateTime?
   languagePreference String?
-  groups             Groups    @relation(fields: [groupsId], references: [id])
+  status             String           @default("inactive")
+  avatar             String?
+  localisation       String?
+  titles             String?
+  badges             String?
+  company            String?
+  url                String?
+  school             String?
+  github             String?
+  groupsId           Int              @default(1)
+  groups             groups           @relation(fields: [groupsId], references: [id])
+  Histories          histories[]
+  userRanking        userRanking[]
+  userTournament     userTournament[]
+  userMatch          userMatch[]
 }
 
-model Groups {
+model groups {
   id    Int     @id @default(autoincrement())
   name  String
   roles String?
-  users User[]
+  users user[]
+}
+
+model histories {
+  id               Int      @id @default(autoincrement())
+  userID           Int
+  user             user     @relation(fields: [userID], references: [id])
+  modificationType String
+  details          String
+  modificationDate DateTime
+  oldValue         String
+  newValue         String
+}
+
+model tournaments {
+  id             Int              @id @default(autoincrement())
+  startDate      DateTime
+  endDate        DateTime
+  playerMax      Int
+  title          String
+  description    String
+  rewards        String
+  matches        matches[]
+  userTournament userTournament[]
+}
+
+model rankings {
+  id          Int           @id @default(autoincrement())
+  startDate   DateTime
+  endDate     DateTime
+  title       String
+  description String
+  rewards     String
+  matches     matches[]
+  userRanking userRanking[]
+}
+
+model matches {
+  id           Int         @id @default(autoincrement())
+  date         DateTime
+  time         DateTime
+  location     String
+  status       String
+  score        Float
+  tournamentID Int
+  tournaments  tournaments @relation(fields: [tournamentID], references: [id])
+  rankingsID   Int
+  rankings     rankings    @relation(fields: [rankingsID], references: [id])
+  userMatch    userMatch[]
+}
+
+model userRanking {
+  id         Int      @id @default(autoincrement())
+  userID     Int
+  user       user     @relation(fields: [userID], references: [id])
+  rankingsID Int
+  rankings   rankings @relation(fields: [rankingsID], references: [id])
+  points     Float
+}
+
+model userTournament {
+  id           Int         @id @default(autoincrement())
+  userID       Int
+  user         user        @relation(fields: [userID], references: [id])
+  tournamentID Int
+  tournaments  tournaments @relation(fields: [tournamentID], references: [id])
+  points       Float
+}
+
+model userMatch {
+  id      Int     @id @default(autoincrement())
+  userID  Int
+  user    user    @relation(fields: [userID], references: [id])
+  matchID Int
+  matches matches @relation(fields: [matchID], references: [id])
 }

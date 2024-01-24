@@ -1,11 +1,11 @@
 -- Insérer des données dans la table Groups
-INSERT INTO Groups (name, roles) VALUES
+INSERT INTO groups (name, roles) VALUES
   ('Group1', 'User'),
   ('Group2', 'Admin'),
   ('Group3', 'Entreprise');
 
 -- Insérer des données dans la table User
-INSERT INTO User (userName, password, email, emailVerified, createdAt, lastLogin, status, avatar, firstName, lastName, groupsId, languagePreference) VALUES
+INSERT INTO user (userName, password, email, emailVerified, createdAt, lastLogin, status, avatar, firstName, lastName, groupsId, languagePreference) VALUES
   ('user1', 'password1', 'user1@example.com', true, '2023-01-01 12:00:00', '2023-01-02 10:30:00', 'active', 'avatar1.jpg', 'John', 'Doe', 1, 'en'),
   ('user2', 'password2', 'user2@example.com', true, '2023-01-03 14:45:00', '2023-01-04 08:20:00', 'inactive', 'avatar2.jpg', 'Jane', 'Doe', 2, 'fr'),
   ('user3', 'password3', 'user3@example.com', false, '2023-01-05 18:20:00', NULL, 'inactive', NULL, 'Bob', 'Smith', 3, 'es');
