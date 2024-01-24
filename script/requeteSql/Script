@@ -9,3 +9,12 @@ INSERT INTO user (userName, password, email, emailVerified, createdAt, lastLogin
   ('user1', 'password1', 'user1@example.com', true, '2023-01-01 12:00:00', '2023-01-02 10:30:00', 'active', 'avatar1.jpg', 'John', 'Doe', 1, 'en'),
   ('user2', 'password2', 'user2@example.com', true, '2023-01-03 14:45:00', '2023-01-04 08:20:00', 'inactive', 'avatar2.jpg', 'Jane', 'Doe', 2, 'fr'),
   ('user3', 'password3', 'user3@example.com', false, '2023-01-05 18:20:00', NULL, 'inactive', NULL, 'Bob', 'Smith', 3, 'es');
+
+-- Ajouter des rangs
+INSERT INTO rankings (startDate, endDate, title, description, rewards, maxPoints, minPoints) VALUES
+  (NOW(), NOW(), 'Bronze Rank', '0-99 points', 'Bronze Rewards', 99, 0),
+  (NOW(), NOW(), 'Silver Rank', '100-199 points', 'Silver Rewards', 199, 100),
+  (NOW(), NOW(), 'Gold Rank', '200-299 points', 'Gold Rewards', 299, 200),
+  (NOW(), NOW(), 'Diamond Rank', '300-399 points', 'Diamond Rewards', 499, 300),
+  (NOW(), NOW(), 'Emeraude Rank', '400-799 points', 'Emeraude Rewards', 999, 500),
+  (NOW(), NOW(), 'Master Rank', '800+ points', 'Master Rewards', 999999, 1000);

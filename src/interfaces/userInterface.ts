@@ -123,12 +123,10 @@ interface Ranking {
   userRanking: UserRanking[];
 }
 
-interface UserRanking {
+export interface UserRanking {
   id: number;
   userID: number;
-  user: User;
   rankingsID: number;
-  rankings: Ranking;
   points: number;
 }
 

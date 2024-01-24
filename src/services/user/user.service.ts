@@ -5,7 +5,7 @@ import { AuthService } from '../authentificationService/auth.service';
 import { MailService } from '../../email/service/MailService';
 import { User } from '../../interfaces/userInterface';
 
-const prisma = new PrismaClient();
+const prisma: PrismaClient = new PrismaClient();
 
 //TODO: Lorsque la page "mon compte" sera créé coté front, il faudra gérer la vérification du mail. OU obliger a valdier le mail avant la première connexion.
 
@@ -39,6 +39,12 @@ export class UserService {
   public async create(data: User): Promise<boolean> {
     try {
       const userListe = await prisma.user.findMany();
+      const rankListe = await prisma.rankings.findMany();
+
+      // On va chercher le rang bronze dans la table ranking
+      const rankBronze = rankListe.find((element) => {
+        return element.title === 'Bronze Rank';
+      });
 
       const userExistPromises: Promise<boolean>[] = userListe.map(
         async (user) => {
@@ -56,25 +62,39 @@ export class UserService {
 
       if (!userExist) {
         const password: string = await AuthService.hashPassword(data.password);
-        const createUser: User = await prisma.user.create({
-          data: {
-            userName: data.userName,
-            password: password,
-            email: data.email,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            groupsId: 1, //Par défaut groupe 1 qui équivaut au groupe utilisateur lambda
-          },
-        });
+        try {
+          const createUser: User = await prisma.user.create({
+            data: {
+              userName: data.userName,
+              password: password,
+              email: data.email,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              groupsId: 1, // Par défaut groupe 1 qui équivaut au groupe utilisation lambda
+            },
+          });
 
-        // Realise les actions necessaire à l'envoie du mail de création de compte.
-        const responseSendMail = await this.MailService.prepareMail(
-          createUser.id,
-          data,
-          1,
-        );
+          // createUser a réussi, procéder à la création de createRank
+          const newUserRanking = await prisma.userRanking.create({
+            data: {
+              userID: createUser.id /* ID de l'utilisateur associé */,
+              rankingsID: rankBronze.id /* ID du classement associé */,
+              points: 0 /* La valeur des points que vous souhaitez attribuer */,
+            },
+          });
 
-        return createUser && responseSendMail;
+          // Realise les actions necessaire à l'envoie du mail de création de compte.
+          const responseSendMail = await this.MailService.prepareMail(
+            createUser.id,
+            data,
+            1,
+          );
+
+          return createUser && newUserRanking && responseSendMail;
+        } catch (error) {
+          console.error("Erreur lors de la création de l'utilisateur :", error);
+          // Gérer l'erreur de création de l'utilisateur
+        }
       } else {
         //Si l'utilisateur existe déja
         return false;
