@@ -74,6 +74,8 @@ model rankings {
   rewards     String
   matches     matches[]
   userRanking userRanking[]
+  maxPoints   String
+  minPoints   String
 }
 
 model matches {
