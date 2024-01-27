@@ -46,5 +46,6 @@
   "noTournament": "No tournaments currently scheduled",
   "date": "The date : ",
   "noEvent": "No events scheduled at the moment",
-  "myAccount": "My account"
+  "myAccount": "My account",
+  "update": "Update"
 }

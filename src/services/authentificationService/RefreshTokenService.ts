@@ -125,6 +125,7 @@ export class RefreshTokenService {
             groups: user.groupsId,
             languagePreference: user.languagePreference,
             group: user.groups,
+            presentation: user.presentation,
           },
         };
         const options: SignOptions = {

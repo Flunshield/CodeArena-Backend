@@ -27,6 +27,7 @@ model user {
   url                String?
   school             String?
   github             String?
+  presentation       String?
   groupsId           Int              @default(1)
   groups             groups           @relation(fields: [groupsId], references: [id])
   Histories          histories[]

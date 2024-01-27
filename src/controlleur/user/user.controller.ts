@@ -3,10 +3,12 @@ import {
   Controller,
   HttpException,
   HttpStatus,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { UserService } from '../../services/user/user.service';
+import { User } from '../../interfaces/userInterface';
 
 /**
  * Contrôleur responsable de la gestion des utilisateurs.
@@ -57,6 +59,18 @@ export class UserController {
         "Le nom de compte n'est pas disponnible",
         HttpStatus.BAD_REQUEST,
       );
+    }
+  }
+
+  @Patch('/updateUser')
+  async update(@Body() user: User): Promise<HttpException> {
+    const response = await this.userService.update(user);
+    if (response === HttpStatus.OK) {
+      // Si la création réussi, on envoie un code HTTP 200.
+      return new HttpException('Utilistaeur mis à jour', HttpStatus.OK);
+    } else {
+      // Si la création échoue, on envoie une exception HTTP avec un code 400
+      throw new HttpException('Utilistaeur inconnu', HttpStatus.BAD_REQUEST);
     }
   }
 }

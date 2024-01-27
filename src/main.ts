@@ -7,7 +7,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     origin: true, // ou true pour permettre à tous les domaines
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true, // autoriser les cookies et les en-têtes d'autorisation
   });
   await app.listen(3000);

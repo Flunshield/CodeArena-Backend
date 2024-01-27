@@ -19,6 +19,7 @@ export interface User {
   url?: string;
   school?: string;
   github?: string;
+  presentation?: string;
   Histories?: Histories;
   userRanking?: UserRanking;
   userTournament?: UserTournament;
