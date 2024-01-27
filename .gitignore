@@ -42,9 +42,6 @@ ehthumbs.db
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
-# VS Code directories
-.vscode/
-
 # Windows Installer files
 *.cab
 *.msi
@@ -60,11 +57,7 @@ $RECYCLE.BIN/
 # Jupyter Notebooks
 .ipynb_checkpoints/
 
-# Visual Studio Code folders
-.vscode/
-
 # Node
-node_modules/
 npm-debug.log*
 
 # Yarn
@@ -89,20 +82,14 @@ logs
 *.sw?
 
 # OS generated files
-.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
 ehthumbs_vista.db
 
 # NestJS
 dist
-.env
-npm-debug.log*
-.env.local
 .env.test
 .env.development
 .env.production
@@ -120,11 +107,7 @@ prisma/.prisma/client
 tslint-report*
 
 # Yarn
-yarn-error.log
 .pnp.*
-
-# Jest
-coverage/
 
 # Cypress
 cypress/screenshots/
@@ -133,14 +116,11 @@ cypress/videos/
 # Debug logs
 debug.log
 
-# .vscode
-.vscode/
-
 # local env files
-.env.local
 .env.development.local
 .env.test.local
 .env.production.local
+!/.env-docker
 
 #bddMaria
 mariadb_data/*
