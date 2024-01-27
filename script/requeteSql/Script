@@ -18,3 +18,33 @@ INSERT INTO rankings (startDate, endDate, title, description, rewards, maxPoints
   (NOW(), NOW(), 'Diamond Rank', '300-399 points', 'Diamond Rewards', 499, 300),
   (NOW(), NOW(), 'Emeraude Rank', '400-799 points', 'Emeraude Rewards', 999, 500),
   (NOW(), NOW(), 'Master Rank', '800+ points', 'Master Rewards', 999999, 1000);
+
+-- Ajouter des tournois
+INSERT INTO tournaments (startDate, endDate, playerMax, title, description, rewards)
+VALUES
+  (NOW() + INTERVAL FLOOR(RAND() * 30) DAY, NOW() + INTERVAL FLOOR(RAND() * 60) DAY, FLOOR(RAND() * 100),
+  CONCAT('Tournament ', FLOOR(RAND() * 1000)),
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et tristique mauris. Integer at lacus id urna fringilla tempus.',
+  'Random Rewards'),
+  -- Ajoutez d'autres lignes comme nécessaire
+  (NOW() + INTERVAL FLOOR(RAND() * 30) DAY, NOW() + INTERVAL FLOOR(RAND() * 60) DAY, FLOOR(RAND() * 100),
+  CONCAT('Tournament ', FLOOR(RAND() * 1000)),
+  'Autre description aléatoire ici.',
+  'Autres récompenses');
+
+-- Ajouter des events
+INSERT INTO events (startDate, endDate, playerMax, title, description, rewards, organize)
+VALUES
+    (NOW() + INTERVAL FLOOR(RAND() * 30) DAY, NOW() + INTERVAL FLOOR(RAND() * 60) DAY, FLOOR(RAND() * 100),
+    CONCAT('Event ', FLOOR(RAND() * 1000)),
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et tristique mauris. Integer at lacus id urna fringilla tempus.',
+    'Random Rewards',
+    'Organizer 1'),
+    -- Ajoutez d'autres lignes comme nécessaire
+    (NOW() + INTERVAL FLOOR(RAND() * 30) DAY, NOW() + INTERVAL FLOOR(RAND() * 60) DAY, FLOOR(RAND() * 100),
+    CONCAT('Event ', FLOOR(RAND() * 1000)),
+    'Autre description aléatoire ici.',
+    'Autres récompenses',
+    'Organizer 2');
+
+

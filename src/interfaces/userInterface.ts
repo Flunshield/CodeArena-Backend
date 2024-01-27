@@ -1,7 +1,6 @@
 export interface User {
   id?: number;
   userName: string;
-  password: string;
   email: string;
   emailVerified?: boolean;
   createdAt?: Date;
@@ -37,7 +36,6 @@ export interface DecodedTokenController {
   aud: {
     id?: number;
     userName: string;
-    password: string;
     email: string;
     emailVerified?: boolean;
     createdAt?: Date;
@@ -53,10 +51,14 @@ export interface DecodedTokenController {
   iat: number;
   exp: number;
 }
-export interface UserConnect {
+
+export interface shortUser {
   userName: string;
   password?: string;
   email?: string;
+  id?: number;
+  firstName?: string;
+  lastName?: string;
 }
 
 export interface DecodedTokenMail {
@@ -76,7 +78,7 @@ export interface UserMail {
   groupsId?: number;
 }
 
-interface Histories {
+export interface Histories {
   id: number;
   userID: number;
   user: User;
@@ -87,7 +89,7 @@ interface Histories {
   newValue: string;
 }
 
-interface Tournament {
+export interface Tournament {
   id: number;
   startDate: Date;
   endDate: Date;
@@ -95,11 +97,9 @@ interface Tournament {
   title: string;
   description: string;
   rewards: string;
-  matches: Match[];
-  userTournaments: UserTournament[];
 }
 
-interface Match {
+export interface Match {
   id: number;
   date: Date;
   time: Date;
@@ -112,7 +112,7 @@ interface Match {
   rankings: Ranking;
 }
 
-interface Ranking {
+export interface Ranking {
   id: number;
   startDate: Date;
   endDate: Date;
@@ -124,13 +124,14 @@ interface Ranking {
 }
 
 export interface UserRanking {
-  id: number;
+  id?: number;
   userID: number;
-  rankingsID: number;
-  points: number;
+  user: User;
+  rankingsID?: number;
+  points?: number;
 }
 
-interface UserTournament {
+export interface UserTournament {
   id: number;
   userID: number;
   user: User;
@@ -139,10 +140,32 @@ interface UserTournament {
   points: number;
 }
 
-interface UserMatch {
+export interface UserMatch {
   id: number;
   userID: number;
   user: User;
   matchID: number;
   match: Match;
+}
+
+export interface Event {
+  id?: number;
+  startDate?: Date;
+  endDate?: Date;
+  playerMax?: number;
+  title?: string;
+  description?: string;
+  rewards?: string;
+  organize?: string;
+  matches?: Match[];
+  userEvent?: UserEvent[];
+}
+
+export interface UserEvent {
+  id: number;
+  userID: number;
+  user: User;
+  eventsID: number;
+  events: Event;
+  points: number;
 }

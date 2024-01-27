@@ -21,6 +21,8 @@ import {
   I18nModule,
   QueryResolver,
 } from 'nestjs-i18n';
+import { DashboardController } from './controlleur/dashboard/dashboard.controller';
+import { DashboardService } from './services/dashboard/dashboard.service';
 import * as path from 'path';
 
 @Module({
@@ -39,7 +41,12 @@ import * as path from 'path';
       ],
     }),
   ],
-  controllers: [AppController, UserController, AuthController],
+  controllers: [
+    AppController,
+    UserController,
+    AuthController,
+    DashboardController,
+  ],
   providers: [
     AppService,
     UserService,
@@ -47,6 +54,7 @@ import * as path from 'path';
     MailService,
     RefreshTokenService,
     RolesGuard,
+    DashboardService,
   ],
 })
 export class AppModule implements NestModule {

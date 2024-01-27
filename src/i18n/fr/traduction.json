@@ -38,5 +38,12 @@
   "tournaments": "Tournois",
   "event": "Évènement",
   "community": "Communauté",
-  "yourRank": "Votre rang"
+  "yourRank": "Votre rang",
+  "futurTournament": "Tournois à venir",
+  "the": "Le",
+  "at": "à",
+  "seeMore": "Voir plus",
+  "noTournament": "Aucun tournois pour le moment de prévu",
+  "date": "La date : ",
+  "noEvent": "Aucun événement n'est prévu pour le moment"
 }

@@ -1,10 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import {
-  DecodedTokenMail,
-  User,
-  UserConnect,
-} from '../../interfaces/userInterface';
+import { DecodedTokenMail, shortUser } from '../../interfaces/userInterface';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { PrismaClient } from '@prisma/client';
@@ -117,7 +113,7 @@ export class AuthService {
    * }
    */
   async connect(
-    credentials: UserConnect,
+    credentials: shortUser,
     @Res() res: Response,
     frenchCodeAreaCookie: string,
   ): Promise<HttpException | HttpStatus> {
@@ -147,7 +143,7 @@ export class AuthService {
         }
       }
 
-      const user: User = await prisma.user.findFirst({
+      const user: shortUser = await prisma.user.findFirst({
         where: {
           userName: credentials.userName,
         },
@@ -284,7 +280,7 @@ export class AuthService {
     }
   }
 
-  async changePassword(data: UserConnect): Promise<HttpStatus> {
+  async changePassword(data: shortUser): Promise<HttpStatus> {
     try {
       const userListe = await prisma.user.findMany();
 

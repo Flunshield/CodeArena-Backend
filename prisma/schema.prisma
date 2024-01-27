@@ -33,6 +33,7 @@ model user {
   userRanking        userRanking[]
   userTournament     userTournament[]
   userMatch          userMatch[]
+  userEvent          userEvent[]
 }
 
 model groups {
@@ -90,6 +91,8 @@ model matches {
   rankingsID   Int
   rankings     rankings    @relation(fields: [rankingsID], references: [id])
   userMatch    userMatch[]
+  eventsID     Int
+  events       events    @relation(fields: [eventsID], references: [id])
 }
 
 model userRanking {
@@ -116,4 +119,26 @@ model userMatch {
   user    user    @relation(fields: [userID], references: [id])
   matchID Int
   matches matches @relation(fields: [matchID], references: [id])
+}
+
+model events {
+  id             Int              @id @default(autoincrement())
+  startDate      DateTime
+  endDate        DateTime
+  playerMax      Int
+  title          String
+  description    String
+  rewards        String
+  organize       String
+  matches        matches[]
+  userEvent      userEvent[]
+}
+
+model userEvent {
+  id           Int         @id @default(autoincrement())
+  userID       Int
+  user         user        @relation(fields: [userID], references: [id])
+  eventsID     Int
+  events       events        @relation(fields: [eventsID], references: [id])
+  points       Float
 }

@@ -4,6 +4,7 @@ import { AuthService } from '../authentificationService/auth.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MailService } from '../../email/service/MailService';
 import { User } from '../../interfaces/userInterface';
+import { CreateUserDto } from '../../dto/CreateUserDto';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -29,6 +30,7 @@ const prisma: PrismaClient = new PrismaClient();
 @Injectable()
 export class UserService {
   constructor(private readonly MailService: MailService) {}
+
   /**
    * Crée un nouvel utilisateur avec des vérifications d'existence et hachage sécurisé du mot de passe.
    *
@@ -36,7 +38,7 @@ export class UserService {
    * @returns Une promesse résolue avec un boolean indiquant si l'utilisateur a été créé avec succès.
    * @throws {Error} Une erreur si la création de l'utilisateur échoue.
    */
-  public async create(data: User): Promise<boolean> {
+  public async create(data: CreateUserDto): Promise<boolean> {
     try {
       const userListe = await prisma.user.findMany();
       const rankListe = await prisma.rankings.findMany();

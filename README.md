@@ -38,15 +38,6 @@ Pour exécuter les tests end 2 end :
 npm run test:e2e
 ```
 
-### Migration
-Créer une migration et mettre à jour la Bdd : **A lancer depuis la racine du projet**
-````bash
-# Commande Windows :
-.\script\migrations\recupMigration.ps1 "nomDeLaMigration"
-# Commande Linux/Max :
-.\script\migrations\recupMigration.sh "nomDeLaMigration"
-````
-
 ## Section Prisma
 
 Pas d'injection SQL grâce à prisma. :-)
@@ -61,7 +52,7 @@ npm install prisma -D
 npm install @prisma/client
 ```
 
-Pour créer une migration après avoir modifier le fichier **schema.prisma**
+Pour créer une migration après avoir modifier le fichier **schema.prisma** (docker compsoe lancé)
 ```
 npx prisma migrate dev --name nomDeVotreMigration
 ```
