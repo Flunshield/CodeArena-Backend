@@ -3,8 +3,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { AuthController } from '../../src/controlleur/auth/auth.controller';
 import { RefreshTokenService } from '../../src/services/authentificationService/RefreshTokenService';
 import { AuthService } from '../../src/services/authentificationService/auth.service';
-import { UserConnect } from '../../src/interfaces/userInterface';
 import { MailService } from '../../src/email/service/MailService';
+import {shortUser} from "../../src/interfaces/userInterface";
 
 describe('AuthController (E2E)', () => {
   let authController: AuthController;
@@ -27,7 +27,7 @@ describe('AuthController (E2E)', () => {
   describe('login', () => {
     it('should authenticate user and return a refreshToken', async () => {
       // Mock dependencies
-      const userLogin: UserConnect = {
+      const userLogin: shortUser = {
         email: 'j.bert@cacahete.fr',
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -57,7 +57,7 @@ describe('AuthController (E2E)', () => {
 
     it('should handle BadRequestException and return 403 status', async () => {
       // Mock dependencies
-      const userLogin: UserConnect = {
+      const userLogin: shortUser = {
         email: 'j.bert@cacahete.fr',
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

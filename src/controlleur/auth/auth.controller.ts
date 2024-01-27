@@ -11,7 +11,7 @@ import {
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
-import { UserConnect } from '../../interfaces/userInterface';
+import { shortUser } from '../../interfaces/userInterface';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AuthService } from '../../services/authentificationService/auth.service';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
@@ -53,7 +53,7 @@ export class AuthController {
    */
   @Post('/login')
   async login(
-    @Body() userLogin: UserConnect,
+    @Body() userLogin: shortUser,
     @Req() request,
     @Res({ passthrough: true }) response,
   ) {

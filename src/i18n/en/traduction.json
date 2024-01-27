@@ -38,5 +38,12 @@
   "tournaments": "Tournaments",
   "event": "Event",
   "community": "Community",
-  "yourRank": "Your rank"
+  "yourRank": "Your rank",
+  "futurTournament": "Future tournaments",
+  "the": "The",
+  "at": "at",
+  "seeMore": "See more",
+  "noTournament": "No tournaments currently scheduled",
+  "date": "The date : ",
+  "noEvent": "No events scheduled at the moment"
 }
