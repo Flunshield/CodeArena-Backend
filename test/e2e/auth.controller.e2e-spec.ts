@@ -4,7 +4,7 @@ import { AuthController } from '../../src/controlleur/auth/auth.controller';
 import { RefreshTokenService } from '../../src/services/authentificationService/RefreshTokenService';
 import { AuthService } from '../../src/services/authentificationService/auth.service';
 import { MailService } from '../../src/email/service/MailService';
-import {shortUser} from "../../src/interfaces/userInterface";
+import { shortUser } from '../../src/interfaces/userInterface';
 
 describe('AuthController (E2E)', () => {
   let authController: AuthController;

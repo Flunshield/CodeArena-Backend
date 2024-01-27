@@ -9,9 +9,6 @@ RUN npm ci
 
 COPY . .
 
-# Renommer le fichier dans l'image
-RUN mv /app/.env-docker /app/.env
-
 RUN npm run build
 RUN npx prisma generate
 

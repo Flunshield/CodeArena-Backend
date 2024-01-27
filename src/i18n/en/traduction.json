@@ -45,5 +45,6 @@
   "seeMore": "See more",
   "noTournament": "No tournaments currently scheduled",
   "date": "The date : ",
-  "noEvent": "No events scheduled at the moment"
+  "noEvent": "No events scheduled at the moment",
+  "myAccount": "My account"
 }
