@@ -46,5 +46,13 @@
   "noTournament": "No tournaments currently scheduled",
   "date": "The date : ",
   "noEvent": "No events scheduled at the moment",
-  "myAccount": "My account"
+  "myAccount": "My account",
+  "update": "Update",
+  "firstName": "firstName",
+  "lastName": "lastName",
+  "ProfileUpdate": "Profile update",
+  "close": "Close",
+  "SelectTitle": "Select a title",
+  "yourBadges": "Your Badges",
+  "presentation": "Presentation"
 }

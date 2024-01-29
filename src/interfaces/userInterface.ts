@@ -1,3 +1,5 @@
+import {JsonValue} from "@prisma/client/runtime/library";
+
 export interface User {
   id?: number;
   userName: string;
@@ -13,16 +15,25 @@ export interface User {
   group?: Groups;
   languagePreference?: string;
   localisation?: string;
-  titles?: string;
+  titlesId?: number;
+  titles?: Titles[];
+  data?: JsonValue;
   badges?: string;
   company?: string;
   url?: string;
   school?: string;
   github?: string;
+  presentation?: string;
   Histories?: Histories;
   userRanking?: UserRanking;
   userTournament?: UserTournament;
   userMatch?: UserMatch;
+}
+
+export interface Titles {
+  id: number;
+  value: string;
+  label: string;
 }
 
 export interface Groups {

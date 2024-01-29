@@ -148,7 +148,7 @@ export class AuthController {
           cookie.serialize(nomDuCookie, '', {
             httpOnly: true,
             maxAge: 0,
-            domain: 'localhost', // Assurez-vous de spécifier le même chemin que celui utilisé pour définir le cookie
+            domain: 'localhost',
           }),
         );
 

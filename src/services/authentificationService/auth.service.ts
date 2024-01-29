@@ -265,7 +265,6 @@ export class AuthService {
       return HttpStatus.BAD_REQUEST;
     } else if (userExistArray) {
       // Realise les actions necessaire à l'envoie du mail d'oublie de mot de passe.
-      console.log('data_authService : ', data);
       const responseSendMail = await this.mailService.prepareMail(
         data.id,
         data,

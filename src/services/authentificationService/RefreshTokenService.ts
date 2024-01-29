@@ -105,6 +105,13 @@ export class RefreshTokenService {
         where: { id: parseInt(userId as string, 10) },
         include: {
           groups: true,
+          titles: {
+            select: {
+              id: true,
+              label: true,
+              value: true,
+            },
+          },
         },
       });
 
@@ -113,18 +120,7 @@ export class RefreshTokenService {
         const payload = {
           sub: userId,
           aud: {
-            userName: user.userName,
-            email: user.email,
-            emailVerifed: user.emailVerified,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            lastLogin: user.lastLogin,
-            createdAt: user.createdAt,
-            status: user.status,
-            avatar: user.avatar,
-            groups: user.groupsId,
-            languagePreference: user.languagePreference,
-            group: user.groups,
+            data: user,
           },
         };
         const options: SignOptions = {

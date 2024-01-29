@@ -19,7 +19,7 @@ export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Get('/checkDashboard')
-  async checkRank(
+  async checkDashboard(
     @Query('id') id: number,
     @Res() response,
   ): Promise<HttpException> {
