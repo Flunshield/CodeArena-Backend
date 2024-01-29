@@ -47,4 +47,9 @@ VALUES
     'Autres récompenses',
     'Organizer 2');
 
+-- Ajouter des titres
+INSERT INTO Title (value, label)
+VALUES ('VotreValeur', 'VotreLibellé');
+
+
 

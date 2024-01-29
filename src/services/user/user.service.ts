@@ -119,6 +119,14 @@ export class UserService {
             data: {
                 avatar: user.avatar,
                 presentation: user.presentation,
+                localisation: user.localisation,
+                company: user.company,
+                school: user.school,
+                github: user.github,
+                url: user.url,
+                lastName: user.lastName,
+                firstName: user.firstName,
+                titlesId: parseInt(String(user.titlesId))
             },
         });
 
@@ -126,6 +134,14 @@ export class UserService {
             return HttpStatus.OK;
         } else {
             return HttpStatus.NOT_FOUND;
+        }
+    }
+
+    async getTitles() {
+        try {
+            return await prisma.title.findMany();
+        } catch (error) {
+            console.error("Erreur lors de la récupération des titres :", error);
         }
     }
 }

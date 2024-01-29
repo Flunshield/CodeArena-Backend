@@ -21,8 +21,10 @@ model user {
   status             String           @default("inactive")
   avatar             String?
   localisation       String?
-  titles             String?
-  badges             String?
+  titlesId           Int?
+  titles             Title?           @relation(fields: [titlesId], references: [id])
+  titlesWin          Json?
+  badgesWin          Json?
   company            String?
   url                String?
   school             String?
@@ -35,6 +37,13 @@ model user {
   userTournament     userTournament[]
   userMatch          userMatch[]
   userEvent          userEvent[]
+}
+
+model Title {
+  id    Int    @id @default(autoincrement())
+  value String
+  label String
+  users user[]
 }
 
 model groups {
@@ -93,7 +102,7 @@ model matches {
   rankings     rankings    @relation(fields: [rankingsID], references: [id])
   userMatch    userMatch[]
   eventsID     Int
-  events       events    @relation(fields: [eventsID], references: [id])
+  events       events      @relation(fields: [eventsID], references: [id])
 }
 
 model userRanking {
@@ -123,23 +132,23 @@ model userMatch {
 }
 
 model events {
-  id             Int              @id @default(autoincrement())
-  startDate      DateTime
-  endDate        DateTime
-  playerMax      Int
-  title          String
-  description    String
-  rewards        String
-  organize       String
-  matches        matches[]
-  userEvent      userEvent[]
+  id          Int         @id @default(autoincrement())
+  startDate   DateTime
+  endDate     DateTime
+  playerMax   Int
+  title       String
+  description String
+  rewards     String
+  organize    String
+  matches     matches[]
+  userEvent   userEvent[]
 }
 
 model userEvent {
-  id           Int         @id @default(autoincrement())
-  userID       Int
-  user         user        @relation(fields: [userID], references: [id])
-  eventsID     Int
-  events       events        @relation(fields: [eventsID], references: [id])
-  points       Float
+  id       Int    @id @default(autoincrement())
+  userID   Int
+  user     user   @relation(fields: [userID], references: [id])
+  eventsID Int
+  events   events @relation(fields: [eventsID], references: [id])
+  points   Float
 }

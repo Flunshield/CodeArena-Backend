@@ -47,5 +47,12 @@
   "date": "La date : ",
   "noEvent": "Aucun événement n'est prévu pour le moment",
   "myAccount": "Mon compte",
-  "update": "Mettre à jour"
+  "update": "Mettre à jour",
+  "firstName": "Nom",
+  "lastName": "prenom",
+  "ProfileUpdate": "Mise à jour du profile",
+  "close": "Fermer",
+  "SelectTitle": "Slectionne un titre",
+  "yourBadges": "Vos Badges",
+  "presentation": "Présentation"
 }
