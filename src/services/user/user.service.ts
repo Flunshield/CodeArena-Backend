@@ -144,4 +144,94 @@ export class UserService {
             console.error("Erreur lors de la récupération des titres :", error);
         }
     }
+
+    async getUserRanked(userName?: string) {
+        try {
+            let users;
+            if(userName) {
+                const user = await prisma.user.findFirst({
+                    where: {
+                        userName: userName,
+                    },
+                    include: {
+                        userRanking: {
+                            include: {
+                                rankings: true,
+                            },
+                        },
+                        titles: {
+                            select: {
+                                label: true
+                            }
+                        }
+                    },
+                });
+                if (user) {
+                    const pointsValue = user.userRanking[0].points;
+
+                    const usersBelow = await prisma.userRanking.findMany({
+                        where: {
+                            points: {
+                                lte: pointsValue,
+                            },
+                            userID: {
+                                not: user.id,
+                            },
+                        },
+                        orderBy: {
+                            points: 'desc',
+                        },
+                        take: 9,
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    userName: true,
+                                    avatar: true,
+                                },
+                            },
+                            rankings: {
+                                select: {
+                                    title: true
+                                }
+                            }
+                        },
+                    });
+                    users = {
+                        user, "usersBelow": usersBelow
+                    }
+                }
+            }
+            if(!users) {
+                users = this.findTenUserRanking();
+            }
+
+            return users
+        } catch (error) {
+            console.error("Erreur lors de la récupération des utilisateurs :", error);
+        }
+    }
+
+    async findTenUserRanking() {
+        return prisma.userRanking.findMany({
+            take: 10,
+            orderBy: {
+                points: 'desc',
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        userName: true,
+                        avatar: true,
+                    },
+                },
+                rankings: {
+                    select: {
+                        title: true
+                    }
+                }
+            },
+        });
+    }
 }

@@ -3,7 +3,7 @@ import {JsonValue} from "@prisma/client/runtime/library";
 export interface User {
   id?: number;
   userName: string;
-  email: string;
+  email?: string;
   emailVerified?: boolean;
   createdAt?: Date;
   lastLogin?: Date;

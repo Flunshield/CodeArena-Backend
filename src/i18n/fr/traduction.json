@@ -54,5 +54,9 @@
   "close": "Fermer",
   "SelectTitle": "Slectionne un titre",
   "yourBadges": "Vos Badges",
-  "presentation": "Présentation"
+  "presentation": "Présentation",
+  "noUserWithUsername": "Aucun utilisateur trouvé avec ce nom",
+  "avatar": "Avatar",
+  "points": "Points",
+  "rank": "Rang"
 }
