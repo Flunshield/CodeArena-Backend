@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { Tournament } from '../../interfaces/userInterface';
-import { Event } from '../../interfaces/userInterface';
+import {Injectable} from '@nestjs/common';
+import {PrismaClient} from '@prisma/client';
+import {Event, Tournament} from '../../interfaces/userInterface';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -97,7 +96,7 @@ export class DashboardService {
   }
 
   async findEvent(): Promise<Event[]> {
-    const events: Event[] = await prisma.events.findMany({
+    return prisma.events.findMany({
       where: {
         startDate: {
           gte: new Date(), // Pour s'assurer que la date est dans le futur
@@ -107,7 +106,5 @@ export class DashboardService {
         startDate: 'asc',
       },
     });
-
-    return events;
   }
 }

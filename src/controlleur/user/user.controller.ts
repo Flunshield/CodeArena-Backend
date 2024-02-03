@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Req, Res,} from '@nestjs/common';
+import {Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Query, Req, Res,} from '@nestjs/common';
 import {CreateUserDto} from '../../dto/CreateUserDto';
 import {UserService} from '../../services/user/user.service';
 import {User} from '../../interfaces/userInterface';
@@ -73,6 +73,23 @@ export class UserController {
         try {
             const titles = await this.userService.getTitles();
             response.send(titles);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    @Get('/getUserRanking')
+    async getUserRanking(@Query('userName') userName: string, @Req() request, @Res() response) {
+        try {
+            let users;
+            if (userName) {
+                // Si userName n'est pas vide, appeler la fonction avec userName
+                users = await this.userService.getUserRanked(userName);
+            } else {
+                // Si userName est vide, appeler la fonction sans userName
+                users = await this.userService.getUserRanked();
+            }
+            response.send(users);
         } catch (error) {
             console.log(error);
         }
