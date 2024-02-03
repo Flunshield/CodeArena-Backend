@@ -23,6 +23,8 @@ import {
 } from 'nestjs-i18n';
 import { DashboardController } from './controlleur/dashboard/dashboard.controller';
 import { DashboardService } from './services/dashboard/dashboard.service';
+import { TournamentController } from './controlleur/tournament/tournament.controller';
+import { TournamentService } from './services/tournament/TournamentService';
 import * as path from 'path';
 
 @Module({
@@ -46,6 +48,7 @@ import * as path from 'path';
     UserController,
     AuthController,
     DashboardController,
+    TournamentController,
   ],
   providers: [
     AppService,
@@ -55,6 +58,7 @@ import * as path from 'path';
     RefreshTokenService,
     RolesGuard,
     DashboardService,
+    TournamentService,
   ],
 })
 export class AppModule implements NestModule {
