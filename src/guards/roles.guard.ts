@@ -22,6 +22,6 @@ export class RolesGuard implements CanActivate {
       token,
     ) as unknown as DecodedTokenController;
 
-    return roles.includes(decodedToken.aud.group.roles);
+    return roles.includes(decodedToken.aud.data.groups.roles);
   }
 }

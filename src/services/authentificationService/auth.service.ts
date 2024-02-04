@@ -236,18 +236,28 @@ export class AuthService {
     }
   }
 
+  /**
+   * Gère le processus de récupération de mot de passe pour un utilisateur.
+   *
+   * @param {string} email - L'adresse e-mail associée au compte utilisateur.
+   * @returns {Promise<HttpStatus>} Une promesse qui résout avec le statut HTTP indiquant le résultat de l'opération.
+   */
   async passwordForgot(email: string): Promise<HttpStatus> {
+    // Récupérer la liste des utilisateurs depuis la base de données
     const userListe = await prisma.user.findMany();
 
+    // Initialiser les données utilisateur par défaut
     let data = {
       userName: '',
       email: '',
       id: null,
     };
 
+    // Créer un tableau de promesses pour vérifier l'existence de l'utilisateur
     const userExistPromises: Promise<boolean>[] = userListe.map(
       async (user) => {
         if (user.email === email) {
+          // Mettre à jour les données si l'utilisateur est trouvé
           data = {
             id: user.id,
             userName: user.userName,
@@ -258,19 +268,21 @@ export class AuthService {
       },
     );
 
-    // Attendez que toutes les vérifications soient terminées
+    // Attendre que toutes les vérifications soient terminées
     const userExistArray: boolean[] = await Promise.all(userExistPromises);
 
+    // Vérifier si l'utilisateur existe
     if (!userExistArray) {
       return HttpStatus.BAD_REQUEST;
     } else if (userExistArray) {
-      // Realise les actions necessaire à l'envoie du mail d'oublie de mot de passe.
+      // Réaliser les actions necessaire à l'envoie du mail d'oublie de mot de passe.
       const responseSendMail = await this.mailService.prepareMail(
         data.id,
         data,
         2,
       );
 
+      // Vérifier le résultat de l'envoi du mail
       if (responseSendMail) {
         return HttpStatus.OK;
       } else {
@@ -279,10 +291,18 @@ export class AuthService {
     }
   }
 
+  /**
+   * Modifie le mot de passe d'un utilisateur.
+   *
+   * @param {shortUser} data - Les données de l'utilisateur comprenant le nom d'utilisateur et le nouveau mot de passe.
+   * @returns {Promise<HttpStatus>} Une promesse qui résout avec le statut HTTP indiquant le résultat de l'opération.
+   */
   async changePassword(data: shortUser): Promise<HttpStatus> {
     try {
+      // Récupérer la liste des utilisateurs depuis la base de données
       const userListe = await prisma.user.findMany();
 
+      // Créer un tableau de promesses pour vérifier l'existence de l'utilisateur
       const userExistPromises: Promise<boolean>[] = userListe.map(
         async (user) => {
           return user.userName === data.userName;
@@ -298,7 +318,10 @@ export class AuthService {
       );
 
       if (userExist) {
+        // Hacher le nouveau mot de passe
         const password: string = await AuthService.hashPassword(data.password);
+
+        // Mettre à jour le mot de passe de l'utilisateur dans la base de données
         await prisma.user.update({
           where: {
             userName: data.userName,

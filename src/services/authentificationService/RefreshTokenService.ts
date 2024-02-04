@@ -168,6 +168,14 @@ export class RefreshTokenService {
     const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
     return jwt.sign({ id: id, userName: userName }, privateKey, options);
   }
+
+  /**
+   * Génère un token d'accès pour le processus de changement de mot de passe.
+   *
+   * @param {number} id - L'identifiant de l'utilisateur.
+   * @param {string} userName - Le nom d'utilisateur de l'utilisateur.
+   * @returns {Promise<string>} Une promesse qui résout avec le token d'accès généré.
+   */
   async generateAccesTokenPasswordChange(
     id: number,
     userName: string,

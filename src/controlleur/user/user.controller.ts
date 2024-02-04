@@ -9,10 +9,14 @@ import {
   Query,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { UserService } from '../../services/user/user.service';
 import { User } from '../../interfaces/userInterface';
+import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
+import { RolesGuard } from '../../guards/roles.guard';
+import { Roles } from '../auth/auth.controller';
 
 /**
  * Contrôleur responsable de la gestion des utilisateurs.
@@ -67,6 +71,8 @@ export class UserController {
   }
 
   @Patch('/updateUser')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
   async update(@Body() user: User): Promise<HttpException> {
     const response = await this.userService.update(user);
     if (response === HttpStatus.OK) {
@@ -79,6 +85,8 @@ export class UserController {
   }
 
   @Get('/getTitles')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
   async getTitles(@Req() request, @Res() response) {
     try {
       const titles = await this.userService.getTitles();
@@ -89,6 +97,8 @@ export class UserController {
   }
 
   @Get('/getUserRanking')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
   async getUserRanking(
     @Query('userName') userName: string,
     @Req() request,

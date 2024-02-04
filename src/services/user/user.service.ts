@@ -109,7 +109,24 @@ export class UserService {
     }
   }
 
+  /**
+   * Met à jour les informations d'un utilisateur dans la base de données.
+   *
+   * @param user - Les nouvelles informations de l'utilisateur à mettre à jour.
+   *
+   * @returns Le code de statut HTTP indiquant le résultat de l'opération de mise à jour.
+   * - HttpStatus.OK (200) si la mise à jour a réussi.
+   * - HttpStatus.NOT_FOUND (404) si l'utilisateur n'a pas été trouvé dans la base de données.
+   *
+   * @throws Error si une erreur se produit lors de la mise à jour de l'utilisateur.
+   *
+   * @beta
+   */
   async update(user: User) {
+    /**
+     * Met à jour les informations de l'utilisateur dans la base de données.
+     * Les champs mis à jour incluent l'avatar, la présentation, la localisation, l'entreprise, l'école, GitHub, l'URL, le nom, le prénom et les titres.
+     */
     const userUpdate = await prisma.user.update({
       where: {
         userName: user.userName,
@@ -129,25 +146,54 @@ export class UserService {
       },
     });
 
-    if (userUpdate) {
-      return HttpStatus.OK;
-    } else {
-      return HttpStatus.NOT_FOUND;
-    }
+    /**
+     * Vérifie si la mise à jour de l'utilisateur a réussi.
+     * Retourne le code de statut HTTP approprié en conséquence.
+     */
+    return userUpdate ? HttpStatus.OK : HttpStatus.NOT_FOUND;
   }
 
+  /**
+   * Récupère tous les titres disponibles depuis la base de données.
+   *
+   * @returns Une liste de tous les titres disponibles.
+   *
+   * @throws Error si une erreur se produit lors de la récupération des titres.
+   *
+   * @beta
+   */
   async getTitles() {
     try {
+      /**
+       * Récupère tous les titres disponibles depuis la base de données.
+       */
       return await prisma.title.findMany();
     } catch (error) {
+      /**
+       * Gère les erreurs survenues lors de la récupération des titres.
+       */
       console.error('Erreur lors de la récupération des titres :', error);
     }
   }
 
+  /**
+   * Récupère les informations sur un utilisateur classé spécifique en fonction de son nom d'utilisateur.
+   *
+   * @param userName - Le nom d'utilisateur de l'utilisateur recherché.
+   * @returns Les informations sur l'utilisateur classé et les utilisateurs classés en dessous de lui.
+   *
+   * @throws Error si une erreur se produit lors de la récupération des utilisateurs classés.
+   *
+   * @beta
+   */
   async getUserRanked(userName?: string) {
     try {
       let users;
+
       if (userName) {
+        /**
+         * Récupère les informations sur un utilisateur spécifique en fonction de son nom d'utilisateur.
+         */
         const user = await prisma.user.findFirst({
           where: {
             userName: userName,
@@ -168,6 +214,9 @@ export class UserService {
         if (user) {
           const pointsValue = user.userRanking[0].points;
 
+          /**
+           * Récupère les utilisateurs classés en dessous de l'utilisateur spécifié.
+           */
           const usersBelow = await prisma.userRanking.findMany({
             where: {
               points: {
@@ -202,6 +251,10 @@ export class UserService {
           };
         }
       }
+
+      /**
+       * Si aucune information sur l'utilisateur n'est trouvée, récupère les dix premiers utilisateurs classés.
+       */
       if (!users) {
         users = this.findTenUserRanking();
       }
@@ -212,6 +265,21 @@ export class UserService {
     }
   }
 
+  /**
+   * Recherche les dix meilleurs classements d'utilisateurs.
+   *
+   * @returns {Promise<Array<{
+   *   user: {
+   *     id: number;
+   *     userName: string;
+   *     avatar: string;
+   *   };
+   *   rankings: {
+   *     title: string;
+   *   }[];
+   *   points: number;
+   * }>>} Une promesse qui résout avec un tableau des dix meilleurs classements d'utilisateurs.
+   */
   async findTenUserRanking() {
     return prisma.userRanking.findMany({
       take: 10,
