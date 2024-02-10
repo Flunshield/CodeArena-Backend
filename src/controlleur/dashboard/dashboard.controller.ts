@@ -13,7 +13,7 @@ import { TournamentService } from '../../services/tournament/TournamentService';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../auth/auth.controller';
-import {EvenementService} from "../../services/evenement/evenement.service";
+import { EvenementService } from '../../services/evenement/evenement.service';
 
 @Controller('dashboard')
 export class DashboardController {

@@ -9,6 +9,7 @@ import { sign, SignOptions } from 'jsonwebtoken';
 @Injectable()
 export class RefreshTokenService {
   prisma = new PrismaClient();
+
   /**
    * Méthode pour générer et envoyer un token de rafraîchissement à l'utilisateur.
    *
@@ -112,6 +113,9 @@ export class RefreshTokenService {
               value: true,
             },
           },
+          userRanking: true,
+          userTournament: true,
+          userEvent: true,
         },
       });
 

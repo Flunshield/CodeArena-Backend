@@ -58,5 +58,10 @@
   "noUserWithUsername": "No users found with this name",
   "avatar": "Avatar",
   "points": "Points",
-  "rank": "Rank"
+  "rank": "Rank",
+  "dateDebut": "Start date",
+  "dateFin": "End date",
+  "rules": "The rules",
+  "unsubscribe": "Unsubscribe",
+  "maxPlayer": "Maximum players"
 }

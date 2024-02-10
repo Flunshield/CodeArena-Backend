@@ -58,5 +58,10 @@
   "noUserWithUsername": "Aucun utilisateur trouvé avec ce nom",
   "avatar": "Avatar",
   "points": "Points",
-  "rank": "Rang"
+  "rank": "Rang",
+  "dateDebut": "Date de début",
+  "dateFin": "Date de fin",
+  "maxPlayer": "Joueurs maximum",
+  "rules": "Les règles",
+  "unsubscribe": "Se désinscrire"
 }
