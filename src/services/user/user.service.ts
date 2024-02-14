@@ -40,27 +40,20 @@ export class UserService {
    */
   public async create(data: CreateUserDto): Promise<boolean> {
     try {
-      const userListe = await prisma.user.findMany();
+      const userExist = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { userName: data.userName },
+            { email: data.email }
+          ]
+        }
+      });
       const rankListe = await prisma.rankings.findMany();
 
       // On va chercher le rang bronze dans la table ranking
       const rankBronze = rankListe.find((element) => {
         return element.title === 'Bronze Rank';
       });
-
-      const userExistPromises: Promise<boolean>[] = userListe.map(
-        async (user) => {
-          return user.userName === data.userName || user.email === data.email;
-        },
-      );
-
-      // Attendez que toutes les vérifications soient terminées
-      const userExistArray: boolean[] = await Promise.all(userExistPromises);
-
-      // Vérifiez s'il y a un utilisateur existant
-      const userExist: boolean = userExistArray.some(
-        (exists: boolean) => exists,
-      );
 
       if (!userExist) {
         const password: string = await AuthService.hashPassword(data.password);
