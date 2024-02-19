@@ -42,11 +42,8 @@ export class UserService {
     try {
       const userExist = await prisma.user.findFirst({
         where: {
-          OR: [
-            { userName: data.userName },
-            { email: data.email }
-          ]
-        }
+          OR: [{ userName: data.userName }, { email: data.email }],
+        },
       });
       const rankListe = await prisma.rankings.findMany();
 

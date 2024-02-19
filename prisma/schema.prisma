@@ -30,6 +30,7 @@ model user {
   school             String?
   github             String?
   presentation       String?
+  nbGames            Int?             @default(0)
   groupsId           Int              @default(1)
   groups             groups           @relation(fields: [groupsId], references: [id])
   Histories          histories[]
@@ -74,6 +75,7 @@ model tournaments {
   rewards        String
   matches        matches[]
   userTournament userTournament[]
+  puzzles        puzzles[]
 }
 
 model rankings {
@@ -87,6 +89,7 @@ model rankings {
   userRanking userRanking[]
   maxPoints   Float
   minPoints   Float
+  puzzles     puzzles[]
 }
 
 model matches {
@@ -142,6 +145,7 @@ model events {
   organize    String
   matches     matches[]
   userEvent   userEvent[]
+  puzzles     puzzles[]
 }
 
 model userEvent {
@@ -151,4 +155,16 @@ model userEvent {
   eventsID Int
   events   events @relation(fields: [eventsID], references: [id])
   points   Float
+}
+
+model puzzles {
+  id           Int         @id @default(autoincrement())
+  rankingsID   Int
+  rankings     rankings    @relation(fields: [rankingsID], references: [id])
+  tournamentID Int
+  tournaments  tournaments @relation(fields: [tournamentID], references: [id])
+  eventsID     Int
+  events       events      @relation(fields: [eventsID], references: [id])
+  tests        String
+  details      String
 }
