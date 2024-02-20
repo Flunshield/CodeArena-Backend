@@ -57,7 +57,8 @@ export class TournamentController {
   @Post('/inscription')
   @Roles(USER)
   @UseGuards(RolesGuard)
-  async update(@Body() user: UserTournament): Promise<HttpException> {
+  async update(@Body() data): Promise<HttpException> {
+    const user: UserTournament = data.data.data;
     const response: HttpStatus = await this.tournamentService.update(user);
     if (response === HttpStatus.CREATED) {
       // Si la mise à jour réussi, on envoie un code HTTP 201.
