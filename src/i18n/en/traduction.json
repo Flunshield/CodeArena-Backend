@@ -63,5 +63,7 @@
   "dateFin": "End date",
   "rules": "The rules",
   "unsubscribe": "Unsubscribe",
-  "maxPlayer": "Maximum players"
+  "maxPlayer": "Maximum players",
+  "emailNotVerified": "Email not verified",
+  "validMail": "Validate mail"
 }

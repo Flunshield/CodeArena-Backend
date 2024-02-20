@@ -63,5 +63,7 @@
   "dateFin": "Date de fin",
   "maxPlayer": "Joueurs maximum",
   "rules": "Les règles",
-  "unsubscribe": "Se désinscrire"
+  "unsubscribe": "Se désinscrire",
+  "emailNotVerified": "Email non vérifié",
+  "validMail": "Valider le mail"
 }
