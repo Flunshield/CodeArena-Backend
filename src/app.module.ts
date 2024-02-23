@@ -29,7 +29,7 @@ import { EvenementService } from './services/evenement/evenement.service';
 import { EvenementController } from './controlleur/evenement/evenement.controller';
 import { AdminController } from './controlleur/admin/admin.controller';
 import * as path from 'path';
-import {AdminService} from "./services/admin/admin.service";
+import { AdminService } from './services/admin/admin.service';
 
 @Module({
   imports: [
