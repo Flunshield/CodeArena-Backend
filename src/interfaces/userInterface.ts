@@ -31,7 +31,7 @@ export interface User {
 }
 
 export interface Titles {
-  id: number;
+  id?: number;
   value: string;
   label: string;
 }

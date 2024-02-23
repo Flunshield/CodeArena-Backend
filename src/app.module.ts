@@ -27,7 +27,9 @@ import { TournamentController } from './controlleur/tournament/tournament.contro
 import { TournamentService } from './services/tournament/TournamentService';
 import { EvenementService } from './services/evenement/evenement.service';
 import { EvenementController } from './controlleur/evenement/evenement.controller';
+import { AdminController } from './controlleur/admin/admin.controller';
 import * as path from 'path';
+import {AdminService} from "./services/admin/admin.service";
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import * as path from 'path';
     DashboardController,
     TournamentController,
     EvenementController,
+    AdminController,
   ],
   providers: [
     AppService,
@@ -63,6 +66,7 @@ import * as path from 'path';
     DashboardService,
     TournamentService,
     EvenementService,
+    AdminService,
   ],
 })
 export class AppModule implements NestModule {
