@@ -38,6 +38,7 @@ export class UserController {
    * Crée une instance du contrôleur utilisateur.
    *
    * @param userService - Le service utilisateur utilisé pour gérer les opérations liées aux utilisateurs.
+   * @param mailService
    */
   constructor(
     private readonly userService: UserService,
