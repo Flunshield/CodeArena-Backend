@@ -165,6 +165,6 @@ model puzzles {
   tournaments  tournaments @relation(fields: [tournamentID], references: [id])
   eventsID     Int
   events       events      @relation(fields: [eventsID], references: [id])
-  tests        String
+  tests        Json
   details      String
 }
