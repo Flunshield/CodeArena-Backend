@@ -41,7 +41,7 @@ export class RefreshTokenService {
   public async generateRefreshToken(
     userId: number,
     res: Response,
-  ): Promise<HttpException> {
+  ): Promise<HttpStatus> {
     try {
       const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
       const payload = { sub: userId };
@@ -61,7 +61,7 @@ export class RefreshTokenService {
 
       res.setHeader('Set-Cookie', cookies);
 
-      return new HttpException('Utilisateur connecté', HttpStatus.OK);
+      return HttpStatus.OK;
     } catch {
       throw new Error("Une erreur s'est produite");
     }
@@ -133,8 +133,6 @@ export class RefreshTokenService {
           header: { alg: 'RS256', typ: 'access' },
         };
         return sign(payload, privateKey, options);
-      } else {
-        return 'Nok';
       }
     } catch (error) {
       // Gérer l'erreur, par exemple, le refresh token est invalide

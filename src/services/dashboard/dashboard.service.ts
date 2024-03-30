@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import {Injectable} from '@nestjs/common';
+import {PrismaClient} from '@prisma/client';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -94,12 +94,10 @@ export class DashboardService {
     });
 
     // Crée un objet contenant les informations sur l'utilisateur
-    const listUser = {
+    return {
       usersAbove: usersAbove,
       user: userWithRankings,
       usersBelow: usersBelow,
     };
-
-    return listUser ?? {};
   }
 }
