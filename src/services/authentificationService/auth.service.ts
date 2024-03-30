@@ -158,7 +158,10 @@ export class AuthService {
 
                 if (passwordsMatch) {
                     try {
-                        return await this.refreshTokenService.generateRefreshToken(user.id, res);
+                        const tokenGenerated = await this.refreshTokenService.generateRefreshToken(user.id, res);
+                        if (tokenGenerated === HttpStatus.OK) {
+                            return HttpStatus.OK
+                        }
                     } catch (readFileError) {
                         console.error('Error reading private key file:', readFileError);
                         throw new HttpException(

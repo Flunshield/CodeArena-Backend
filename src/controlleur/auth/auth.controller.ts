@@ -65,10 +65,11 @@ export class AuthController {
                 response,
                 frenchCodeAreaCookie,
             );
+
             if (reponse === HttpStatus.OK) {
                 return response.status(HttpStatus.OK).send('Connecté');
             } else {
-                return response.status(HttpStatus.NOT_FOUND)
+                return response.status(HttpStatus.NOT_FOUND).send();
             }
         } catch (error: any) {
             const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
