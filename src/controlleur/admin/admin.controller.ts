@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, Patch,
   Post,
   Query,
   Req,
@@ -81,9 +81,24 @@ export class AdminController {
   @Delete('/deleteTitle')
   @Roles(ADMIN)
   @UseGuards(RolesGuard)
-  async delete(@Body() data, @Res() response): Promise<void> {
-    console.log(data.title);
+  async deleteTitle(@Body() data, @Res() response): Promise<void> {
     const deleteTitle = await this.adminService.deleteTitle(data.title);
     response.send(deleteTitle);
+  }
+
+  @Delete('/deleteUser')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async deleteUser(@Body() data, @Res() response): Promise<void> {
+    const deleteUser = await this.adminService.deleteUser(data.user);
+    response.send(deleteUser);
+  }
+
+  @Patch("/resetPoints")
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async patchPointsUser(@Body() data, @Res() response): Promise<void> {
+    const patchPointsUser = await this.adminService.patchPointsUser(data.user);
+    response.send(patchPointsUser);
   }
 }
