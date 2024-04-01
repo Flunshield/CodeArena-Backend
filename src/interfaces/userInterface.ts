@@ -183,3 +183,8 @@ export interface UserEvent {
   events: Event;
   points: number;
 }
+
+export interface ResponseCreateUser {
+  bool: boolean;
+  type: string;
+}

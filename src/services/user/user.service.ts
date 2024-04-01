@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MailService } from '../../email/service/MailService';
-import { User } from '../../interfaces/userInterface';
+import {ResponseCreateUser, User} from '../../interfaces/userInterface';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { PAGE_SIZE } from '../../constantes/contante';
 
@@ -39,8 +39,14 @@ export class UserService {
    * @returns Une promesse résolue avec un boolean indiquant si l'utilisateur a été créé avec succès.
    * @throws {Error} Une erreur si la création de l'utilisateur échoue.
    */
-  public async create(data: CreateUserDto): Promise<boolean> {
+  public async create(data: CreateUserDto): Promise<ResponseCreateUser> {
+    const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     try {
+      if(!regexPassword.test(data.password)) {
+        // Si le mot de passe n'est pas conforme.
+        return {bool:false, type:"password"};
+      }
+
       const userExist = await prisma.user.findFirst({
         where: {
           OR: [{ userName: data.userName }, { email: data.email }],
@@ -82,15 +88,14 @@ export class UserService {
             data,
             1,
           );
-
-          return createUser && newUserRanking && responseSendMail;
+          return {bool:createUser && newUserRanking && responseSendMail, type:"ok"};
         } catch (error) {
           console.error("Erreur lors de la création de l'utilisateur :", error);
           // Gérer l'erreur de création de l'utilisateur
         }
       } else {
         //Si l'utilisateur existe déja
-        return false;
+        return {bool:false, type:"username"};
       }
     } catch (error) {
       throw new HttpException(
