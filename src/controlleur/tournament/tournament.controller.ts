@@ -59,7 +59,6 @@ export class TournamentController {
   @UseGuards(RolesGuard)
   async update(@Body() data, @Res() response) {
     const user: UserTournament = data.data;
-    console.log(user);
     const res: HttpStatus = await this.tournamentService.update(user);
     if (res === HttpStatus.CREATED) {
       response.send(res);

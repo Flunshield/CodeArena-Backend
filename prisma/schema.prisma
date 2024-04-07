@@ -8,21 +8,21 @@ datasource db {
 }
 
 model user {
-  id                 Int              @id @default(autoincrement())
+  id                 Int                  @id @default(autoincrement())
   firstName          String?
   lastName           String?
-  userName           String           @unique
+  userName           String               @unique
   password           String
   email              String
-  emailVerified      Boolean          @default(false)
-  createdAt          DateTime         @default(now())
+  emailVerified      Boolean              @default(false)
+  createdAt          DateTime             @default(now())
   lastLogin          DateTime?
   languagePreference String?
-  status             String           @default("inactive")
+  status             String               @default("inactive")
   avatar             String?
   localisation       String?
   titlesId           Int?
-  titles             Title?           @relation(fields: [titlesId], references: [id])
+  titles             Title?               @relation(fields: [titlesId], references: [id])
   titlesWin          Json?
   badgesWin          Json?
   company            String?
@@ -30,14 +30,15 @@ model user {
   school             String?
   github             String?
   presentation       String?
-  nbGames            Int?             @default(0)
-  groupsId           Int              @default(1)
-  groups             groups           @relation(fields: [groupsId], references: [id])
+  nbGames            Int?                 @default(0)
+  groupsId           Int                  @default(1)
+  groups             groups               @relation(fields: [groupsId], references: [id])
   Histories          histories[]
   userRanking        userRanking[]
   userTournament     userTournament[]
   userMatch          userMatch[]
   userEvent          userEvent[]
+  commandeEntreprise commandeEntreprise[]
 }
 
 model Title {
@@ -167,4 +168,17 @@ model puzzles {
   events       events      @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
+}
+
+model commandeEntreprise {
+  id           Int      @id @default(autoincrement())
+  idSession    String   @unique
+  objetSession Json
+  idPayment    String   @unique
+  item         String
+  userID       Int
+  user         user     @relation(fields: [userID], references: [id])
+  dateCommande DateTime @default(now())
+  etatCommande String
+  nbCreateTest Int      @default(10)
 }

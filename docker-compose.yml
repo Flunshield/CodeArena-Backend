@@ -3,6 +3,7 @@ version: '3.7'
 services:
   mariadb:
     image: mariadb:${MARIADBVERSION}
+    container_name: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: admin

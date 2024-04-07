@@ -1,12 +1,13 @@
 import {HttpException, HttpStatus, Injectable, Res} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import {DecodedTokenMail, shortUser} from '../../interfaces/userInterface';
+import {DecodedTokenMail, shortUser, User} from '../../interfaces/userInterface';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import {PrismaClient} from '@prisma/client';
 import {RefreshTokenService} from './RefreshTokenService';
 import {Response} from 'express';
 import {MailService} from '../../email/service/MailService';
+import {ENTREPRISE_PRICE, PREMIUM_PRICE} from "../../constantes/contante";
 
 const prisma = new PrismaClient();
 
@@ -28,7 +29,7 @@ const prisma = new PrismaClient();
 export class AuthService {
     constructor(
         private readonly refreshTokenService: RefreshTokenService,
-        private readonly mailService: MailService,
+        private readonly mailService: MailService
     ) {
     }
 
@@ -149,6 +150,7 @@ export class AuthService {
                     userName: credentials.userName,
                 },
             });
+            verifEntrepriseGroups(user);
 
             if (user) {
                 const passwordsMatch: boolean = await AuthService.comparePasswords(
@@ -343,3 +345,65 @@ export class AuthService {
         }
     }
 }
+
+async function resetUserGroup(user: User) {
+    await prisma.user.update({
+        where: {
+            id: user.id,
+            userName: user.userName
+        },
+        data: {
+            groupsId: 1
+        }
+    })
+}
+
+async function verifEntrepriseGroups(user: User) {
+    const isEntrepriseValid = await prisma.commandeEntreprise.findMany({
+        where: {
+            userID: user.id
+        }
+    })
+    if (isEntrepriseValid.length === 0) {
+        return
+    }
+
+    if (isEntrepriseValid.length === 1) {
+        const today = new Date();
+        const dateCommand = isEntrepriseValid[0].dateCommande;
+        const deltaTime = differenceEnAnnees(today, dateCommand)
+        if (deltaTime > 1) {
+            await resetUserGroup(user);
+        }
+    }
+
+    if (isEntrepriseValid.length > 1) {
+        const today = new Date();
+        const dateCommand = isEntrepriseValid[0].dateCommande;
+        const deltaTime = differenceEnAnnees(today, dateCommand)
+        let nbYearPremium = 0
+        let nbYearEntreprise = 0
+
+        nbYearPremium = isEntrepriseValid.filter(elem => elem.item === PREMIUM_PRICE).length;
+        nbYearEntreprise = isEntrepriseValid.filter(elem => elem.item === ENTREPRISE_PRICE).length;
+
+        const deltaTimeLastOrder = differenceEnAnnees(today, isEntrepriseValid[isEntrepriseValid.length - 1].dateCommande)
+
+        if (deltaTimeLastOrder > 1) {
+            if (
+                (nbYearPremium > 0 && deltaTime > nbYearPremium)
+                || (nbYearEntreprise > 0 && deltaTime > nbYearEntreprise)
+            ) {
+                await resetUserGroup(user);
+            }
+        }
+    }
+}
+
+function differenceEnAnnees(date1: Date, date2: Date): number {
+    const differenceEnMilliseconds = Math.abs(date2.getTime() - date1.getTime());
+    const millisecondsDansAnnee = 1000 * 60 * 60 * 24 * 365.25; // Approximation du nombre de millisecondes dans une année
+    const differenceEnAnnees = differenceEnMilliseconds / millisecondsDansAnnee;
+    return Math.floor(differenceEnAnnees);
+}
+
