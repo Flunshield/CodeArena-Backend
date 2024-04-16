@@ -8,6 +8,7 @@ coverage/
 
 # Docker
 .docker/
+docker-compose-prod.yml
 
 # Prisma
 prisma/.prisma/client/
