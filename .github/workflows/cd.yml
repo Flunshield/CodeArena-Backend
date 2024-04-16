@@ -25,5 +25,5 @@ jobs:
             git pull origin main
             docker compose -f docker-compose-prod.yml up --build -d
 
-      - name:  🚀 Deploy
+      - name: 🚀 Deploy
         run: echo "🚀 Deployed!"
