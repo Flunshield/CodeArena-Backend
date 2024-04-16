@@ -20,10 +20,10 @@ import { Roles } from '../auth/auth.controller';
 export class TournamentController {
   constructor(private readonly tournamentService: TournamentService) {}
 
-  @Get('/findTournaments')
+  @Get('/findNextTenTournament')
   @Roles(USER, ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
-  async findTournaments(@Res() response) {
+  async findNextTenTournament(@Res() response) {
     try {
       const getAllTournaments: Tournament[] =
         await this.tournamentService.findNextTenTournament();
@@ -57,13 +57,12 @@ export class TournamentController {
   @Post('/inscription')
   @Roles(USER)
   @UseGuards(RolesGuard)
-  async update(@Body() data): Promise<HttpException> {
-    const user: UserTournament = data.data.data;
-    const response: HttpStatus = await this.tournamentService.update(user);
-    if (response === HttpStatus.CREATED) {
-      // Si la mise à jour réussi, on envoie un code HTTP 201.
-      return new HttpException('Utilistaeur mis à jour', HttpStatus.CREATED);
-    } else if (response === HttpStatus.NOT_ACCEPTABLE) {
+  async update(@Body() data, @Res() response) {
+    const user: UserTournament = data.data;
+    const res: HttpStatus = await this.tournamentService.update(user);
+    if (res === HttpStatus.CREATED) {
+      response.send(res);
+    } else if (res === HttpStatus.NOT_ACCEPTABLE) {
       // Si la mise à jour échoue, on envoie une exception HTTP avec un code 406
       throw new HttpException('Utilistaeur inconnu', HttpStatus.NOT_ACCEPTABLE);
     } else {

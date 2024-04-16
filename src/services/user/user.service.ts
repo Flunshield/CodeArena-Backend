@@ -3,8 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MailService } from '../../email/service/MailService';
-import { User } from '../../interfaces/userInterface';
+import { ResponseCreateUser, User } from '../../interfaces/userInterface';
 import { CreateUserDto } from '../../dto/CreateUserDto';
+import { PAGE_SIZE } from '../../constantes/contante';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -38,8 +39,15 @@ export class UserService {
    * @returns Une promesse résolue avec un boolean indiquant si l'utilisateur a été créé avec succès.
    * @throws {Error} Une erreur si la création de l'utilisateur échoue.
    */
-  public async create(data: CreateUserDto): Promise<boolean> {
+  public async create(data: CreateUserDto): Promise<ResponseCreateUser> {
+    const regexPassword =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     try {
+      if (!regexPassword.test(data.password)) {
+        // Si le mot de passe n'est pas conforme.
+        return { bool: false, type: 'password' };
+      }
+
       const userExist = await prisma.user.findFirst({
         where: {
           OR: [{ userName: data.userName }, { email: data.email }],
@@ -81,15 +89,17 @@ export class UserService {
             data,
             1,
           );
-
-          return createUser && newUserRanking && responseSendMail;
+          return {
+            bool: createUser && newUserRanking && responseSendMail,
+            type: 'ok',
+          };
         } catch (error) {
           console.error("Erreur lors de la création de l'utilisateur :", error);
           // Gérer l'erreur de création de l'utilisateur
         }
       } else {
         //Si l'utilisateur existe déja
-        return false;
+        return { bool: false, type: 'username' };
       }
     } catch (error) {
       throw new HttpException(
@@ -158,6 +168,55 @@ export class UserService {
        * Récupère tous les titres disponibles depuis la base de données.
        */
       return await prisma.title.findMany();
+    } catch (error) {
+      /**
+       * Gère les erreurs survenues lors de la récupération des titres.
+       */
+      console.error('Erreur lors de la récupération des titres :', error);
+    }
+  }
+
+  /**
+   * Récupère tous les rangs disponibles depuis la base de données.
+   *
+   * @returns Une liste de tous les rangs disponibles.
+   *
+   * @throws Error si une erreur se produit lors de la récupération des rangs.
+   *
+   * @beta
+   */
+  async getRanks() {
+    try {
+      /**
+       * Récupère tous les titres disponibles depuis la base de données.
+       */
+      return await prisma.rankings.findMany();
+    } catch (error) {
+      /**
+       * Gère les erreurs survenues lors de la récupération des titres.
+       */
+      console.error('Erreur lors de la récupération des titres :', error);
+    }
+  }
+
+  async getUsers(pageNumber: number) {
+    try {
+      const skip = pageNumber * PAGE_SIZE;
+      return await prisma.user.findMany({
+        take: PAGE_SIZE,
+        skip: skip,
+        include: {
+          userRanking: {
+            include: {
+              rankings: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
+        },
+      });
     } catch (error) {
       /**
        * Gère les erreurs survenues lors de la récupération des titres.
@@ -289,6 +348,18 @@ export class UserService {
             title: true,
           },
         },
+      },
+    });
+  }
+
+  async attributeEntrepriseRole(user: User) {
+    return prisma.user.update({
+      where: {
+        userName: user.userName,
+        id: user.id,
+      },
+      data: {
+        groupsId: 3,
       },
     });
   }

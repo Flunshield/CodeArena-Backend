@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { UserService } from '../../services/user/user.service';
-import { User } from '../../interfaces/userInterface';
+import { ResponseCreateUser, User } from '../../interfaces/userInterface';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../auth/auth.controller';
@@ -38,6 +38,7 @@ export class UserController {
    * Crée une instance du contrôleur utilisateur.
    *
    * @param userService - Le service utilisateur utilisé pour gérer les opérations liées aux utilisateurs.
+   * @param mailService
    */
   constructor(
     private readonly userService: UserService,
@@ -61,16 +62,26 @@ export class UserController {
    */
   @Post('/creatUser')
   async create(@Body() createUserDto: CreateUserDto): Promise<HttpException> {
-    const response = await this.userService.create(createUserDto);
-    if (response) {
+    const response: ResponseCreateUser =
+      await this.userService.create(createUserDto);
+    if (response.bool && response.type === 'ok') {
       // Si la création réussi, on envoie un code HTTP 200.
       return new HttpException('Utilisateur créé avec succès', HttpStatus.OK);
     } else {
-      // Si la création échoue, on envoie une exception HTTP avec un code 400
-      throw new HttpException(
-        "Le nom de compte n'est pas disponnible",
-        HttpStatus.BAD_REQUEST,
-      );
+      if (!response.bool && response.type === 'username') {
+        // Si la création échoue, on envoie une exception HTTP avec un code 400
+        throw new HttpException(
+          "Le nom de compte ou l'adresse mail n'est pas disponnible",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (!response.bool && response.type === 'password') {
+        // Si la création échoue, on envoie une exception HTTP avec un code 400
+        throw new HttpException(
+          'Mot de passe invalide. Il doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre, un caractère spécial et faire au moins 8 caractères.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
   }
 

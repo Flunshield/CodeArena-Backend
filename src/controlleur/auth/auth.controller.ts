@@ -52,11 +52,7 @@ export class AuthController {
    * @throws HttpException - En cas d'erreur lors de la connexion.
    */
   @Post('/login')
-  async login(
-    @Body() userLogin: shortUser,
-    @Req() request,
-    @Res({ passthrough: true }) response,
-  ) {
+  async login(@Body() userLogin: shortUser, @Req() request, @Res() response) {
     try {
       const frenchCodeAreaCookie = request.cookies['frenchcodeareatoken'];
       const reponse = await this.AuthService.connect(
@@ -64,13 +60,11 @@ export class AuthController {
         response,
         frenchCodeAreaCookie,
       );
+
       if (reponse === HttpStatus.OK) {
         return response.status(HttpStatus.OK).send('Connecté');
       } else {
-        throw new HttpException(
-          `Erreur de connexion : ${reponse}`,
-          HttpStatus.FORBIDDEN,
-        );
+        return response.status(HttpStatus.NOT_FOUND).send();
       }
     } catch (error: any) {
       const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
@@ -108,10 +102,26 @@ export class AuthController {
         await this.refreshTokenService.generateAccessTokenFromRefreshToken(
           refreshToken,
         );
-      response.send({ accessToken: accessToken });
+      if (!accessToken) {
+        response
+          .status(HttpStatus.UNAUTHORIZED)
+          .send({ message: 'Unauthorized' });
+        return;
+      } else {
+        try {
+          response.send({ accessToken: accessToken });
+        } catch (e) {
+          throw new HttpException(
+            'Merci de vous authentifier',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+      }
     } catch (error: any) {
-      console.error("Erreur lors de la récupération de l'accesToken :", error);
-      throw new HttpException('Merci de vous authentifier', error.HttpStatus);
+      throw new HttpException(
+        'Merci de vous authentifier',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 

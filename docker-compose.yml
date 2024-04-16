@@ -3,6 +3,7 @@ version: '3.7'
 services:
   mariadb:
     image: mariadb:${MARIADBVERSION}
+    container_name: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: admin
@@ -41,21 +42,17 @@ services:
     volumes:
       - ./src:/app/src
 
-  # PROD
-  #  app:
-  #    image: flusnhield/notre_projet_api:1.0.0
-  #    container_name: nest
-  #    ports:
-  #      - '3000:3000'
-  #    environment:
-  #      - DATABASE_URL=${DATABASE_URL}
-  #      - MAIL=${MAIL}
-  #      - MAIL_PASSWORD=${MAIL_PASSWORD}
-  #      - MAIL_HOST=${MAIL_HOST}
-  #      - MAIL_TO=${MAIL_TO}
-  #      - COOKIE=${COOKIE}
-  #    depends_on:
-  #      - mariadb
-  #    volumes:
-  #      - ./src:/app/src
+#   networks:
+#       - rcr_network
+#   labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.rcr-api.rule=Host(`code.MYDOMAIN.fr`)"
+#       - "traefik.http.routers.rcr-api.entrypoints=websecure"
+#       - "traefik.http.routers.rcr-api.tls.certresolver=myresolver"
+#       - "traefik.http.routers.rcr-api.middlewares=rcr-api-prefix"
+#       - "traefik.http.services.rcr-api.loadbalancer.server.port=3000"
+#       - "traefik.http.middlewares.rcr-api-prefix.stripprefix.prefixes=/api"
 
+# networks:
+#   rcr_network:
+#     external: true

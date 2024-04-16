@@ -27,7 +27,11 @@ import { TournamentController } from './controlleur/tournament/tournament.contro
 import { TournamentService } from './services/tournament/TournamentService';
 import { EvenementService } from './services/evenement/evenement.service';
 import { EvenementController } from './controlleur/evenement/evenement.controller';
+import { AdminController } from './controlleur/admin/admin.controller';
 import * as path from 'path';
+import { AdminService } from './services/admin/admin.service';
+import { StripeController } from './controlleur/stripe/stripe.controller';
+import { StripeService } from './services/stripe/stripe.service';
 
 @Module({
   imports: [
@@ -52,6 +56,8 @@ import * as path from 'path';
     DashboardController,
     TournamentController,
     EvenementController,
+    AdminController,
+    StripeController,
   ],
   providers: [
     AppService,
@@ -63,6 +69,8 @@ import * as path from 'path';
     DashboardService,
     TournamentService,
     EvenementService,
+    AdminService,
+    StripeService,
   ],
 })
 export class AppModule implements NestModule {
@@ -77,6 +85,10 @@ export class AppModule implements NestModule {
         { path: 'auth/validMail', method: RequestMethod.GET },
         { path: '/traduction', method: RequestMethod.GET },
         { path: 'auth/forgotPassWord', method: RequestMethod.POST },
+        {
+          path: '/stripe/create-checkout-session-premium',
+          method: RequestMethod.POST,
+        },
       )
       .forRoutes('*');
   }

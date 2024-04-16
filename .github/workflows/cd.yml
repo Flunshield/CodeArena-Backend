@@ -1,0 +1,29 @@
+name: CD - Déploiement de l'application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⏳ Checkout
+        uses: actions/checkout@v2
+
+      - name: 🚧 Déploiement sur le VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd back-app/
+            docker compose -f docker-compose-prod.yml down
+            git pull origin main
+            docker compose -f docker-compose-prod.yml up --build -d
+
+      - name: 🚀 Deploy
+        run: echo "🚀 Deployed!"

@@ -42,15 +42,15 @@ export class VerifyJwtMiddleware implements NestMiddleware {
           req['decodedToken'] = decodedToken;
           next();
         } else {
-          res.status(401).json({ error: 'Unauthorized - Invalid token type' });
+          res.status(401).send({ error: 'Unauthorized - Invalid token type' });
         }
       } catch (error) {
-        res.status(401).json({ error: 'Unauthorized - Invalid token' });
+        res.status(401).send({ error: 'Unauthorized - Invalid token' });
       }
     } else {
       res
         .status(401)
-        .json({ message: 'Unauthorized - Missing Authorization header' });
+        .send({ message: 'Unauthorized - Missing Authorization header' });
     }
   }
 }

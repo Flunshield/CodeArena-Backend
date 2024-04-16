@@ -1,12 +1,17 @@
 import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { DecodedTokenMail, shortUser } from '../../interfaces/userInterface';
+import {
+  DecodedTokenMail,
+  shortUser,
+  User,
+} from '../../interfaces/userInterface';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { RefreshTokenService } from './RefreshTokenService';
 import { Response } from 'express';
 import { MailService } from '../../email/service/MailService';
+import { ENTREPRISE_PRICE, PREMIUM_PRICE } from '../../constantes/contante';
 
 const prisma = new PrismaClient();
 
@@ -129,7 +134,7 @@ export class AuthService {
           };
           if (decodedToken) {
             throw new HttpException(
-              'Utilisateur déja connecté',
+              'Utilisateur déjà connecté',
               HttpStatus.NOT_FOUND,
             );
           } else {
@@ -137,7 +142,7 @@ export class AuthService {
           }
         } catch (verifyError) {
           throw new HttpException(
-            'Vérification érroné',
+            'Vérification erronée',
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -148,6 +153,7 @@ export class AuthService {
           userName: credentials.userName,
         },
       });
+      verifEntrepriseGroups(user);
 
       if (user) {
         const passwordsMatch: boolean = await AuthService.comparePasswords(
@@ -157,29 +163,32 @@ export class AuthService {
 
         if (passwordsMatch) {
           try {
-            await this.refreshTokenService.generateRefreshToken(user.id, res);
-            return HttpStatus.OK;
+            const tokenGenerated =
+              await this.refreshTokenService.generateRefreshToken(user.id, res);
+            if (tokenGenerated === HttpStatus.OK) {
+              return HttpStatus.OK;
+            }
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
             throw new HttpException(
-              'Erreur sur la lecture de la private key',
+              'Erreur sur la lecture de la clé privée',
               HttpStatus.EXPECTATION_FAILED,
             );
           }
         } else {
           throw new HttpException(
-            'Le nom de compte et/ou le mot de passe est/sont erroné',
+            'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
             HttpStatus.BAD_REQUEST,
           );
         }
       } else {
         throw new HttpException(
-          'Le nom de compte et/ou le mot de passe est/sont erroné',
+          'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
           HttpStatus.BAD_REQUEST,
         );
       }
     } catch (error) {
-      return error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+      return HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
 
@@ -339,4 +348,72 @@ export class AuthService {
       console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
     }
   }
+}
+
+async function resetUserGroup(user: User) {
+  await prisma.user.update({
+    where: {
+      id: user.id,
+      userName: user.userName,
+    },
+    data: {
+      groupsId: 1,
+    },
+  });
+}
+
+async function verifEntrepriseGroups(user: User) {
+  const isEntrepriseValid = await prisma.commandeEntreprise.findMany({
+    where: {
+      userID: user.id,
+    },
+  });
+  if (isEntrepriseValid.length === 0) {
+    return;
+  }
+
+  if (isEntrepriseValid.length === 1) {
+    const today = new Date();
+    const dateCommand = isEntrepriseValid[0].dateCommande;
+    const deltaTime = differenceEnAnnees(today, dateCommand);
+    if (deltaTime > 1) {
+      await resetUserGroup(user);
+    }
+  }
+
+  if (isEntrepriseValid.length > 1) {
+    const today = new Date();
+    const dateCommand = isEntrepriseValid[0].dateCommande;
+    const deltaTime = differenceEnAnnees(today, dateCommand);
+    let nbYearPremium = 0;
+    let nbYearEntreprise = 0;
+
+    nbYearPremium = isEntrepriseValid.filter(
+      (elem) => elem.item === PREMIUM_PRICE,
+    ).length;
+    nbYearEntreprise = isEntrepriseValid.filter(
+      (elem) => elem.item === ENTREPRISE_PRICE,
+    ).length;
+
+    const deltaTimeLastOrder = differenceEnAnnees(
+      today,
+      isEntrepriseValid[isEntrepriseValid.length - 1].dateCommande,
+    );
+
+    if (deltaTimeLastOrder > 1) {
+      if (
+        (nbYearPremium > 0 && deltaTime > nbYearPremium) ||
+        (nbYearEntreprise > 0 && deltaTime > nbYearEntreprise)
+      ) {
+        await resetUserGroup(user);
+      }
+    }
+  }
+}
+
+function differenceEnAnnees(date1: Date, date2: Date): number {
+  const differenceEnMilliseconds = Math.abs(date2.getTime() - date1.getTime());
+  const millisecondsDansAnnee = 1000 * 60 * 60 * 24 * 365.25; // Approximation du nombre de millisecondes dans une année
+  const differenceEnAnnees = differenceEnMilliseconds / millisecondsDansAnnee;
+  return Math.floor(differenceEnAnnees);
 }

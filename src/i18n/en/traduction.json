@@ -65,5 +65,22 @@
   "unsubscribe": "Unsubscribe",
   "maxPlayer": "Maximum players",
   "emailNotVerified": "Email not verified",
-  "validMail": "Validate mail"
+  "validMail": "Validate mail",
+  "adminPage": "Administration",
+  "adminDashboard": "Admin Dashboard",
+  "labelTitre": "Title Label",
+  "valeurTitre": "Title Value",
+  "nottitle": "No Title",
+  "listRank": "Rank List",
+  "labelRank": "Rank Label",
+  "minPoint": "Minimum Points",
+  "maxPoint": "Maximum Points",
+  "descriptionRank": "Rank Description",
+  "actualRank": "Current Rank",
+  "pointNumber": "Point Number",
+  "nbPlayingGame": "Number of Games Played",
+  "next": "Next",
+  "previous": "Previous",
+  "delete": "Delete",
+  "resetPoints": "Reset les points"
 }

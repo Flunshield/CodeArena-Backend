@@ -31,7 +31,7 @@ export interface User {
 }
 
 export interface Titles {
-  id: number;
+  id?: number;
   value: string;
   label: string;
 }
@@ -182,4 +182,9 @@ export interface UserEvent {
   eventsID: number;
   events: Event;
   points: number;
+}
+
+export interface ResponseCreateUser {
+  bool: boolean;
+  type: string;
 }
