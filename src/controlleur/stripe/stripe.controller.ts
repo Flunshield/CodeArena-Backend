@@ -49,7 +49,6 @@ export class StripeController {
     if (session && session.payment_status === 'paid') {
       const checkIfOrderExist = await this.stripeService.checkIfOrderExist(
         session,
-        data.user.data,
       );
       if (checkIfOrderExist) {
         response.send(
