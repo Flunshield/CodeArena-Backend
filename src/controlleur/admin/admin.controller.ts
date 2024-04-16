@@ -2,7 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get, Patch,
+  Get,
+  Patch,
   Post,
   Query,
   Req,
@@ -94,7 +95,7 @@ export class AdminController {
     response.send(deleteUser);
   }
 
-  @Patch("/resetPoints")
+  @Patch('/resetPoints')
   @Roles(ADMIN)
   @UseGuards(RolesGuard)
   async patchPointsUser(@Body() data, @Res() response): Promise<void> {
