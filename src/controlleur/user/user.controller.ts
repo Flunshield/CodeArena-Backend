@@ -62,6 +62,7 @@ export class UserController {
    */
   @Post('/creatUser')
   async create(@Body() createUserDto: CreateUserDto): Promise<HttpException> {
+    console.log('createUserDto : ', createUserDto);
     const response: ResponseCreateUser =
       await this.userService.create(createUserDto);
     if (response.bool && response.type === 'ok') {
