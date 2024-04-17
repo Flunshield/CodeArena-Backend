@@ -153,7 +153,7 @@ export class AuthService {
           userName: credentials.userName,
         },
       });
-      verifEntrepriseGroups(user);
+      await verifEntrepriseGroups(user);
 
       if (user) {
         const passwordsMatch: boolean = await AuthService.comparePasswords(
