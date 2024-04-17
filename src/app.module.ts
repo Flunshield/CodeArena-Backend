@@ -32,6 +32,7 @@ import * as path from 'path';
 import { AdminService } from './services/admin/admin.service';
 import { StripeController } from './controlleur/stripe/stripe.controller';
 import { StripeService } from './services/stripe/stripe.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { StripeService } from './services/stripe/stripe.service';
     UserService,
     AuthService,
     MailService,
+    MailerService,
     RefreshTokenService,
     RolesGuard,
     DashboardService,
