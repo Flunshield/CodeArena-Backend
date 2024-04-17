@@ -56,7 +56,7 @@ export class RefreshTokenService {
         httpOnly: true, // Utiliser httpOnly pour des raisons de sécurité
         sameSite: true, // Nécessite Secure pour les requêtes HTTPS
         secure: true, // Utiliser uniquement en production avec HTTPS
-        domain: 'kbegot.fr', // Remplacez par le domaine correct
+        domain: process.env.DOMAINE, // Remplacez par le domaine correct
       });
 
       res.setHeader('Set-Cookie', cookies);

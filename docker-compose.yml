@@ -39,6 +39,7 @@ services:
       - COOKIE=${COOKIE}
       - URL_BACK=${URL_BACK}
       - URL_FRONT=${URL_FRONT}
+      - DOMAINE=${DOMAINE}
     depends_on:
       - mariadb
     volumes:
