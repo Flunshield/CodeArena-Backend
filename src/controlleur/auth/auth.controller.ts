@@ -140,7 +140,14 @@ export class AuthController {
       const refreshToken = request.cookies['frenchcodeareatoken'];
       if (refreshToken) {
         // Suppression du cookie côté serveur
-        response.clearCookie('frenchcodeareatoken');
+        response.clearCookie('frenchcodeareatoken', {
+          domain: 'code.kbegot.fr',
+          path: '/',
+        });
+        response.clearCookie('frenchcodeareatoken', {
+          domain: 'code.jbertrand.fr',
+          path: '/',
+        });
 
         // Envoyez une réponse pour confirmer la suppression du cookie
         response.send('Cookie supprimé avec succès');
