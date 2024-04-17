@@ -1,11 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MailService } from '../../email/service/MailService';
 import { ResponseCreateUser, User } from '../../interfaces/userInterface';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { PAGE_SIZE } from '../../constantes/contante';
+import { MailService } from '../../email/service/MailService';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -28,7 +27,7 @@ const prisma: PrismaClient = new PrismaClient();
  */
 @Injectable()
 export class UserService {
-  constructor(private readonly MailService: MailService) {}
+  constructor(private readonly mailService: MailService) {}
 
   /**
    * Crée un nouvel utilisateur avec des vérifications d'existence et hachage sécurisé du mot de passe.
@@ -82,7 +81,7 @@ export class UserService {
           });
 
           // Realise les actions necessaire à l'envoie du mail de création de compte.
-          const responseSendMail = await this.MailService.prepareMail(
+          const responseSendMail = await this.mailService.prepareMail(
             createUser.id,
             data,
             1,
