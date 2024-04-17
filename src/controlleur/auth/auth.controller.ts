@@ -141,12 +141,11 @@ export class AuthController {
       if (refreshToken) {
         // Suppression du cookie côté serveur
         response.clearCookie('frenchcodeareatoken', {
-          domain: 'code.kbegot.fr',
-          path: '/',
-        });
-        response.clearCookie('frenchcodeareatoken', {
-          domain: 'code.jbertrand.fr',
-          path: '/',
+          path: '/', // accessible from the entire domain
+          domain: 'code.kbegot.fr', // parent domain
+          secure: true, // cookie accessible via HTTPS only
+          httpOnly: true, // cookie accessible via HTTP only, not JavaScript
+          sameSite: 'none', // 'None' avec une majuscule pour respecter la syntaxe du SameSite
         });
 
         // Envoyez une réponse pour confirmer la suppression du cookie
