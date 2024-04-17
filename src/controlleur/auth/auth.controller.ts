@@ -14,7 +14,6 @@ import {
 import { shortUser } from '../../interfaces/userInterface';
 import { AuthService } from '../../services/authentificationService/auth.service';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
-import * as cookie from 'cookie';
 import { RolesGuard } from '../../guards/roles.guard';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 
@@ -140,18 +139,8 @@ export class AuthController {
     try {
       const refreshToken = request.cookies['frenchcodeareatoken'];
       if (refreshToken) {
-        const nomDuCookie = 'frenchcodeareatoken';
-
         // Suppression du cookie côté serveur
-        response.setHeader(
-          'Set-Cookie',
-          cookie.serialize(nomDuCookie, '', {
-            httpOnly: true,
-            maxAge: 0,
-            domain: 'code.jbertrand.fr', // parent domain
-            sameSite: 'none',
-          }),
-        );
+        response.clearCookie('frenchcodeareatoken');
 
         // Envoyez une réponse pour confirmer la suppression du cookie
         response.send('Cookie supprimé avec succès');
