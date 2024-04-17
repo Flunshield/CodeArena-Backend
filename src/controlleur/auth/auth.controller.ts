@@ -148,7 +148,7 @@ export class AuthController {
           cookie.serialize(nomDuCookie, '', {
             httpOnly: true,
             maxAge: 0,
-            domain: 'code.jbertrand.fr',
+            domain: 'code.kbegot.fr',
           }),
         );
 
