@@ -5,7 +5,7 @@ import { ENTREPRISE, USER } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../auth/auth.controller';
 
-const YOUR_DOMAIN = 'http://localhost:5173';
+const YOUR_DOMAIN = process.env.URL_FRONT;
 const stripe = new Stripe(
   'sk_test_51P1YCzFoLa8m0nzyi1YXY5DWNpDYc89lZ0oa17ueukKAwuJkhUMP1Ig1XRtuveCVaMJBcxXq1dVuD1p1UtHEqZNd007GVNqPQx',
   {

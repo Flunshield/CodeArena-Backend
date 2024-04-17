@@ -200,9 +200,9 @@ export class AuthController {
     try {
       const validMail: HttpStatus = await this.AuthService.validMail(token);
       if (validMail === 200) {
-        response.redirect('http://localhost:5173/login');
+        response.redirect(`${process.env.URL_FRONT}/login`);
       } else {
-        response.redirect('http://localhost:5173/notFound');
+        response.redirect(`${process.env.URL_FRONT}/notFound`);
       }
     } catch (error: any) {
       console.error("Erreur lors de la création de l'utilisateur :", error);
