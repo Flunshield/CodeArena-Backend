@@ -363,13 +363,16 @@ async function resetUserGroup(user: User) {
 }
 
 async function verifEntrepriseGroups(user: User) {
-  const isEntrepriseValid = await prisma.commandeEntreprise.findMany({
-    where: {
-      userID: user.id,
-    },
-  });
-  if (isEntrepriseValid.length === 0) {
-    return;
+  let isEntrepriseValid;
+
+  if (user && user.id) {
+    isEntrepriseValid = await prisma.commandeEntreprise.findMany({
+      where: {
+        userID: user.id,
+      },
+    });
+  } else {
+    isEntrepriseValid = [];
   }
 
   if (isEntrepriseValid.length === 1) {
