@@ -155,7 +155,7 @@ export class AuthController {
           cookie.serialize(nomDuCookie, '', {
             httpOnly: true,
             maxAge: 0,
-            domain: 'kbegot.fr',
+            domain: process.env.DOMAINE,
           }),
         );
 
@@ -227,9 +227,9 @@ export class AuthController {
         try {
           const validMail = await this.authService.validMail(token);
           if (validMail) {
-            response.sendStatus(HttpStatus.OK);
+            response.send();
           } else {
-            response.sendStatus(HttpStatus.BAD_REQUEST);
+            response.send();
           }
         } catch (error) {
           console.log(error);
@@ -245,8 +245,8 @@ export class AuthController {
     try {
       const email = request.body.email;
       try {
-        const changePassword = await this.authService.passwordForgot(email);
-        response.sendStatus(changePassword);
+        await this.authService.passwordForgot(email);
+        response.send();
       } catch (error) {
         console.log(error);
       }
@@ -259,8 +259,8 @@ export class AuthController {
   async changePassword(@Req() request, @Res() response) {
     const data = request.body;
     try {
-      const changePassword = await this.authService.changePassword(data);
-      response.sendStatus(changePassword);
+      await this.authService.changePassword(data);
+      response.send();
     } catch (error: any) {
       console.error("Erreur lors de la création de l'utilisateur :", error);
       throw new HttpException(
