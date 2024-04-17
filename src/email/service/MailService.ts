@@ -88,7 +88,7 @@ export class MailService {
       );
       return await this.sendActiveAccount(
         data,
-        `http://localhost:3000/auth/validMail?token=${token}`,
+        `${process.env.URL_BACK}/auth/validMail?token=${token}`,
       );
     }
 
@@ -101,7 +101,7 @@ export class MailService {
         );
       return await this.sendForgotPassword(
         data,
-        `http://localhost:5173/changePassword?token=${token}&userName=${data.userName}`,
+        `${process.env.URL_FRONT}/changePassword?token=${token}&userName=${data.userName}`,
       );
     }
   }
