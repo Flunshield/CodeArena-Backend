@@ -227,7 +227,7 @@ export class AuthService {
           publicKey,
         ) as unknown as DecodedTokenMail;
       if (verifedToken?.exp - verifedToken?.iat > 0) {
-        await prisma.user.update({
+        const updateUser = await prisma.user.update({
           where: {
             id: verifedToken.id,
             userName: verifedToken.userName,
@@ -237,7 +237,11 @@ export class AuthService {
             status: 'actif',
           },
         });
-        return HttpStatus.OK;
+        if (updateUser) {
+          return HttpStatus.OK;
+        } else {
+          return HttpStatus.BAD_REQUEST;
+        }
       }
       return HttpStatus.GATEWAY_TIMEOUT;
     } catch (error) {

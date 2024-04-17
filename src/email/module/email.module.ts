@@ -8,8 +8,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     MailerModule.forRoot({
       transport: {
         host: process.env.MAIL_HOST,
-        port: 465,
-        secure: true,
+        port: 587,
+        secure: false,
         auth: {
           user: process.env.MAIL,
           pass: process.env.MAIL_PASSWORD,
