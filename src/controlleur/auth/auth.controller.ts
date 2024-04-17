@@ -93,8 +93,8 @@ export class AuthController {
    */
   @Post('refresh-access-token')
   async refreshAccessToken(@Req() request, @Res() response): Promise<void> {
+    const refreshToken = request.cookies['frenchcodeareatoken'];
     try {
-      const refreshToken = request.cookies['frenchcodeareatoken'];
       const accessToken =
         await this.refreshTokenService.generateAccessTokenFromRefreshToken(
           refreshToken,
@@ -103,20 +103,12 @@ export class AuthController {
         response
           .status(HttpStatus.UNAUTHORIZED)
           .send({ message: 'Unauthorized' });
-        return;
       } else {
-        try {
-          response.send({ accessToken: accessToken });
-        } catch (e) {
-          throw new HttpException(
-            'Merci de vous authentifier',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
+        response.send({ accessToken: accessToken });
       }
     } catch (error: any) {
       throw new HttpException(
-        'Merci de vous authentifier',
+        `Merci de vous authentifier ${refreshToken}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -155,7 +147,7 @@ export class AuthController {
           cookie.serialize(nomDuCookie, '', {
             httpOnly: true,
             maxAge: 0,
-            domain: '.jbertrand.fr',
+            domain: 'code.jbertrand.fr',
           }),
         );
 
