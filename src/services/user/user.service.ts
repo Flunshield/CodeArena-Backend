@@ -9,8 +9,6 @@ import { PAGE_SIZE } from '../../constantes/contante';
 
 const prisma: PrismaClient = new PrismaClient();
 
-//TODO: Lorsque la page "mon compte" sera créé coté front, il faudra gérer la vérification du mail. OU obliger a valdier le mail avant la première connexion.
-
 /**
  * Service responsable de la gestion des utilisateurs.
  *
@@ -102,10 +100,7 @@ export class UserService {
         return { bool: false, type: 'username' };
       }
     } catch (error) {
-      throw new HttpException(
-        'Erreur interne du serveur',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
