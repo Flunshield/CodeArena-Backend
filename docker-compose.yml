@@ -37,6 +37,8 @@ services:
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_TO=${MAIL_TO}
       - COOKIE=${COOKIE}
+      - URL_BACK=${URL_BACK}
+      - URL_FRONT=${URL_FRONT}
     depends_on:
       - mariadb
     volumes:
