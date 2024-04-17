@@ -47,9 +47,8 @@ export class StripeController {
     const data = req.body.data;
     const session = await this.stripeService.retrieveSession(data.sessionId);
     if (session && session.payment_status === 'paid') {
-      const checkIfOrderExist = await this.stripeService.checkIfOrderExist(
-        session,
-      );
+      const checkIfOrderExist =
+        await this.stripeService.checkIfOrderExist(session);
       if (checkIfOrderExist) {
         response.send(
           await this.stripeService.createCommande(session, data.user.data),

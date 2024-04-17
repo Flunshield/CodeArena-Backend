@@ -15,8 +15,8 @@ if [ -d "$local_folder/migrations" ]; then
 fi
 
 # Construire et démarrer les conteneurs Docker avec Docker Compose
-docker compose build
-docker compose up -d
+docker compose up --build -d
+#docker compose -f docker-compose-prod.yml up --build -d
 
 # Attendre que les conteneurs soient prêts, notamment mariadb qui prend du temps
 sleep 30
@@ -40,12 +40,14 @@ fi
 
 # Arrêter les conteneurs Docker avec Docker Compose
 docker compose stop
+#docker compose -f docker-compose-prod.yml stop
 
 # Attendre que les conteneurs soient bien éteints
 sleep 10
 
 # Redémarrer les conteneurs Docker avec Docker Compose
 docker compose up -d
+#docker compose -f docker-compose-prod.yml up -d
 
 # Attendre que les conteneurs soient bien démarrés
 sleep 10

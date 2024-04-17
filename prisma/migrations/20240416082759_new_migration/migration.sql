@@ -158,8 +158,6 @@ CREATE TABLE `userEvent` (
 CREATE TABLE `puzzles` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `rankingsID` INTEGER NOT NULL,
-    `coucou` VARCHAR(191) NOT NULL,
-    `tuture` VARCHAR(191) NOT NULL,
     `tournamentID` INTEGER NOT NULL,
     `eventsID` INTEGER NOT NULL,
     `tests` JSON NOT NULL,
