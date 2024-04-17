@@ -53,9 +53,10 @@ export class RefreshTokenService {
       const refreshToken = sign(payload, privateKey, options);
       const cookies = cookie.serialize('frenchcodeareatoken', refreshToken, {
         maxAge: 3600000,
-        sameSite: true, // Nécessite Secure pour les requêtes HTTPS
-        secure: true, // Utiliser uniquement en production avec HTTPS
-        domain: process.env.DOMAINE, // Remplacez par le domaine correct
+        path: '/', // accessible from the entire domain
+        domain: '.code.fr', // parent domain
+        secure: true, // cookie accessible via HTTPS only
+        httpOnly: true, // cookie accessible via HTTP only, not JavaScript
       });
 
       res.setHeader('Set-Cookie', cookies);
