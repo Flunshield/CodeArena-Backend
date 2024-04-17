@@ -81,13 +81,13 @@ export class UserService {
           });
 
           // Realise les actions necessaire à l'envoie du mail de création de compte.
-          const responseSendMail = await this.mailService.prepareMail(
+          /*const responseSendMail = await this.mailService.prepareMail(
             createUser.id,
             data,
             1,
-          );
+          );*/
           return {
-            bool: createUser && newUserRanking && responseSendMail,
+            bool: !!(createUser && newUserRanking) /*&& responseSendMail*/,
             type: 'ok',
           };
         } catch (error) {
