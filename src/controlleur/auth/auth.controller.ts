@@ -12,14 +12,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { shortUser } from '../../interfaces/userInterface';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AuthService } from '../../services/authentificationService/auth.service';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import * as cookie from 'cookie';
 import { RolesGuard } from '../../guards/roles.guard';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
-
-//TODO: Ajouter une vérification au login pour l'email vérifier, si non, renvoyer un mail de validation
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
@@ -33,11 +30,11 @@ export class AuthController {
   /**
    * Crée une nouvelle instance de AuthController.
    *
-   * @param AuthService
+   * @param authService
    * @param refreshTokenService
    */
   constructor(
-    private readonly AuthService: AuthService,
+    private readonly authService: AuthService,
     private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
@@ -55,7 +52,7 @@ export class AuthController {
   async login(@Body() userLogin: shortUser, @Req() request, @Res() response) {
     try {
       const frenchCodeAreaCookie = request.cookies['frenchcodeareatoken'];
-      const reponse = await this.AuthService.connect(
+      const reponse = await this.authService.connect(
         userLogin,
         response,
         frenchCodeAreaCookie,
@@ -198,7 +195,7 @@ export class AuthController {
   @Get('/validMail')
   async validMail(@Query('token') token: string, @Res() response) {
     try {
-      const validMail: HttpStatus = await this.AuthService.validMail(token);
+      const validMail: HttpStatus = await this.authService.validMail(token);
       if (validMail === 200) {
         response.redirect(`${process.env.URL_FRONT}/login`);
       } else {
@@ -228,7 +225,7 @@ export class AuthController {
         const token = accesToken.split(' ')[1];
 
         try {
-          await this.AuthService.validMail(token);
+          await this.authService.validMail(token);
           response.send();
         } catch (error) {
           console.log(error);
@@ -244,7 +241,7 @@ export class AuthController {
     try {
       const email = request.body.email;
       try {
-        await this.AuthService.passwordForgot(email);
+        await this.authService.passwordForgot(email);
         response.send();
       } catch (error) {
         console.log(error);
@@ -258,7 +255,7 @@ export class AuthController {
   async changePassword(@Req() request, @Res() response) {
     const data = request.body;
     try {
-      await this.AuthService.changePassword(data);
+      await this.authService.changePassword(data);
       response.send();
     } catch (error: any) {
       console.error("Erreur lors de la création de l'utilisateur :", error);
