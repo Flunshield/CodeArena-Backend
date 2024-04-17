@@ -93,12 +93,13 @@ export class AuthController {
    */
   @Post('refresh-access-token')
   async refreshAccessToken(@Req() request, @Res() response): Promise<void> {
-    const refreshToken = request.cookies['frenchcodeareatoken'];
+    let refreshToken = request.cookies['frenchcodeareatoken'];
     try {
       const accessToken =
         await this.refreshTokenService.generateAccessTokenFromRefreshToken(
           refreshToken,
         );
+      refreshToken = accessToken;
       if (!accessToken) {
         response
           .status(HttpStatus.UNAUTHORIZED)
