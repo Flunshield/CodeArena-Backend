@@ -53,10 +53,9 @@ export class RefreshTokenService {
       const refreshToken = sign(payload, privateKey, options);
       const cookies = cookie.serialize('frenchcodeareatoken', refreshToken, {
         maxAge: 3600000,
-        httpOnly: true, // Utiliser httpOnly pour des raisons de sécurité
         sameSite: true, // Nécessite Secure pour les requêtes HTTPS
         secure: true, // Utiliser uniquement en production avec HTTPS
-        domain: process.env.DOMAINE, // Remplacez par le domaine correct
+        domain: 'code.jbertrand.fr', // Remplacez par le domaine correct
       });
 
       res.setHeader('Set-Cookie', cookies);
