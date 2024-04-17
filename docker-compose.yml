@@ -48,12 +48,10 @@ services:
 #       - rcr_network
 #   labels:
 #       - "traefik.enable=true"
-#       - "traefik.http.routers.rcr-api.rule=Host(`code.MYDOMAIN.fr`)"
+#       - "traefik.http.routers.rcr-api.rule=Host(`MYDOMAIN.fr`)"
 #       - "traefik.http.routers.rcr-api.entrypoints=websecure"
 #       - "traefik.http.routers.rcr-api.tls.certresolver=myresolver"
-#       - "traefik.http.routers.rcr-api.middlewares=rcr-api-prefix"
 #       - "traefik.http.services.rcr-api.loadbalancer.server.port=3000"
-#       - "traefik.http.middlewares.rcr-api-prefix.stripprefix.prefixes=/api"
 
 # networks:
 #   rcr_network:
