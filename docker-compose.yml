@@ -12,6 +12,8 @@ services:
       - ${MARIADB_PORTS}:3306
     volumes:
       - ${MARIADB_PATH}:/var/lib/mysql
+    networks:
+      - mynetwork
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.2
@@ -22,6 +24,8 @@ services:
       - "8080:80"
     depends_on:
       - mariadb
+    networks:
+      - mynetwork
 
   app:
     build:
@@ -44,6 +48,13 @@ services:
       - mariadb
     volumes:
       - ./src:/app/src
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    external: true
+
 
 #   networks:
 #       - rcr_network
