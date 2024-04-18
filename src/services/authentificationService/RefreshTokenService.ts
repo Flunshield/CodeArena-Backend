@@ -54,7 +54,7 @@ export class RefreshTokenService {
       const cookies = cookie.serialize('frenchcodeareatoken', refreshToken, {
         maxAge: 3600000,
         path: '/', // accessible from the entire domain
-        domain: 'code.kbegot.fr', // parent domain
+        domain: process.env.DOMAINE, // parent domain
         secure: true, // cookie accessible via HTTPS only
         httpOnly: true, // cookie accessible via HTTP only, not JavaScript
         sameSite: 'none',

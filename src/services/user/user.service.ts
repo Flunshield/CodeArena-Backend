@@ -37,11 +37,9 @@ export class UserService {
    * @throws {Error} Une erreur si la création de l'utilisateur échoue.
    */
   public async create(data: CreateUserDto): Promise<ResponseCreateUser> {
-    console.log('CreateUserDto : ', data);
     const regexPassword =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     try {
-      console.log('regexPassword : ', regexPassword.test(data.password));
       if (!regexPassword.test(data.password)) {
         // Si le mot de passe n'est pas conforme.
         return { bool: false, type: 'password' };
@@ -53,19 +51,16 @@ export class UserService {
         },
       });
 
-      console.log('userExist: ', userExist);
       const rankListe = await prisma.rankings.findMany();
 
-      console.log('rankListe: ', rankListe);
       // On va chercher le rang bronze dans la table ranking
       const rankBronze = rankListe.find((element) => {
         return element.title === 'Bronze Rank';
       });
 
-      console.log('rankBronze: ', rankBronze);
       if (!userExist) {
         const password: string = await AuthService.hashPassword(data.password);
-        console.log('password : ', password);
+
         try {
           const createUser: User = await prisma.user.create({
             data: {
@@ -77,7 +72,6 @@ export class UserService {
               groupsId: 1, // Par défaut groupe 1 qui équivaut au groupe utilisation lambda
             },
           });
-          console.log('createUser : ', createUser);
           // createUser a réussi, procéder à la création de createRank
           const newUserRanking = await prisma.userRanking.create({
             data: {
@@ -86,7 +80,6 @@ export class UserService {
               points: 0 /* La valeur des points que vous souhaitez attribuer */,
             },
           });
-          console.log('newUserRanking : ', newUserRanking);
 
           // Realise les actions necessaire à l'envoie du mail de création de compte.
           const responseSendMail = await this.mailService.prepareMail(
@@ -94,7 +87,6 @@ export class UserService {
             data,
             1,
           );
-          console.log('responseSendMail : ', responseSendMail);
           return {
             bool: createUser && newUserRanking && responseSendMail,
             type: 'ok',
@@ -356,6 +348,7 @@ export class UserService {
   }
 
   async attributeEntrepriseRole(user: User) {
+
     return prisma.user.update({
       where: {
         userName: user.userName,

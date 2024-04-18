@@ -142,7 +142,7 @@ export class AuthController {
         // Suppression du cookie côté serveur
         response.clearCookie('frenchcodeareatoken', {
           path: '/', // accessible from the entire domain
-          domain: 'code.kbegot.fr', // parent domain
+          domain: process.env.DOMAINE, // parent domain
           secure: true, // cookie accessible via HTTPS only
           httpOnly: true, // cookie accessible via HTTP only, not JavaScript
           sameSite: 'none', // 'None' avec une majuscule pour respecter la syntaxe du SameSite
