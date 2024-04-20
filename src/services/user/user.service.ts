@@ -348,7 +348,6 @@ export class UserService {
   }
 
   async attributeEntrepriseRole(user: User) {
-
     return prisma.user.update({
       where: {
         userName: user.userName,
