@@ -16,7 +16,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
         },
       },
       defaults: {
-        from: '"NotreProjet" <noreply@qrcoffee.fr>',
+        from: '"NotreProjet" <contact@jbertrand.fr>',
       },
       template: {
         dir: process.cwd() + '/templates/mails/',

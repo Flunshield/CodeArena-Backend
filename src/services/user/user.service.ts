@@ -312,7 +312,7 @@ export class UserService {
   /**
    * Recherche les dix meilleurs classements d'utilisateurs.
    *
-   * @returns {Promise<Array<{
+   * @returns Promise<Array<{
    *   user: {
    *     id: number;
    *     userName: string;
@@ -322,7 +322,7 @@ export class UserService {
    *     title: string;
    *   }[];
    *   points: number;
-   * }>>} Une promesse qui résout avec un tableau des dix meilleurs classements d'utilisateurs.
+   * }>> Une promesse qui résout avec un tableau des dix meilleurs classements d'utilisateurs.
    */
   async findTenUserRanking() {
     return prisma.userRanking.findMany({
@@ -347,6 +347,14 @@ export class UserService {
     });
   }
 
+  /**
+   * Attribue un rôle d'entreprise à un utilisateur en mettant à jour son groupe d'appartenance dans la base de données.
+   * Cette fonction met à jour l'identifiant de groupe de l'utilisateur pour le passer à un identifiant spécifique
+   * représentant le groupe des entreprises (par exemple, groupe ID 3 pour les utilisateurs d'entreprise).
+   *
+   * @param user - L'objet `User` représentant l'utilisateur à qui le rôle d'entreprise sera attribué.
+   * @returns Une promesse résolue avec l'objet utilisateur mis à jour.
+   */
   async attributeEntrepriseRole(user: User) {
     return prisma.user.update({
       where: {
