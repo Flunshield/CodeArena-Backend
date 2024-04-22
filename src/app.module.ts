@@ -32,6 +32,7 @@ import * as path from 'path';
 import { AdminService } from './services/admin/admin.service';
 import { StripeController } from './controlleur/stripe/stripe.controller';
 import { StripeService } from './services/stripe/stripe.service';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { StripeService } from './services/stripe/stripe.service';
         new HeaderResolver(['x-lang']),
       ],
     }),
+    WebsocketModule,
   ],
   controllers: [
     AppController,
