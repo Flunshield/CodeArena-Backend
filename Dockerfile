@@ -18,4 +18,4 @@ RUN npm run build
 RUN npx prisma generate
 
 # Command to run your application
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
