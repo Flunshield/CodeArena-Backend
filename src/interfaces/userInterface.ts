@@ -135,6 +135,9 @@ export interface Ranking {
   rewards: string;
   matches: Match[];
   userRanking: UserRanking[];
+  maxPoints: number;
+  minPoints: number;
+  puzzle: puzzles[];
 }
 
 export interface UserRanking {
@@ -142,6 +145,7 @@ export interface UserRanking {
   userID: number;
   user: User;
   rankingsID?: number;
+  rankings: Ranking;
   points?: number;
 }
 
@@ -187,4 +191,18 @@ export interface UserEvent {
 export interface ResponseCreateUser {
   bool: boolean;
   type: string;
+}
+
+export interface puzzles {
+  id: number;
+  rankingsID: number;
+  coucou: string;
+  tuture: string;
+  rankings: Ranking;
+  tournamentID: number;
+  tournament: Tournament;
+  eventID: number;
+  events: Event;
+  tests: JsonValue;
+  details: string;
 }
