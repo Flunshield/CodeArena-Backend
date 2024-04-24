@@ -32,6 +32,8 @@ import * as path from 'path';
 import { AdminService } from './services/admin/admin.service';
 import { StripeController } from './controlleur/stripe/stripe.controller';
 import { StripeService } from './services/stripe/stripe.service';
+import { PuzzleController } from './controlleur/puzzle/puzzle.controller';
+import { PuzzleService } from './services/puzzle/puzzle.service';
 
 @Module({
   imports: [
@@ -58,6 +60,7 @@ import { StripeService } from './services/stripe/stripe.service';
     EvenementController,
     AdminController,
     StripeController,
+    PuzzleController,
   ],
   providers: [
     AppService,
@@ -71,6 +74,7 @@ import { StripeService } from './services/stripe/stripe.service';
     EvenementService,
     AdminService,
     StripeService,
+    PuzzleService,
   ],
 })
 export class AppModule implements NestModule {

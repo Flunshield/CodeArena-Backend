@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
 import { ResponseCreateUser, User } from '../../interfaces/userInterface';
-import { CreateUserDto } from '../../dto/CreateUserDto';
+import { Dto } from '../../dto/./Dto';
 import { PAGE_SIZE } from '../../constantes/contante';
 import { MailService } from '../../email/service/MailService';
 
@@ -36,7 +36,7 @@ export class UserService {
    * @returns Une promesse résolue avec un boolean indiquant si l'utilisateur a été créé avec succès.
    * @throws {Error} Une erreur si la création de l'utilisateur échoue.
    */
-  public async create(data: CreateUserDto): Promise<ResponseCreateUser> {
+  public async create(data: Dto): Promise<ResponseCreateUser> {
     const regexPassword =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     try {

@@ -1,0 +1,91 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Roles } from '../auth/auth.controller';
+import { ADMIN, ENTREPRISE } from '../../constantes/contante';
+import { RolesGuard } from '../../guards/roles.guard';
+import { PuzzleService } from '../../services/puzzle/puzzle.service';
+import { puzzlesEntreprise } from '@prisma/client';
+
+@Controller('puzzle')
+export class PuzzleController {
+  constructor(private readonly puzzleService: PuzzleService) {}
+
+  @Post('/create')
+  @Roles(ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async createPuzzle(@Body() data, @Req() request, @Res() response) {
+    try {
+      const create = await this.puzzleService.createPuzzle(data.data);
+      response.send(create);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('/findPuzzles')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async findPuzzles(@Res() response, @Query('id') id: string) {
+    try {
+      const puzzles: puzzlesEntreprise[] =
+        await this.puzzleService.findPuzzles(id);
+      if (puzzles.length > 0) {
+        response.send(puzzles);
+      } else {
+        response.send([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Patch('/updatePuzzle')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async updatePuzzle(@Body() updatePuzzleDto, @Res() response) {
+    try {
+      const updatedPuzzle =
+        await this.puzzleService.updatePuzzlePartially(updatePuzzleDto);
+      if (updatedPuzzle) {
+        response.json(updatedPuzzle);
+      } else {
+        response.status(HttpStatus.NOT_FOUND).send('Puzzle not found');
+      }
+    } catch (error) {
+      console.error(error);
+      response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send('Internal Server Error');
+    }
+  }
+
+  @Delete('deletePuzzle')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async deletePuzzle(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.deletePuzzle(data.id);
+      if (result) {
+        response.send();
+      } else {
+        response.status(HttpStatus.NOT_FOUND).send('Puzzle not found');
+      }
+    } catch (error) {
+      console.error('Delete Puzzle Error:', error);
+      return response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Error deleting puzzle' });
+    }
+  }
+}

@@ -62,6 +62,13 @@ Pour généré les migrations non joué (a utiliser si il y a de nouvelles migra
 docker exec -it nest npx prisma migrate deploy
 ```
 
+APRES AVOIR Jouer les migrations :
+```
+docker compose down
+npx prisma generate
+docker compose up --build
+```
+
 Pour lancer prisma studio (Port par défault 5555) :
 ```
 npx prisma studio

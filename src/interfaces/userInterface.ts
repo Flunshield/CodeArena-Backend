@@ -17,8 +17,7 @@ export interface User {
   localisation?: string;
   titlesId?: number;
   titles?: Titles[];
-  data?: JsonValue;
-  badges?: string;
+  badgesWin?: JsonValue;
   company?: string;
   url?: string;
   school?: string;
@@ -28,6 +27,8 @@ export interface User {
   userRanking?: UserRanking;
   userTournament?: UserTournament;
   userMatch?: UserMatch;
+  puzzlesEntreprise?: PuzzlesEntreprise;
+  commandeEntreprise?: CommandeEntreprise;
 }
 
 export interface Titles {
@@ -187,4 +188,30 @@ export interface UserEvent {
 export interface ResponseCreateUser {
   bool: boolean;
   type: string;
+}
+
+export interface Puzzle {
+  details: string;
+  test: [];
+}
+
+export interface CommandeEntreprise {
+  id: number;
+  idSession: string;
+  objetSession: JSON;
+  idPayment: string;
+  item: string;
+  userID: number;
+  user: User;
+  dateCommande: Date;
+  etatCommande: string;
+  nbCreateTest: number;
+}
+
+export interface PuzzlesEntreprise {
+  id: number;
+  userID: number;
+  user: User;
+  tests: JSON;
+  details: string;
 }

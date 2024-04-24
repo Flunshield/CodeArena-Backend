@@ -105,7 +105,28 @@ export class RefreshTokenService {
       const { sub: userId } = jwt.verify(refreshToken, publicKey);
       const user = await this.prisma.user.findUnique({
         where: { id: parseInt(userId as string, 10) },
-        include: {
+        select: {
+          id: true,
+          userName: true,
+          password: false,
+          email: true,
+          emailVerified: true,
+          createdAt: true,
+          lastLogin: true,
+          status: true,
+          avatar: true,
+          firstName: true,
+          lastName: true,
+          groupsId: true,
+          languagePreference: true,
+          localisation: true,
+          company: true,
+          badgesWin: true,
+          url: true,
+          school: true,
+          github: true,
+          presentation: true,
+          Histories: true,
           groups: true,
           titles: {
             select: {
