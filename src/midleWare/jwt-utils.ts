@@ -20,8 +20,7 @@ import * as fs from 'fs';
  *   @UseMiddleware(VerifyJwtMiddleware)
  *   protectedRoute(@Req() request) {
  *     const decodedToken = request['decodedToken'];
- *     // ... Logique de la route protégée avec le jeton décodé
- *   }
+ *     // ... Logique de la route protégée avec le jeton décodé *   }
  * }
  */
 @Injectable()
