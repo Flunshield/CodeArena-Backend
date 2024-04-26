@@ -161,8 +161,6 @@ model userEvent {
 model puzzles {
   id           Int         @id @default(autoincrement())
   rankingsID   Int
-  coucou       String
-  tuture       String
   rankings     rankings    @relation(fields: [rankingsID], references: [id])
   tournamentID Int
   tournaments  tournaments @relation(fields: [tournamentID], references: [id])
@@ -183,4 +181,10 @@ model commandeEntreprise {
   dateCommande DateTime @default(now())
   etatCommande String
   nbCreateTest Int      @default(10)
+}
+
+model puzzlesEntreprise {
+  id      Int    @id @default(autoincrement())
+  tests   Json
+  details String
 }

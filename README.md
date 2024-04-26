@@ -10,11 +10,11 @@ Renommer le fichier ``.env.example`` en ``.env``
 
 Puis lancer la commande : **A lancer depuis la racine du projet**
 ```bash
-# Commande pour windows
-script/lancement/script.ps1
+npm install
 
-# Commande pour linux ou Max
-script/lancement/script.sh
+docker compose up --build
+
+docker exec -it nest npx prisma migrate deploy
 ```
 
 Pour alimenter la bdd, vous pouvez utiliser les requetes SQL se trouvant dans :
@@ -46,35 +46,20 @@ Pas d'injection SQL grâce à prisma. :-)
 ```
 https://www.youtube.com/watch?v=akP9E1vURBU&ab_channel=AKDEV
 ```
-Installer les dépendances (si pas déja fait) :
-```
-npm install prisma -D
-npm install @prisma/client
-```
 
 Pour créer une migration après avoir modifier le fichier **schema.prisma** (docker compsoe lancé)
 ```
-npx prisma migrate dev --name nomDeVotreMigration
+docker exec -it nest npx prisma migrate dev --create-only --name nom-de-la-migration
 ```
 
 Pour récupérer le dossier migration depuis le container
 ```
-docker cp IDdeVotreContainer:/app/prisma/migrations ./prisma
+docker cp nest:/usr/src/app/prisma/migrations ./prisma
 ```
 
-Pour généré les migrations non joué (a utiliser à chaque lancement du projet) :
+Pour généré les migrations non joué (a utiliser si il y a de nouvelles migrations) :
 ```
-npx prisma migrate up
-```
-
-Pour jouer une migration spécifique :
-```
-npx prisma migrate up --nomDeVotreMigration
-```
-
-Pour annuler une migration spécifique :
-```
-npx prisma migrate down --nomDeVotreMigration
+docker exec -it nest npx prisma migrate deploy
 ```
 
 Pour lancer prisma studio (Port par défault 5555) :
