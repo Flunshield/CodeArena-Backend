@@ -11,7 +11,7 @@ import { PrismaClient } from '@prisma/client';
 import { RefreshTokenService } from './RefreshTokenService';
 import { Response } from 'express';
 import { MailService } from '../../email/service/MailService';
-import { ENTREPRISE_PRICE, PREMIUM_PRICE } from '../../constantes/contante';
+import { UserService } from '../user/user.service';
 
 const prisma = new PrismaClient();
 
@@ -150,7 +150,7 @@ export class AuthService {
           userName: credentials.userName,
         },
       });
-      await verifEntrepriseGroups(user);
+      await this.verifEntrepriseGroups(user);
 
       if (user) {
         const passwordsMatch: boolean = await AuthService.comparePasswords(
@@ -349,6 +349,38 @@ export class AuthService {
       console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
     }
   }
+
+  /**
+   * Vérifie la validité des groupes d'entreprise pour un utilisateur et réinitialise son groupe si les conditions sont remplies.
+   * Cette fonction examine les commandes de l'utilisateur pour déterminer si son abonnement d'entreprise est toujours valide.
+   * - Si l'utilisateur a une seule commande et que cette commande a expiré il y a plus d'un an, son groupe est réinitialisé.
+   * - Si l'utilisateur a plusieurs commandes, la fonction vérifie la durée de validité de la plus ancienne et de la plus récente commande.
+   *   Si la plus récente commande a expiré il y a plus d'un an et que la durée depuis la première commande dépasse le nombre
+   *   d'années couvertes par les abonnements achetés, le groupe de l'utilisateur est également réinitialisé.
+   *
+   * @param user - L'objet `User` contenant les informations de l'utilisateur à vérifier.
+   * @returns Une promesse qui se résout sans valeur de retour, après potentiellement avoir réinitialisé le groupe de l'utilisateur.
+   */
+  async verifEntrepriseGroups(user: User) {
+    let isEntrepriseValid;
+
+    if (user && user.id) {
+      isEntrepriseValid = [
+        await UserService.getLastCommande(user.id.toString()),
+      ];
+    } else {
+      isEntrepriseValid = [];
+    }
+    if (isEntrepriseValid.length > 0) {
+      const today = new Date();
+      const dateCommand = isEntrepriseValid[0].dateCommande;
+      const deltaTime = differenceEnAnnees(today, dateCommand);
+      console.log(deltaTime);
+      if (deltaTime > 1) {
+        await resetUserGroup(user);
+      }
+    }
+  }
 }
 
 /**
@@ -372,67 +404,6 @@ async function resetUserGroup(user: User) {
 }
 
 /**
- * Vérifie la validité des groupes d'entreprise pour un utilisateur et réinitialise son groupe si les conditions sont remplies.
- * Cette fonction examine les commandes de l'utilisateur pour déterminer si son abonnement d'entreprise est toujours valide.
- * - Si l'utilisateur a une seule commande et que cette commande a expiré il y a plus d'un an, son groupe est réinitialisé.
- * - Si l'utilisateur a plusieurs commandes, la fonction vérifie la durée de validité de la plus ancienne et de la plus récente commande.
- *   Si la plus récente commande a expiré il y a plus d'un an et que la durée depuis la première commande dépasse le nombre
- *   d'années couvertes par les abonnements achetés, le groupe de l'utilisateur est également réinitialisé.
- *
- * @param user - L'objet `User` contenant les informations de l'utilisateur à vérifier.
- * @returns Une promesse qui se résout sans valeur de retour, après potentiellement avoir réinitialisé le groupe de l'utilisateur.
- */
-async function verifEntrepriseGroups(user: User) {
-  let isEntrepriseValid;
-
-  if (user && user.id) {
-    isEntrepriseValid = await prisma.commandeEntreprise.findMany({
-      where: {
-        userID: user.id,
-      },
-    });
-  } else {
-    isEntrepriseValid = [];
-  }
-
-  if (isEntrepriseValid.length === 1) {
-    const today = new Date();
-    const dateCommand = isEntrepriseValid[0].dateCommande;
-    const deltaTime = differenceEnAnnees(today, dateCommand);
-    if (deltaTime > 1) {
-      await resetUserGroup(user);
-    }
-  }
-
-  if (isEntrepriseValid.length > 1) {
-    const today = new Date();
-    const dateCommand = isEntrepriseValid[0].dateCommande;
-    const deltaTime = differenceEnAnnees(today, dateCommand);
-
-    const nbYearPremium = isEntrepriseValid.filter(
-      (elem) => elem.item === PREMIUM_PRICE,
-    ).length;
-    const nbYearEntreprise = isEntrepriseValid.filter(
-      (elem) => elem.item === ENTREPRISE_PRICE,
-    ).length;
-
-    const deltaTimeLastOrder = differenceEnAnnees(
-      today,
-      isEntrepriseValid[isEntrepriseValid.length - 1].dateCommande,
-    );
-
-    if (deltaTimeLastOrder > 1) {
-      if (
-        (nbYearPremium > 0 && deltaTime > nbYearPremium) ||
-        (nbYearEntreprise > 0 && deltaTime > nbYearEntreprise)
-      ) {
-        await resetUserGroup(user);
-      }
-    }
-  }
-}
-
-/**
  * Calcule la différence en années entières entre deux dates.
  * Cette fonction détermine le nombre d'années complètes entre deux dates en tenant compte des années bissextiles,
  * en utilisant une approximation du nombre de millisecondes dans une année.
@@ -442,7 +413,7 @@ async function verifEntrepriseGroups(user: User) {
  * @returns Le nombre entier d'années de différence entre les deux dates.
  */
 function differenceEnAnnees(date1: Date, date2: Date): number {
-  const differenceEnMilliseconds = Math.abs(date2.getTime() - date1.getTime());
+  const differenceEnMilliseconds = Math.abs(date1.getTime() - date2.getTime());
   const millisecondsDansAnnee = 1000 * 60 * 60 * 24 * 365.25; // Approximation du nombre de millisecondes dans une année
   const differenceEnAnnees = differenceEnMilliseconds / millisecondsDansAnnee;
   return Math.floor(differenceEnAnnees);

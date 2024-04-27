@@ -366,4 +366,15 @@ export class UserService {
       },
     });
   }
+
+  static async getLastCommande(id: string) {
+    return prisma.commandeEntreprise.findFirst({
+      where: {
+        userID: parseInt(id),
+      },
+      orderBy: {
+        dateCommande: 'desc',
+      },
+    });
+  }
 }

@@ -40,6 +40,7 @@ model user {
   userEvent          userEvent[]
   commandeEntreprise commandeEntreprise[]
   puzzlesEntreprise  puzzlesEntreprise[]
+  puzzleSend         puzzleSend[]
 }
 
 model Title {
@@ -185,9 +186,23 @@ model commandeEntreprise {
 }
 
 model puzzlesEntreprise {
-  id      Int    @id @default(autoincrement())
-  userID  Int
-  user    user   @relation(fields: [userID], references: [id])
-  tests   Json
-  details String
+  id         Int          @id @default(autoincrement())
+  userID     Int
+  user       user         @relation(fields: [userID], references: [id])
+  tests      Json
+  details    String
+  puzzleSend puzzleSend[]
+}
+
+model puzzleSend {
+  id                  Int               @id @default(autoincrement())
+  userID              Int
+  user                user              @relation(fields: [userID], references: [id])
+  puzzlesEntrepriseId Int
+  puzzlesEntreprise   puzzlesEntreprise @relation(fields: [puzzlesEntrepriseId], references: [id])
+  sendDate            DateTime
+  firstName           String
+  lastName            String
+  email               String
+  commentaire         String
 }

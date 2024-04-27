@@ -210,8 +210,8 @@ export interface CommandeEntreprise {
 
 export interface PuzzlesEntreprise {
   id: number;
-  userID: number;
-  user: User;
+  userID?: number;
+  user?: User;
   tests: JSON;
   details: string;
 }

@@ -12,7 +12,7 @@ export class MailService {
     private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
-  async sendActiveAccount(user: UserMail, urlActive: string): Promise<boolean> {
+  async sendActiveAccount(user, urlActive: string): Promise<boolean> {
     try {
       await this.mailerService.sendMail({
         to: user.email,
@@ -55,6 +55,28 @@ export class MailService {
     }
   }
 
+  async sendPuzzleToUser(data, urlActive: string): Promise<boolean> {
+    try {
+      await this.mailerService.sendMail({
+        to: data.email,
+        subject: 'Puzzle de test',
+        template: 'puzzleTest',
+        context: {
+          urlActive: urlActive,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          commentaire: data.commentaire,
+        },
+      });
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
   /**
    * Envoie un e-mail d'activation de compte à l'utilisateur avec les informations spécifiées.
    *
@@ -79,13 +101,13 @@ export class MailService {
    * await sendMail(id, userData);
    * ```
    **/
-  public async prepareMail(id: number, data: UserMail, type: number) {
+  public async prepareMail(id: number, data, type: number) {
     // TYPE 1 : Envoie du mail pour valdier l'adresse mail
     if (type === 1) {
-      const token = await this.refreshTokenService.generateAccesTokenEmail(
-        id,
-        data.userName,
-      );
+      const token = await this.refreshTokenService.generateAccesTokenEmail({
+        id: id,
+        userName: data.userName,
+      });
       return await this.sendActiveAccount(
         data,
         `${process.env.URL_BACK}/auth/validMail?token=${token}`,
@@ -102,6 +124,19 @@ export class MailService {
       return await this.sendForgotPassword(
         data,
         `${process.env.URL_FRONT}/changePassword?token=${token}&userName=${data.userName}`,
+      );
+    }
+
+    // TYPE 3 : Envoie d'un puzzle par mail
+    if (type === 3) {
+      console.log(data);
+      const token = await this.refreshTokenService.generateAccesTokenEmail(
+        { puzzle: data.puzzle },
+        '7d',
+      );
+      return await this.sendPuzzleToUser(
+        data,
+        `${process.env.URL_BACK}/entrepise/puzzleGame?token=${token}`,
       );
     }
   }

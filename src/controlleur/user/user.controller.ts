@@ -142,4 +142,20 @@ export class UserController {
     await this.mailService.prepareMail(user.id, user, 1);
     response.send();
   }
+
+  @Get('/lastCommande')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async findLastCommande(
+    @Query('id') id: string,
+    @Req() request,
+    @Res() response,
+  ) {
+    try {
+      const lastCommande = await UserService.getLastCommande(id);
+      response.send(lastCommande);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

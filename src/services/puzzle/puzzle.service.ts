@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { ENTREPRISE } from '../../constantes/contante';
+import { Injectable } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { ENTREPRISE } from "../../constantes/contante";
 
 const prisma = new PrismaClient();
 
@@ -10,14 +10,14 @@ export class PuzzleService {
     if (data.user.groups.roles === ENTREPRISE) {
       const userID = parseInt(data.user.id, 10);
       const tests =
-        typeof data.tests === 'string' ? JSON.parse(data.tests) : data.tests;
+        typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
       try {
         return await prisma.puzzlesEntreprise.create({
           data: {
             userID: userID,
             tests: tests,
-            details: data.details,
-          },
+            details: data.details
+          }
         });
       } catch (e) {
         console.log(e);
@@ -28,22 +28,23 @@ export class PuzzleService {
   async findPuzzles(id: string) {
     return prisma.puzzlesEntreprise.findMany({
       where: {
-        userID: parseInt(id),
-      },
+        userID: parseInt(id)
+      }
     });
   }
 
   async updatePuzzlePartially(updatePuzzleDto: any) {
-    const puzzleID = parseInt(updatePuzzleDto.id, 10);
+    const data = updatePuzzleDto.data;
+    const puzzleID = parseInt(data.id, 10);
     try {
       return await prisma.puzzlesEntreprise.update({
         where: {
-          id: puzzleID,
+          id: puzzleID
         },
         data: {
-          tests: updatePuzzleDto.tests,
-          details: updatePuzzleDto.details,
-        },
+          tests: data.tests,
+          details: data.details
+        }
       });
     } catch (e) {
       console.error(e);
@@ -55,11 +56,48 @@ export class PuzzleService {
     const puzzleID = parseInt(id, 10);
     try {
       return await prisma.puzzlesEntreprise.delete({
-        where: { id: puzzleID },
+        where: { id: puzzleID }
       });
     } catch (e) {
       console.error(e);
       throw e;
     }
   }
+
+  async findOnePuzzle(id: string) {
+    // Récupération de l'entrée de la base de données
+    const puzzle = await prisma.puzzlesEntreprise.findFirst({
+      where: {
+        id: parseInt(id)
+      },
+      include: {
+        // Ou `select`, selon ce que tu veux exactement récupérer
+        user: true // Inclure l'utilisateur pour exemple
+        // Ajouter d'autres relations si nécessaire
+      }
+    });
+
+    if (!puzzle) {
+      return null; // ou gérer l'absence de l'objet
+    }
+
+    // Formatage des données reçues
+    return formatPuzzleData(puzzle);
+  }
+}
+
+function formatPuzzleData(puzzle) {
+  return {
+    id: puzzle.id,
+    details: puzzle.details,
+    tests: puzzle.tests, // Supposant que `tests` est un champ JSON
+    user: puzzle.user
+      ? {
+        id: puzzle.user.id,
+        fullName: `${puzzle.user.firstName} ${puzzle.user.lastName}`,
+        email: puzzle.user.email,
+        company: puzzle.user.company
+      }
+      : null
+  };
 }
