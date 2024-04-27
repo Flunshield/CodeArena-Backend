@@ -375,7 +375,6 @@ export class AuthService {
       const today = new Date();
       const dateCommand = isEntrepriseValid[0].dateCommande;
       const deltaTime = differenceEnAnnees(today, dateCommand);
-      console.log(deltaTime);
       if (deltaTime > 1) {
         await resetUserGroup(user);
       }

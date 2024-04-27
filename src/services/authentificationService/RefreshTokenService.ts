@@ -184,7 +184,7 @@ export class RefreshTokenService {
    * ```
    */
   async generateAccesTokenEmail(
-    data: { id?: number; userName?: string; puzzle?: any },
+    data: { id?: number; userName?: string; puzzle?: string },
     expiresIn?: string,
   ): Promise<string> {
     const options: SignOptions = {
@@ -192,12 +192,20 @@ export class RefreshTokenService {
       expiresIn: expiresIn ? expiresIn : '5m',
       header: { alg: 'RS256', typ: 'access' },
     };
+    const payload = {
+      id: data?.id,
+      userName: data?.userName,
+      puzzleId: data?.puzzle,
+      aud: {
+        data: {
+          groups: {
+            roles: 'Invite',
+          },
+        },
+      },
+    };
     const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
-    return jwt.sign(
-      { id: data.id, userName: data.userName, puzzleId: data.puzzle.id },
-      privateKey,
-      options,
-    );
+    return jwt.sign(payload, privateKey, options);
   }
 
   /**

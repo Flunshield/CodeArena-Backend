@@ -190,5 +190,18 @@
   "proprieteIntellect": "Intellectual Property",
   "responsabilite": "Liability",
 
-  "perYear": "per year"
+  "perYear": "per year",
+
+  "titlePuzzle": "Puzzle Title",
+  "limitCreatPuzzleAlert": "You have reached the puzzle creation limit.",
+  "createPuzzleTitle": "Create a Puzzle",
+  "tests": "Tests",
+  "send": "Send",
+  "sendPuzzle": "Send a Puzzle",
+  "noAbonnement": "No Subscription",
+  "abonnement": "Subscription",
+  "nbTestCreate": "Number of Tests Created",
+  "nbTestRealized": "Number of Tests Taken",
+  "commentary": "Commentary",
+  "modify": "Edit"
 }

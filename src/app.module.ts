@@ -93,6 +93,7 @@ export class AppModule implements NestModule {
         { path: 'auth/validMail', method: RequestMethod.GET },
         { path: '/traduction', method: RequestMethod.GET },
         { path: 'auth/forgotPassWord', method: RequestMethod.POST },
+        { path: '/entrepise/puzzleGame', method: RequestMethod.GET },
       )
       .forRoutes('*');
   }

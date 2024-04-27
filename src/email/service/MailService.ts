@@ -129,9 +129,8 @@ export class MailService {
 
     // TYPE 3 : Envoie d'un puzzle par mail
     if (type === 3) {
-      console.log(data);
       const token = await this.refreshTokenService.generateAccesTokenEmail(
-        { puzzle: data.puzzle },
+        { puzzle: data.idPuzzle },
         '7d',
       );
       return await this.sendPuzzleToUser(
