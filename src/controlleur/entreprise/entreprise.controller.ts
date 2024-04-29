@@ -1,13 +1,14 @@
 import {
   Body,
   Controller,
-  Get, HttpStatus,
+  Get,
+  HttpStatus,
   Post,
   Query,
   Req,
   Res,
-  UseGuards
-} from "@nestjs/common";
+  UseGuards,
+} from '@nestjs/common';
 import { Roles } from '../auth/auth.controller';
 import { ADMIN, ENTREPRISE, INVITE } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
@@ -46,12 +47,10 @@ export class EntrepriseController {
     @Res() response,
   ) {
     try {
-      console.log(token);
       const publicKey = fs.readFileSync('public_key.pem', 'utf-8');
       const decodedToken = jwt.verify(token, publicKey);
 
       const puzzle = await this.puzzleService.findPuzzleForGame(decodedToken);
-      console.log(puzzle);
       response.send(puzzle);
     } catch (error) {
       response.send(HttpStatus.BAD_REQUEST);

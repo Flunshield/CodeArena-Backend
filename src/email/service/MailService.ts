@@ -135,7 +135,7 @@ export class MailService {
       );
       return await this.sendPuzzleToUser(
         data,
-        `${process.env.URL_BACK}/entrepise/puzzleGame?token=${token}`,
+        `${process.env.URL_FRONT}/loadGame?token=${token}`,
       );
     }
   }

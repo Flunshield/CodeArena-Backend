@@ -30,7 +30,6 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization.split(' ')[1];
-    console.log(token);
     // Décoder le token JWT pour obtenir les informations de l'utilisateur
     const decodedToken: DecodedTokenController = jwt.decode(
       token,
