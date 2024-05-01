@@ -170,6 +170,7 @@ model puzzles {
   events       events      @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
+  title         String
 }
 
 model commandeEntreprise {
@@ -192,6 +193,7 @@ model puzzlesEntreprise {
   tests      Json
   details    String
   puzzleSend puzzleSend[]
+  title      String
 }
 
 model puzzleSend {

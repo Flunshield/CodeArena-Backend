@@ -51,6 +51,9 @@ export class EntrepriseController {
       const decodedToken = jwt.verify(token, publicKey);
 
       const puzzle = await this.puzzleService.findPuzzleForGame(decodedToken);
+      if (puzzle === null) {
+        response.send(HttpStatus.NOT_FOUND);
+      }
       response.send(puzzle);
     } catch (error) {
       response.send(HttpStatus.BAD_REQUEST);

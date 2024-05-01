@@ -1,15 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>Change ton mot de passe !</title>
+    <meta charset="UTF-8">
+    <title>Change ton mot de passe !</title>
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          padding: 40px;
+          background-color: #0D1117;
+          color: #333;
+      }
+      h1 {
+          color: #E3E8EF;
+          font-size: 24px;
+      }
+      p {
+          color: #E3E8EF;
+          font-size: 16px;
+          line-height: 1.5;
+      }
+      a {
+          display: inline-block;
+          background-color: #0066cc;
+          color: #ffffff;
+          padding: 10px 20px;
+          border-radius: 5px;
+          text-decoration: none;
+          font-weight: bold;
+          height: 50px;
+      }
+      a {
+        display: inline-block;
+        background-color: #336699;
+        color: #ffffff;
+        padding: 12px 25px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+  </style>
 </head>
 <body>
-<h1>Pour changer de mot de passe, veuillez suivre ces instructions : </h1>
-<p>Etape 1 : </p>
-<p>Clique sur ce lien : {{urlActive}}</p>
-<p>Etape 2 : </p>
-<p>Renseigne ton nouveau mot de passe</p>
-<p>Etape 3 : </p>
-<p>On s'occupe du reste</p>
+  <h1>Pour changer de mot de passe, veuillez suivre ces instructions : </h1>
+  <p>Etape 1 : </p>
+  <a href="{{urlActive}}" target="_blank">Active ton mail</a>
+  <p>Etape 2 : </p>
+  <p>Renseigne ton nouveau mot de passe</p>
+  <p>Etape 3 : </p>
+  <p>On s'occupe du reste</p>
 </body>
 </html>

@@ -192,6 +192,7 @@
   "perYear": "par an",
 
   "titlePuzzle": "Titre du puzzle",
+  "detailsPuzzle": "Détails du puzzle",
   "limitCreatPuzzleAlert": "Vous avez atteint la limite de création de puzzles.",
   "createPuzzleTitle": "Création d'un test",
   "tests": "Tests",

@@ -195,6 +195,7 @@
   "titlePuzzle": "Puzzle Title",
   "limitCreatPuzzleAlert": "You have reached the puzzle creation limit.",
   "createPuzzleTitle": "Create a Puzzle",
+  "detailsPuzzle": "Puzzle Details",
   "tests": "Tests",
   "send": "Send",
   "sendPuzzle": "Send a Puzzle",

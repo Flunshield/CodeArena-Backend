@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ENTREPRISE } from '../../constantes/contante';
@@ -17,6 +18,7 @@ export class PuzzleService {
             userID: userID,
             tests: tests,
             details: data.details,
+            title: data.title,
           },
         });
       } catch (e) {
@@ -44,6 +46,7 @@ export class PuzzleService {
         data: {
           tests: data.tests,
           details: data.details,
+          title: data.title,
         },
       });
     } catch (e) {
