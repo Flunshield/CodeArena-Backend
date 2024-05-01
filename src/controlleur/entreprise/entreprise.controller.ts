@@ -60,4 +60,38 @@ export class EntrepriseController {
       console.log(error);
     }
   }
+
+  @Post('/puzzleGame')
+  @Roles(INVITE)
+  @UseGuards(RolesGuard)
+  async sendPuzzleAfterGame(@Body() data, @Req() request, @Res() response) {
+    try {
+      const result = await this.puzzleService.updatePuzzleAfterGame(data.data);
+      if (result === null) {
+        response.send(HttpStatus.NOT_FOUND);
+      } else {
+        response.send(result);
+      }
+    } catch (error) {
+      response.send(HttpStatus.BAD_REQUEST);
+      console.log(error);
+    }
+  }
+
+  @Get('/getPuzzlePlaying')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async getPuzzlePlaying(
+    @Query('id') id: string,
+    @Req() request,
+    @Res() response,
+  ) {
+    try {
+      const result = await this.puzzleService.getPuzzlePlaying(id);
+      response.send(result);
+    } catch (error) {
+      response.send(HttpStatus.BAD_REQUEST);
+      console.log(error);
+    }
+  }
 }

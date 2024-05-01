@@ -150,6 +150,7 @@ export class AuthService {
           userName: credentials.userName,
         },
       });
+
       await this.verifEntrepriseGroups(user);
 
       if (user) {
@@ -365,9 +366,14 @@ export class AuthService {
     let isEntrepriseValid;
 
     if (user && user.id) {
-      isEntrepriseValid = [
-        await UserService.getLastCommande(user.id.toString()),
-      ];
+      const lastCommande = await UserService.getLastCommande(
+        user.id.toString(),
+      );
+      if (lastCommande !== null) {
+        isEntrepriseValid = [lastCommande];
+      } else {
+        isEntrepriseValid = [];
+      }
     } else {
       isEntrepriseValid = [];
     }

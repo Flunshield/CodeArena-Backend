@@ -170,7 +170,7 @@ model puzzles {
   events       events      @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
-  title         String
+  title        String
 }
 
 model commandeEntreprise {
@@ -207,4 +207,8 @@ model puzzleSend {
   lastName            String
   email               String
   commentaire         String
+  validated           Boolean           @default(false)
+  result              Json?
+  testValidated       Int?
+  time                String?
 }

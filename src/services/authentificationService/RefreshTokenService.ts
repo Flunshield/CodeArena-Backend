@@ -184,7 +184,12 @@ export class RefreshTokenService {
    * ```
    */
   async generateAccesTokenEmail(
-    data: { id?: number; userName?: string; puzzle?: string },
+    data: {
+      id?: number;
+      userName?: string;
+      puzzleID?: string;
+      mailID?: number;
+    },
     expiresIn?: string,
   ): Promise<string> {
     const options: SignOptions = {
@@ -195,7 +200,8 @@ export class RefreshTokenService {
     const payload = {
       id: data?.id,
       userName: data?.userName,
-      puzzleId: data?.puzzle,
+      puzzleID: data?.puzzleID,
+      mailID: data?.mailID,
       aud: {
         data: {
           groups: {

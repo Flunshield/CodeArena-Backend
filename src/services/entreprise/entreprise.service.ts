@@ -6,6 +6,6 @@ export class EntrepriseService {
   constructor(private readonly mailService: MailService) {}
 
   async sendEmailPuzzle(data) {
-    return await this.mailService.prepareMail(null, data, 3);
+    return await this.mailService.registerMail(data);
   }
 }

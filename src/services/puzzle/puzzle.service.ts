@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { ENTREPRISE } from '../../constantes/contante';
+import { Injectable } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { ENTREPRISE } from "../../constantes/contante";
 
 const prisma = new PrismaClient();
 
@@ -11,15 +11,15 @@ export class PuzzleService {
     if (data.user.groups.roles === ENTREPRISE) {
       const userID = parseInt(data.user.id, 10);
       const tests =
-        typeof data.tests === 'string' ? JSON.parse(data.tests) : data.tests;
+        typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
       try {
         return await prisma.puzzlesEntreprise.create({
           data: {
             userID: userID,
             tests: tests,
             details: data.details,
-            title: data.title,
-          },
+            title: data.title
+          }
         });
       } catch (e) {
         console.log(e);
@@ -30,8 +30,8 @@ export class PuzzleService {
   async findPuzzles(id: string) {
     return prisma.puzzlesEntreprise.findMany({
       where: {
-        userID: parseInt(id),
-      },
+        userID: parseInt(id)
+      }
     });
   }
 
@@ -41,13 +41,13 @@ export class PuzzleService {
     try {
       return await prisma.puzzlesEntreprise.update({
         where: {
-          id: puzzleID,
+          id: puzzleID
         },
         data: {
           tests: data.tests,
           details: data.details,
-          title: data.title,
-        },
+          title: data.title
+        }
       });
     } catch (e) {
       console.error(e);
@@ -59,7 +59,7 @@ export class PuzzleService {
     const puzzleID = parseInt(id, 10);
     try {
       return await prisma.puzzlesEntreprise.delete({
-        where: { id: puzzleID },
+        where: { id: puzzleID }
       });
     } catch (e) {
       console.error(e);
@@ -71,13 +71,13 @@ export class PuzzleService {
     // Récupération de l'entrée de la base de données
     const puzzle = await prisma.puzzlesEntreprise.findFirst({
       where: {
-        id: parseInt(id),
+        id: parseInt(id)
       },
       include: {
         // Ou `select`, selon ce que tu veux exactement récupérer
-        user: true, // Inclure l'utilisateur pour exemple
+        user: true // Inclure l'utilisateur pour exemple
         // Ajouter d'autres relations si nécessaire
-      },
+      }
     });
 
     if (!puzzle) {
@@ -89,17 +89,60 @@ export class PuzzleService {
   }
 
   async findPuzzleForGame(decodedToken) {
-    const puzzle = await prisma.puzzlesEntreprise.findFirst({
+    const puzzleForGame = {
+      puzzle: null,
+      mailID: decodedToken.mailID
+    };
+    puzzleForGame.puzzle = await prisma.puzzlesEntreprise.findFirst({
       where: {
-        id: parseInt(decodedToken.puzzleId),
-      },
+        id: parseInt(decodedToken.puzzleID)
+      }
     });
 
-    if (!puzzle) {
+    if (!puzzleForGame.puzzle) {
       return null;
     }
+    return puzzleForGame;
+  }
 
-    return puzzle;
+  async updatePuzzleAfterGame(data) {
+    const mailID = parseInt(data.mailID, 10);
+
+    try {
+      const checkPuzzleGame = await prisma.puzzleSend.findFirst({
+        where: {
+          id: mailID
+        }
+      });
+
+      if (checkPuzzleGame.validated === false) {
+        return await prisma.puzzleSend.update({
+          where: {
+            id: mailID
+          },
+          data: {
+            validated: true,
+            result: data.result,
+            testValidated: data.testValidated,
+            time: data.remainingTime.toString()
+          }
+        });
+      } else {
+        return null;
+      }
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  async getPuzzlePlaying(data) {
+    return prisma.puzzleSend.findMany({
+      where: {
+        userID: data.userID,
+        validated: true
+      }
+    })
   }
 }
 
@@ -110,11 +153,11 @@ function formatPuzzleData(puzzle) {
     tests: puzzle.tests, // Supposant que `tests` est un champ JSON
     user: puzzle.user
       ? {
-          id: puzzle.user.id,
-          fullName: `${puzzle.user.firstName} ${puzzle.user.lastName}`,
-          email: puzzle.user.email,
-          company: puzzle.user.company,
-        }
-      : null,
+        id: puzzle.user.id,
+        fullName: `${puzzle.user.firstName} ${puzzle.user.lastName}`,
+        email: puzzle.user.email,
+        company: puzzle.user.company
+      }
+      : null
   };
 }

@@ -102,7 +102,6 @@
   "msgRedirectionLink": "If you are not redirected, you can click on this",
   "link": "link",
   "annuleOrder": "Order cancelled, you will be redirected",
-
   "recrutementEfficace": "Effective Recruitment",
   "recrutementEfficaceDescription": "Use coding challenges to assess candidates' technical skills in a practical and efficient manner.",
   "formationContinue": "Continuous Training",
@@ -111,7 +110,6 @@
   "teamBuildingDescription": "Organize team coding competitions to enhance collaboration and cohesion within your company.",
   "identificationTalent": "Talent Identification",
   "identificationTalentDescription": "Discover and hire top developers by observing their performance in real-time programming challenges.",
-
   "essentiel": "Essential",
   "essentielDesciption": "Take advantage of our free offer to get started",
   "essentielFeature1": "10 annual tests",
@@ -119,7 +117,6 @@
   "essentielFeature3": "Basic email support",
   "essentielIdeaFor": "Perfect for small teams and beginners who want to explore Coding Game.",
   "price": "Free",
-
   "premium": "Premium",
   "premiumDescription": "Unlock advanced features for an affordable price",
   "premiumFeature1": "100 annual tests",
@@ -127,7 +124,6 @@
   "premiumFeature3": "Priority email support",
   "premiumFeature4": "Detailed performance statistics",
   "premiumIdeaFor": "Ideal for growing teams in need of additional support.",
-
   "entrepriseDescription": "For businesses looking to maximize their potential",
   "entrepriseFeature1": "Unlimited tests",
   "entrepriseFeature2": "Access to all available challenges",
@@ -135,17 +131,13 @@
   "entrepriseFeature4": "Customization of the work environment",
   "entrepriseFeature5": "Tailored training and integration",
   "entrepriseIdeaFor": "Designed for ambitious companies aiming for excellence and growth.",
-
   "buy": "Buy",
-
   "avantageCodeArena": "The Benefits of CodeArena for Businesses",
   "choosePlan": "Choose the plan that best suits your needs",
   "trustSection": "They Trusted Us!",
-
   "monCompte": "My Account",
   "administration": "Administration",
   "dashboardEntreprise": "Enterprise Dashboard",
-
   "privacyTitle": "Privacy Policy",
   "collecteUseInformation": "Collection and Use of Information",
   "protectData": "Data Protection",
@@ -160,7 +152,6 @@
   "privacy6": "We do not share your personal information with third parties unless it is necessary to provide you with the services you request or as required by law. However, please note that we may share some of your personal information with companies that subscribe to our services, as part of the provision of these services. These companies may use this information to provide you with relevant offers or services. We do not directly sell your personal information to third parties for marketing purposes, but we may share this information with partner companies as part of business partnerships.",
   "privacy7": "We reserve the right to update this privacy policy at any time. Changes will be posted on this page.",
   "privacy8": "By using our site, you consent to our privacy policy.",
-
   "mentionLegal1": "This site is published by CodeArena, a company registered in France (SIRET Number: 123 456 789 101112).",
   "mentionLegal2": "Publication Director: CodeArena",
   "mentionLegal3": "Contact: contact@codearena.fr",
@@ -169,7 +160,6 @@
   "mentionLegal6": "Any reproduction, representation, modification, or distribution, in whole or in part, of the content of this site is prohibited without the prior written authorization of CodeArena.",
   "mentionLegal7": "CodeArena shall not be liable for any direct or indirect damages resulting from access to or use of this site, or the inability to access or use it.",
   "mentionLegal8": "The hyperlinks on this site may redirect to other websites over which CodeArena has no control. CodeArena disclaims any responsibility for the content of these sites.",
-
   "conditionsGeneralesVente": "General Terms and Conditions of Sale (GTCS)",
   "article1Objet": "Article 1 - Object",
   "article1Content": "These general terms and conditions of sale aim to define the rights and obligations of the parties in the context of the online sale of products/services offered by CodeArena to the consumer.",
@@ -185,13 +175,10 @@
   "article6Content": "In accordance with current legislation, the customer has a withdrawal period of 14 days from receipt of the products to exercise his right of withdrawal.",
   "article7ServiceClient": "Article 7 - Customer Service",
   "article7Content": "For any questions or complaints, the customer can contact CodeArena's customer service at the contact details provided on the website.",
-
   "hebergeur": "Hosting",
   "proprieteIntellect": "Intellectual Property",
   "responsabilite": "Liability",
-
   "perYear": "per year",
-
   "titlePuzzle": "Puzzle Title",
   "limitCreatPuzzleAlert": "You have reached the puzzle creation limit.",
   "createPuzzleTitle": "Create a Puzzle",
@@ -204,5 +191,13 @@
   "nbTestCreate": "Number of Tests Created",
   "nbTestRealized": "Number of Tests Taken",
   "commentary": "Commentary",
-  "modify": "Edit"
+  "modify": "Edit",
+  "loading": "Loading...",
+  "subject": "Subject",
+  "stateOfTest": "State of Tests",
+  "testPassed": "Tests passed",
+  "testYourCode": "Test your code",
+  "companyRecontact": "The company that owns the test will contact you soon.",
+  "testFinish": "Test finished!",
+  "testPassedYet": "Test already taken"
 }
