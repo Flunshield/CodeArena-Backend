@@ -10,6 +10,7 @@
   "email": "Email",
   "register": "Create an account",
   "signIntoCodeArena": "Sign in to Code Arena",
+  "signUp": "Sign up to Code Arena",
   "errorNdcMdp": "Account name and/or password is/are incorrect",
   "errorConnection": "Connection error. Please try again.",
   "ndcMandatory": "Username is mandatory",
