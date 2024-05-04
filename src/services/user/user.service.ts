@@ -368,7 +368,7 @@ export class UserService {
   }
 
   static async getLastCommande(id: string) {
-    return prisma.commandeEntreprise.findFirst({
+    const lastCommande = prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
       },
@@ -376,5 +376,11 @@ export class UserService {
         dateCommande: 'desc',
       },
     });
+
+    if (lastCommande) {
+      return lastCommande;
+    } else {
+      return [];
+    }
   }
 }

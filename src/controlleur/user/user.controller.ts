@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -153,7 +154,11 @@ export class UserController {
   ) {
     try {
       const lastCommande = await UserService.getLastCommande(id);
-      response.send(lastCommande);
+      if (lastCommande === null) {
+        response.send({ message: 'Aucune commande trouvée' });
+      } else {
+        response.send(lastCommande);
+      }
     } catch (error) {
       console.log(error);
     }

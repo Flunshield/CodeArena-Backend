@@ -23,7 +23,8 @@ jobs:
             cd back-app/
             docker compose -f docker-compose-prod.yml down
             git pull origin main
-            docker compose -f docker-compose-prod.yml up --build -d
+            docker compose -f docker-compose-prod.yml up --build -d &&
+            docker exec -it nest npx prisma migrate deploy
 
       - name: 🚀 Deploy
         run: echo "🚀 Deployed!"
