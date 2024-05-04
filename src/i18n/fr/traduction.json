@@ -198,5 +198,6 @@
   "testYourCode": "Teste ton code",
   "companyRecontact": "L'entreprise propriétaire du test te recontactera prochainement.",
   "testFinish": "Test terminé !",
-  "testPassedYet": "Test déjà passé"
+  "testPassedYet": "Test déjà passé",
+  "puzzleCreated": "Puzzle créé"
 }

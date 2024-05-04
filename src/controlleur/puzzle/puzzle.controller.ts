@@ -89,4 +89,41 @@ export class PuzzleController {
         .json({ message: 'Error deleting puzzle' });
     }
   }
+
+  @Delete('deletePuzzleSend')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async deletePuzzleSend(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.deletePuzzleSend(data.id);
+      if (result) {
+        response.send();
+      } else {
+        response.sendStatus(HttpStatus.NOT_FOUND).send('Puzzle not found');
+      }
+    } catch (error) {
+      console.error('Delete Puzzle Error:', error);
+      return response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Error deleting puzzle' });
+    }
+  }
+
+  @Get('/countPuzzles')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async countPuzzles(@Res() response, @Query('id') id: string) {
+    try {
+      const puzzlesPlayed = await this.puzzleService.countPuzzlesPlayed(id);
+      const puzzleCreate = await this.puzzleService.countPuzzlesCreated(id);
+      if (puzzlesPlayed !== null && puzzlesPlayed !== undefined  && puzzleCreate !== null && puzzleCreate !== undefined) {
+        response.send({puzzlesPlayed: puzzlesPlayed, puzzleCreate: puzzleCreate});
+      } else {
+        response.status(404).send('No puzzles found.');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 }

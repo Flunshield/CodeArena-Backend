@@ -83,14 +83,15 @@ export class EntrepriseController {
   @UseGuards(RolesGuard)
   async getPuzzlePlaying(
     @Query('id') id: string,
+    @Query('page') page: number,
     @Req() request,
     @Res() response,
   ) {
     try {
-      const result = await this.puzzleService.getPuzzlePlaying(id);
+      const result = await this.puzzleService.getPuzzlePlaying(id, page);
       response.send(result);
     } catch (error) {
-      response.send(HttpStatus.BAD_REQUEST);
+      response.status(HttpStatus.BAD_REQUEST).send();
       console.log(error);
     }
   }

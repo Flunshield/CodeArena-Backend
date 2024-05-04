@@ -199,5 +199,6 @@
   "testYourCode": "Test your code",
   "companyRecontact": "The company that owns the test will contact you soon.",
   "testFinish": "Test finished!",
-  "testPassedYet": "Test already taken"
+  "testPassedYet": "Test already taken",
+  "puzzleCreated": "Puzzle created"
 }
