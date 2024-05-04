@@ -11,7 +11,7 @@ export class PuzzleService {
     if (id === "old") {
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    
+
       try {
         return await prisma.puzzleSend.deleteMany({
           where: {
@@ -24,18 +24,19 @@ export class PuzzleService {
         console.error(e);
         throw e;
       }
-    }else {
-    const puzzleID = parseInt(id, 10);
-    try {
-      return await prisma.puzzleSend.delete({
-        where: { id: puzzleID }
-      });
-    } catch (e) {
-      console.error(e);
-      throw e;
+    } else {
+      const puzzleID = parseInt(id, 10);
+      try {
+        return await prisma.puzzleSend.delete({
+          where: { id: puzzleID }
+        });
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
     }
   }
-  }
+
   async createPuzzle(data) {
     if (data.user.groups.roles === ENTREPRISE) {
       const userID = parseInt(data.user.id, 10);
@@ -56,11 +57,14 @@ export class PuzzleService {
     }
   }
 
-  async findPuzzles(id: string) {
+  async findPuzzles(id: string, page: number, limit: number = 4) {
+    const offset = (page - 1) * limit;
     return prisma.puzzlesEntreprise.findMany({
       where: {
         userID: parseInt(id)
-      }
+      },
+      take: limit,
+      skip: offset
     });
   }
 
@@ -176,7 +180,7 @@ export class PuzzleService {
         puzzlesEntreprise: true
       },
       take: limit,
-      skip: offset,
+      skip: offset
     });
   }
 

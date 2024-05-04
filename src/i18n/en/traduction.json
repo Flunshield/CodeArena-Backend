@@ -200,5 +200,14 @@
   "companyRecontact": "The company that owns the test will contact you soon.",
   "testFinish": "Test finished!",
   "testPassedYet": "Test already taken",
-  "puzzleCreated": "Puzzle created"
+  "puzzleCreated": "Puzzle created",
+  "triDate": "Sort by Date",
+  "month": "Month",
+  "sendAt": "Sent at:",
+  "notCommentary": "No Commentary",
+  "nbTestPassing": "Number of Tests Passed",
+  "realizedIn": "Completed in",
+  "codeSend": "Code Submitted",
+  "anyCodeDisplay": "No Code to Display",
+  "puzzleRealized": "Puzzle Completed"
 }

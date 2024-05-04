@@ -199,5 +199,14 @@
   "companyRecontact": "L'entreprise propriétaire du test te recontactera prochainement.",
   "testFinish": "Test terminé !",
   "testPassedYet": "Test déjà passé",
-  "puzzleCreated": "Puzzle créé"
+  "puzzleCreated": "Puzzle créé",
+  "triDate": "Tri par Date",
+  "month": "Mois",
+  "sendAt": "Envoyé le :",
+  "notCommentary": "Aucun commentaire",
+  "nbTestPassing": "Nombre de test passé",
+  "realizedIn": "Réalisé en",
+  "codeSend": "Code soumis",
+  "anyCodeDisplay": "Aucun code à afficher",
+  "puzzleRealized": "Puzzle réalisé"
 }
