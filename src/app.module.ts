@@ -7,7 +7,6 @@ import {
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserController } from './controlleur/user/user.controller';
-import { UserService } from './services/user/user.service';
 import { AuthService } from './services/authentificationService/auth.service';
 import { AuthController } from './controlleur/auth/auth.controller';
 import { VerifyJwtMiddleware } from './midleWare/jwt-utils';
@@ -32,6 +31,11 @@ import * as path from 'path';
 import { AdminService } from './services/admin/admin.service';
 import { StripeController } from './controlleur/stripe/stripe.controller';
 import { StripeService } from './services/stripe/stripe.service';
+import { PuzzleController } from './controlleur/puzzle/puzzle.controller';
+import { PuzzleService } from './services/puzzle/puzzle.service';
+import { UserService } from './services/user/user.service';
+import { EntrepriseController } from './controlleur/entreprise/entreprise.controller';
+import { EntrepriseService } from './services/entreprise/entreprise.service';
 
 @Module({
   imports: [
@@ -58,6 +62,8 @@ import { StripeService } from './services/stripe/stripe.service';
     EvenementController,
     AdminController,
     StripeController,
+    PuzzleController,
+    EntrepriseController,
   ],
   providers: [
     AppService,
@@ -71,6 +77,8 @@ import { StripeService } from './services/stripe/stripe.service';
     EvenementService,
     AdminService,
     StripeService,
+    PuzzleService,
+    EntrepriseService,
   ],
 })
 export class AppModule implements NestModule {
@@ -85,10 +93,7 @@ export class AppModule implements NestModule {
         { path: 'auth/validMail', method: RequestMethod.GET },
         { path: '/traduction', method: RequestMethod.GET },
         { path: 'auth/forgotPassWord', method: RequestMethod.POST },
-        {
-          path: '/stripe/create-checkout-session-premium',
-          method: RequestMethod.POST,
-        },
+        { path: '/entrepise/puzzleGame', method: RequestMethod.GET },
       )
       .forRoutes('*');
   }

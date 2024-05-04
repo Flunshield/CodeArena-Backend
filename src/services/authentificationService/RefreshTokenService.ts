@@ -105,7 +105,28 @@ export class RefreshTokenService {
       const { sub: userId } = jwt.verify(refreshToken, publicKey);
       const user = await this.prisma.user.findUnique({
         where: { id: parseInt(userId as string, 10) },
-        include: {
+        select: {
+          id: true,
+          userName: true,
+          password: false,
+          email: true,
+          emailVerified: true,
+          createdAt: true,
+          lastLogin: true,
+          status: true,
+          avatar: true,
+          firstName: true,
+          lastName: true,
+          groupsId: true,
+          languagePreference: true,
+          localisation: true,
+          company: true,
+          badgesWin: true,
+          url: true,
+          school: true,
+          github: true,
+          presentation: true,
+          Histories: true,
           groups: true,
           titles: {
             select: {
@@ -144,8 +165,8 @@ export class RefreshTokenService {
   /**
    * Génère un jeton d'accès pour l'e-mail avec les informations spécifiées.
    *
-   * @param id - L'identifiant numérique associé à l'utilisateur.
-   * @param userName - Le nom d'utilisateur lié à l'utilisateur.
+   * @param data
+   * @param expiresIn
    * @returns Une chaîne représentant le jeton d'accès généré.
    * @throws {Error} Une erreur est levée si la lecture de la clé privée échoue ou si la génération du jeton échoue.
    *
@@ -162,14 +183,35 @@ export class RefreshTokenService {
    * console.log(accessToken);
    * ```
    */
-  async generateAccesTokenEmail(id: number, userName: string): Promise<string> {
+  async generateAccesTokenEmail(
+    data: {
+      id?: number;
+      userName?: string;
+      puzzleID?: string;
+      mailID?: number;
+    },
+    expiresIn?: string,
+  ): Promise<string> {
     const options: SignOptions = {
       algorithm: 'RS256',
-      expiresIn: '5m',
+      expiresIn: expiresIn ? expiresIn : '5m',
       header: { alg: 'RS256', typ: 'access' },
     };
+    const payload = {
+      id: data?.id,
+      userName: data?.userName,
+      puzzleID: data?.puzzleID,
+      mailID: data?.mailID,
+      aud: {
+        data: {
+          groups: {
+            roles: 'Invite',
+          },
+        },
+      },
+    };
     const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
-    return jwt.sign({ id: id, userName: userName }, privateKey, options);
+    return jwt.sign(payload, privateKey, options);
   }
 
   /**

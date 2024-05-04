@@ -24,14 +24,12 @@ export class RolesGuard implements CanActivate {
    */
   canActivate(context: ExecutionContext): boolean {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
-
     if (!roles) {
       return true; // Si aucune annotation de rôle, autorise l'accès
     }
 
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization.split(' ')[1];
-
     // Décoder le token JWT pour obtenir les informations de l'utilisateur
     const decodedToken: DecodedTokenController = jwt.decode(
       token,

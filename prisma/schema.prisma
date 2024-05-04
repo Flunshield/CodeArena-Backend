@@ -39,6 +39,8 @@ model user {
   userMatch          userMatch[]
   userEvent          userEvent[]
   commandeEntreprise commandeEntreprise[]
+  puzzlesEntreprise  puzzlesEntreprise[]
+  puzzleSend         puzzleSend[]
 }
 
 model Title {
@@ -168,6 +170,7 @@ model puzzles {
   events       events      @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
+  title        String
 }
 
 model commandeEntreprise {
@@ -184,7 +187,28 @@ model commandeEntreprise {
 }
 
 model puzzlesEntreprise {
-  id      Int    @id @default(autoincrement())
-  tests   Json
-  details String
+  id         Int          @id @default(autoincrement())
+  userID     Int
+  user       user         @relation(fields: [userID], references: [id])
+  tests      Json
+  details    String
+  puzzleSend puzzleSend[]
+  title      String
+}
+
+model puzzleSend {
+  id                  Int               @id @default(autoincrement())
+  userID              Int
+  user                user              @relation(fields: [userID], references: [id])
+  puzzlesEntrepriseId Int
+  puzzlesEntreprise   puzzlesEntreprise @relation(fields: [puzzlesEntrepriseId], references: [id])
+  sendDate            DateTime
+  firstName           String
+  lastName            String
+  email               String
+  commentaire         String
+  validated           Boolean           @default(false)
+  result              Json?
+  testValidated       Int?
+  time                String?
 }

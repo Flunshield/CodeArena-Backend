@@ -9,7 +9,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from '../../src/controlleur/user/user.controller';
 import { UserService } from '../../src/services/user/user.service';
-import { CreateUserDto } from '../../src/dto/CreateUserDto';
+import { Dto } from '../../src/dto/Dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 /**
@@ -78,7 +78,7 @@ describe('UserController', () => {
      */
     it('should create a new user when user does not exist', async () => {
       // Arrange
-      const createUserDto: CreateUserDto = {
+      const createUserDto: Dto = {
         email: 'j.bert@cacahete.fr',
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -103,7 +103,7 @@ describe('UserController', () => {
      */
     it('should return BadRequest when user already exists', async () => {
       // Arrange
-      const createUserDto: CreateUserDto = {
+      const createUserDto: Dto = {
         email: 'j.bert@cacahete.fr',
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -132,7 +132,7 @@ describe('UserController', () => {
      */
     it('should return InternalServerError on service error', async () => {
       // Arrange
-      const createUserDto: CreateUserDto = {
+      const createUserDto: Dto = {
         email: 'j.bert@cacahete.fr',
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

@@ -1,0 +1,17 @@
+
+CREATE PROCEDURE InsertPuzzleSend()
+BEGIN
+    DECLARE count INT DEFAULT 0;
+    WHILE count < 10 DO
+        INSERT INTO puzzleSend 
+        (userID, puzzlesEntrepriseId, sendDate, firstName, lastName, email, commentaire, validated, result, testValidated, time)
+        VALUES
+        (4, 1, NOW(), 'John', 'Doe', 'john.doe@example.com', 'Test commentaire', TRUE, 
+         JSON_OBJECT('key', 'value'), FLOOR(RAND() * 10 + 1), CONCAT(FLOOR(RAND() * 60), ' minutes'));
+        SET count = count + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
+
+InsertPuzzleSend17()
