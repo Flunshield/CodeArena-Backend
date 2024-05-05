@@ -209,5 +209,11 @@
   "realizedIn": "Completed in",
   "codeSend": "Code Submitted",
   "anyCodeDisplay": "No Code to Display",
-  "puzzleRealized": "Puzzle Completed"
+  "puzzleRealized": "Puzzle Completed",
+  "mailToSend": "Mail sent!",
+  "connectSuccess": "Connection successful!",
+  "inscriptionSuccess": "Registration successful!",
+  "inscriptionFail": "Registration failed",
+  "unsubscribeFail": "Unsubscription failed",
+  "unsubscribeSuccess": "Unsubscription successful!"
 }

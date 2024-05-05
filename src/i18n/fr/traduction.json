@@ -208,5 +208,11 @@
   "realizedIn": "Réalisé en",
   "codeSend": "Code soumis",
   "anyCodeDisplay": "Aucun code à afficher",
-  "puzzleRealized": "Puzzle réalisé"
+  "puzzleRealized": "Puzzle réalisé",
+  "mailToSend": "Mail envoyé !",
+  "connectSuccess": "Connexion réussie !",
+  "inscriptionSuccess": "Inscription réussie !",
+  "inscriptionFail": "L'inscription a échoué",
+  "unsubscribeFail": "La désinscription a échoué",
+  "unsubscribeSuccess": "La désinscription a réussi !"
 }
