@@ -40,7 +40,7 @@ npm run test:e2e
 
 ## Section Prisma
 
-Pas d'injection SQL grâce à prisma. :-)
+Pas d'injection SQL grâce à prisma.
 
 **Video youtube a regarder**
 ```
@@ -48,22 +48,29 @@ https://www.youtube.com/watch?v=akP9E1vURBU&ab_channel=AKDEV
 ```
 
 Pour créer une migration après avoir modifier le fichier **schema.prisma** (docker compsoe lancé)
-```
+```bash
 docker exec -it nest npx prisma migrate dev --create-only --name nom-de-la-migration
 ```
 
 Pour récupérer le dossier migration depuis le container
-```
+```bash
 docker cp nest:/usr/src/app/prisma/migrations ./prisma
 ```
 
 Pour généré les migrations non joué (a utiliser si il y a de nouvelles migrations) :
-```
+```bash
 docker exec -it nest npx prisma migrate deploy
 ```
 
-Pour lancer prisma studio (Port par défault 5555) :
+APRES AVOIR Jouer les migrations :
+```bash
+docker compose down
+npx prisma generate
+docker compose up --build
 ```
+
+Pour lancer prisma studio (Port par défault 5555) :
+```bash
 npx prisma studio
 ```
 

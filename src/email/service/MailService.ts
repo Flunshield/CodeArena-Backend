@@ -1,7 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserMail } from '../../interfaces/userInterface';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 @Injectable()
 export class MailService {
@@ -12,7 +15,7 @@ export class MailService {
     private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
-  async sendActiveAccount(user: UserMail, urlActive: string): Promise<boolean> {
+  async sendActiveAccount(user, urlActive: string): Promise<boolean> {
     try {
       await this.mailerService.sendMail({
         to: user.email,
@@ -55,6 +58,28 @@ export class MailService {
     }
   }
 
+  async sendPuzzleToUser(data, urlActive: string): Promise<boolean> {
+    try {
+      await this.mailerService.sendMail({
+        to: data.email,
+        subject: 'Puzzle de test',
+        template: 'puzzleTest',
+        context: {
+          urlActive: urlActive,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          commentaire: data.commentaire,
+        },
+      });
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
   /**
    * Envoie un e-mail d'activation de compte à l'utilisateur avec les informations spécifiées.
    *
@@ -79,13 +104,13 @@ export class MailService {
    * await sendMail(id, userData);
    * ```
    **/
-  public async prepareMail(id: number, data: UserMail, type: number) {
+  public async prepareMail(id: number, data, type: number, mailID?: number) {
     // TYPE 1 : Envoie du mail pour valdier l'adresse mail
     if (type === 1) {
-      const token = await this.refreshTokenService.generateAccesTokenEmail(
-        id,
-        data.userName,
-      );
+      const token = await this.refreshTokenService.generateAccesTokenEmail({
+        id: id,
+        userName: data.userName,
+      });
       return await this.sendActiveAccount(
         data,
         `${process.env.URL_BACK}/auth/validMail?token=${token}`,
@@ -103,6 +128,46 @@ export class MailService {
         data,
         `${process.env.URL_FRONT}/changePassword?token=${token}&userName=${data.userName}`,
       );
+    }
+
+    // TYPE 3 : Envoie d'un puzzle par mail
+    if (type === 3) {
+      const token = await this.refreshTokenService.generateAccesTokenEmail(
+        { puzzleID: data.idPuzzle, mailID: mailID },
+        '7d',
+      );
+      return await this.sendPuzzleToUser(
+        data,
+        `${process.env.URL_FRONT}/loadGame?token=${token}`,
+      );
+    }
+  }
+
+  async registerMail(data) {
+    try {
+      const userID = parseInt(data.userID);
+      const puzzlesEntrepriseId = parseInt(data.idPuzzle);
+      const registerMail = await prisma.puzzleSend.create({
+        data: {
+          userID: userID, // L'ID de l'utilisateur
+          puzzlesEntrepriseId: puzzlesEntrepriseId, // L'ID du puzzle entreprise
+          sendDate: new Date(), // La date d'envoi, assurée de passer un objet Date
+          firstName: data.firstName, // Prénom de l'utilisateur à qui le puzzle est envoyé
+          lastName: data.lastName, // Nom de famille de l'utilisateur
+          email: data.email, // Email de l'utilisateur
+          commentaire: data.commentaire, // Commentaire optionnel
+        },
+      });
+
+      // Logique pour envoyer le mail, supposant qu'une fonction `sendMail` est définie ailleurs
+      if (registerMail) {
+        return await this.prepareMail(null, data, 3, registerMail.id);
+      } else {
+        return HttpStatus.NOT_FOUND;
+      }
+    } catch (error) {
+      console.error('Error in registerMail:', error);
+      throw error; // Rethrow the error for further handling if necessary
     }
   }
 }
