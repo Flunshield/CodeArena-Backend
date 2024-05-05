@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common'; // Importer Param depuis @nestjs/common
-import { WebsocketService } from '../services/websocket.service';
 import { UserRanking } from '../../interfaces/userInterface';
+import { WebsocketService } from '../services/websocket.service';
 
 @Controller('websocket')
 export class WebSocketController {

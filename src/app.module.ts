@@ -37,10 +37,12 @@ import { PuzzleService } from './services/puzzle/puzzle.service';
 import { UserService } from './services/user/user.service';
 import { EntrepriseController } from './controlleur/entreprise/entreprise.controller';
 import { EntrepriseService } from './services/entreprise/entreprise.service';
+import { WebsocketService } from './websocket/services/websocket.service';
 
 @Module({
   imports: [
     EmailModule,
+    WebsocketModule,
     I18nModule.forRoot({
       fallbackLanguage: 'fr',
       loaderOptions: {
@@ -53,7 +55,6 @@ import { EntrepriseService } from './services/entreprise/entreprise.service';
         new HeaderResolver(['x-lang']),
       ],
     }),
-    WebsocketModule,
   ],
   controllers: [
     AppController,
@@ -81,6 +82,7 @@ import { EntrepriseService } from './services/entreprise/entreprise.service';
     StripeService,
     PuzzleService,
     EntrepriseService,
+    WebsocketService,
   ],
 })
 export class AppModule implements NestModule {
