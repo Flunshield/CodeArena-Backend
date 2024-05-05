@@ -214,5 +214,8 @@
   "inscriptionSuccess": "Inscription réussie !",
   "inscriptionFail": "L'inscription a échoué",
   "unsubscribeFail": "La désinscription a échoué",
-  "unsubscribeSuccess": "La désinscription a réussi !"
+  "unsubscribeSuccess": "La désinscription a réussi !",
+  "puzzleDeleted": "Puzzle supprimé",
+  "failedDeletePuzzle": "Échec de la suppression du puzzle",
+  "errorCallAPI": "Erreur lors de l'appel à l'API : "
 }
