@@ -133,18 +133,15 @@ export class AuthService {
             id: number;
           };
           if (decodedToken) {
-            throw new HttpException(
+            new HttpException(
               'Utilisateur déjà connecté',
               HttpStatus.NOT_FOUND,
             );
           } else {
-            throw new HttpException('Token erroné', HttpStatus.BAD_REQUEST);
+            new HttpException('Token erroné', HttpStatus.BAD_REQUEST);
           }
         } catch (verifyError) {
-          throw new HttpException(
-            'Vérification erronée',
-            HttpStatus.BAD_REQUEST,
-          );
+          new HttpException('Vérification erronée', HttpStatus.BAD_REQUEST);
         }
       }
 
@@ -170,19 +167,19 @@ export class AuthService {
             }
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
-            throw new HttpException(
+            new HttpException(
               'Erreur sur la lecture de la clé privée',
               HttpStatus.EXPECTATION_FAILED,
             );
           }
         } else {
-          throw new HttpException(
+          new HttpException(
             'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
             HttpStatus.BAD_REQUEST,
           );
         }
       } else {
-        throw new HttpException(
+        new HttpException(
           'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
           HttpStatus.BAD_REQUEST,
         );
@@ -354,6 +351,14 @@ export class AuthService {
   }
 }
 
+/**
+ * Réinitialise l'identifiant de groupe d'un utilisateur spécifié à un groupe par défaut.
+ * Cette fonction met à jour le champ `groupsId` dans la base de données pour un utilisateur donné,
+ * en attribuant à cet utilisateur un identifiant de groupe par défaut (dans ce cas, 1).
+ *
+ * @param user - L'objet `User` contenant l'identifiant et le nom d'utilisateur de l'utilisateur dont le groupe doit être réinitialisé.
+ * @returns Une promesse qui se résout une fois que l'opération de mise à jour est terminée.
+ */
 async function resetUserGroup(user: User) {
   await prisma.user.update({
     where: {
@@ -366,6 +371,17 @@ async function resetUserGroup(user: User) {
   });
 }
 
+/**
+ * Vérifie la validité des groupes d'entreprise pour un utilisateur et réinitialise son groupe si les conditions sont remplies.
+ * Cette fonction examine les commandes de l'utilisateur pour déterminer si son abonnement d'entreprise est toujours valide.
+ * - Si l'utilisateur a une seule commande et que cette commande a expiré il y a plus d'un an, son groupe est réinitialisé.
+ * - Si l'utilisateur a plusieurs commandes, la fonction vérifie la durée de validité de la plus ancienne et de la plus récente commande.
+ *   Si la plus récente commande a expiré il y a plus d'un an et que la durée depuis la première commande dépasse le nombre
+ *   d'années couvertes par les abonnements achetés, le groupe de l'utilisateur est également réinitialisé.
+ *
+ * @param user - L'objet `User` contenant les informations de l'utilisateur à vérifier.
+ * @returns Une promesse qui se résout sans valeur de retour, après potentiellement avoir réinitialisé le groupe de l'utilisateur.
+ */
 async function verifEntrepriseGroups(user: User) {
   let isEntrepriseValid;
 
@@ -392,13 +408,11 @@ async function verifEntrepriseGroups(user: User) {
     const today = new Date();
     const dateCommand = isEntrepriseValid[0].dateCommande;
     const deltaTime = differenceEnAnnees(today, dateCommand);
-    let nbYearPremium = 0;
-    let nbYearEntreprise = 0;
 
-    nbYearPremium = isEntrepriseValid.filter(
+    const nbYearPremium = isEntrepriseValid.filter(
       (elem) => elem.item === PREMIUM_PRICE,
     ).length;
-    nbYearEntreprise = isEntrepriseValid.filter(
+    const nbYearEntreprise = isEntrepriseValid.filter(
       (elem) => elem.item === ENTREPRISE_PRICE,
     ).length;
 
@@ -418,6 +432,15 @@ async function verifEntrepriseGroups(user: User) {
   }
 }
 
+/**
+ * Calcule la différence en années entières entre deux dates.
+ * Cette fonction détermine le nombre d'années complètes entre deux dates en tenant compte des années bissextiles,
+ * en utilisant une approximation du nombre de millisecondes dans une année.
+ *
+ * @param date1 - La première date de comparaison.
+ * @param date2 - La deuxième date de comparaison.
+ * @returns Le nombre entier d'années de différence entre les deux dates.
+ */
 function differenceEnAnnees(date1: Date, date2: Date): number {
   const differenceEnMilliseconds = Math.abs(date2.getTime() - date1.getTime());
   const millisecondsDansAnnee = 1000 * 60 * 60 * 24 * 365.25; // Approximation du nombre de millisecondes dans une année

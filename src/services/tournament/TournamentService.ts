@@ -38,7 +38,11 @@ export class TournamentService {
         startDate: 'asc',
       },
     });
-    return tournament;
+    if (tournament) {
+      return [tournament];
+    } else {
+      return [];
+    }
   }
 
   /**
