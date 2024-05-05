@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -11,7 +12,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from '../../dto/CreateUserDto';
+import { Dto } from '../../dto/./Dto';
 import { UserService } from '../../services/user/user.service';
 import { ResponseCreateUser, User } from '../../interfaces/userInterface';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
@@ -55,13 +56,13 @@ export class UserController {
    * @example
    * ```typescript
    * // Exemple d'appel du point de terminaison de création d'utilisateur
-   * const createUserDto: CreateUserDto = { ... }; // Définir les détails de l'utilisateur à créer
+   * const createUserDto: Dto = { ... }; // Définir les détails de l'utilisateur à créer
    * const result = await userController.create(createUserDto);
    * console.log(result);
    * ```
    */
   @Post('/creatUser')
-  async create(@Body() createUserDto: CreateUserDto): Promise<HttpException> {
+  async create(@Body() createUserDto: Dto): Promise<HttpException> {
     const response: ResponseCreateUser =
       await this.userService.create(createUserDto);
     if (response.bool && response.type === 'ok') {
@@ -141,5 +142,25 @@ export class UserController {
     const user = data.data;
     await this.mailService.prepareMail(user.id, user, 1);
     response.send();
+  }
+
+  @Get('/lastCommande')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async findLastCommande(
+    @Query('id') id: string,
+    @Req() request,
+    @Res() response,
+  ) {
+    try {
+      const lastCommande = await UserService.getLastCommande(id);
+      if (lastCommande === null) {
+        response.send({ message: 'Aucune commande trouvée' });
+      } else {
+        response.send(lastCommande);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
