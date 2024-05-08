@@ -210,6 +210,7 @@
   "anyCodeDisplay": "Aucun code à afficher",
   "puzzleRealized": "Puzzle réalisé",
   "mailToSend": "Mail envoyé !",
+  "errormailToSend": "Il y a eu un problème lors de l'envoie du mail.",,
   "connectSuccess": "Connexion réussie !",
   "inscriptionSuccess": "Inscription réussie !",
   "inscriptionFail": "L'inscription a échoué",

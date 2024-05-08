@@ -218,5 +218,6 @@
   "unsubscribeSuccess": "Unsubscription successful!",
   "puzzleDeleted": "Puzzle deleted",
   "failedDeletePuzzle": "Failed to delete puzzle",
-  "errorCallAPI": "Error calling the API: "  
+  "errorCallAPI": "Error calling the API: ",
+  "errormailToSend": "Error sending mail"
 }
