@@ -215,5 +215,9 @@
   "inscriptionSuccess": "Registration successful!",
   "inscriptionFail": "Registration failed",
   "unsubscribeFail": "Unsubscription failed",
-  "unsubscribeSuccess": "Unsubscription successful!"
+  "unsubscribeSuccess": "Unsubscription successful!",
+  "puzzleDeleted": "Puzzle deleted",
+  "failedDeletePuzzle": "Failed to delete puzzle",
+  "errorCallAPI": "Error calling the API: ",
+  "errormailToSend": "Error sending mail"
 }
