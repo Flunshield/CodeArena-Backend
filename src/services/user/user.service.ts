@@ -195,16 +195,23 @@ export class UserService {
   }
 
   async getUsers(pageNumber: number) {
+    const offset = (pageNumber - 1) * PAGE_SIZE;
+
     try {
-      const skip = pageNumber * PAGE_SIZE;
-      return await prisma.user.findMany({
+      const users = await prisma.user.findMany({
         take: PAGE_SIZE,
-        skip: skip,
-        include: {
+        skip: offset,
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          userName: true,
+          nbGames: true,
           userRanking: {
             include: {
               rankings: {
                 select: {
+                  id: true,
                   title: true,
                 },
               },
@@ -212,11 +219,57 @@ export class UserService {
           },
         },
       });
+
+      // Trier les utilisateurs en fonction de la somme des points dans userRanking
+      // Cela nécessite une récupération et un tri côté serveur/app, car Prisma ne gère pas encore le tri par relations multiples
+      return users.sort((a, b) => {
+        const sumA = a.userRanking.reduce((acc, cur) => acc + cur.points, 0);
+        const sumB = b.userRanking.reduce((acc, cur) => acc + cur.points, 0);
+        return sumB - sumA; // Pour un tri décroissant
+      });
     } catch (error) {
-      /**
-       * Gère les erreurs survenues lors de la récupération des titres.
-       */
-      console.error('Erreur lors de la récupération des titres :', error);
+      console.error('Erreur lors de la récupération des utilisateurs :', error);
+      throw error;
+    }
+  }
+
+  async getUsersByUserName(pageNumber: number, userNameSubstring) {
+    try {
+      const offset = (pageNumber - 1) * PAGE_SIZE;
+      const users = await prisma.user.findMany({
+        take: PAGE_SIZE,
+        skip: offset,
+        where: {
+          userName: {
+            contains: userNameSubstring,
+          },
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          userName: true,
+          nbGames: true,
+          userRanking: {
+            include: {
+              rankings: {
+                select: {
+                  id: true,
+                  title: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return users;
+    } catch (error) {
+      console.error(
+        'Error fetching users with userName containing:',
+        userNameSubstring,
+        error,
+      );
+      throw error;
     }
   }
 

@@ -15,3 +15,53 @@ END //
 DELIMITER ;
 
 InsertPuzzleSend17()
+
+
+// Créer 10 000 utilisateurs
+DELIMITER //
+
+CREATE PROCEDURE PopulateUsers()
+BEGIN
+    DECLARE i INT DEFAULT 1;
+    DECLARE suffix VARCHAR(255);
+    DECLARE currentTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP();
+    
+    WHILE i <= 10000 DO
+        -- Générer un suffixe basé sur la valeur de i pour garantir l'unicité
+        SET suffix = CONCAT('User', LPAD(i, 5, '0'));
+        
+        -- Insertion de l'utilisateur
+        INSERT INTO user (firstName, lastName, userName, password, email, emailVerified, createdAt, lastLogin, languagePreference, status, avatar, localisation, titlesId, titlesWin, badgesWin, company, url, school, github, presentation, nbGames, groupsId)
+        VALUES (
+            CONCAT('FirstName', suffix), -- firstName
+            CONCAT('LastName', suffix),  -- lastName
+            CONCAT('userName', suffix),  -- userName, doit être unique
+            'password123',               -- password, exemple statique
+            CONCAT(suffix, '@example.com'), -- email
+            FALSE,                       -- emailVerified
+            currentTime,                 -- createdAt
+            NULL,                        -- lastLogin
+            'en',                        -- languagePreference
+            'active',                    -- status
+            NULL,                        -- avatar
+            NULL,                        -- localisation
+            NULL,                        -- titlesId
+            NULL,                        -- titlesWin
+            NULL,                        -- badgesWin
+            NULL,                        -- company
+            NULL,                        -- url
+            NULL,                        -- school
+            NULL,                        -- github
+            'This is a sample user.',    -- presentation
+            0,                           -- nbGames
+            1                            -- groupsId, supposons que 1 est valide
+        );
+        
+        SET i = i + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
+
+
+CALL PopulateUsers();
