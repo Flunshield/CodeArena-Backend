@@ -22,6 +22,7 @@ jobs:
           script: |
             cd back-app/
             docker compose -f docker-compose-prod.yml down
+            git switch main
             git pull origin main
             docker compose -f docker-compose-prod.yml up --build -d
 
