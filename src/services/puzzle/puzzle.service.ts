@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
-import { ENTREPRISE } from "../../constantes/contante";
+import { ADMIN, ENTREPRISE } from "../../constantes/contante";
 
 const prisma = new PrismaClient();
 
@@ -54,6 +54,8 @@ export class PuzzleService {
       } catch (e) {
         console.log(e);
       }
+    }
+    if(data.user.groups.roles === ADMIN) {
     }
   }
 

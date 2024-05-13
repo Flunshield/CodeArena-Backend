@@ -5,7 +5,6 @@ import {
   Get,
   Patch,
   Post,
-  Query,
   Req,
   Res,
   UseGuards,
@@ -36,18 +35,6 @@ export class AdminController {
     try {
       const ranks = await this.userService.getRanks();
       response.send(ranks);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  @Get('/getUsers')
-  @Roles(ADMIN)
-  @UseGuards(RolesGuard)
-  async getUsers(@Query('page') page: string, @Req() request, @Res() response) {
-    try {
-      const users = await this.userService.getUsers(parseInt(page));
-      response.send(users);
     } catch (error) {
       console.log(error);
     }

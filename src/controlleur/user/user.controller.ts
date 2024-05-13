@@ -86,6 +86,30 @@ export class UserController {
     }
   }
 
+  @Get('/getUsers')
+  @Roles(ADMIN, ENTREPRISE, USER)
+  @UseGuards(RolesGuard)
+  async getUsers(@Query('page') page: string, @Req() request, @Res() response) {
+    try {
+      const users = await this.userService.getUsers(parseInt(page));
+      response.send(users);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('/getUsersByUsername')
+  @Roles(ADMIN, ENTREPRISE, USER)
+  @UseGuards(RolesGuard)
+  async getUsersByUsername(@Query('page') page: string, @Query('username') username: string, @Req() request, @Res() response) {
+    try {
+      const users = await this.userService.getUsersByUserName(parseInt(page), username.toString());
+      response.send(users);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   @Patch('/updateUser')
   @Roles(USER, ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
