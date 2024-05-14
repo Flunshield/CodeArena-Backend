@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UserRanking } from '../../interfaces/userInterface';
-import { WebSocketServer } from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
 @Injectable()
+@WebSocketGateway()
 export class WebsocketService {
   @WebSocketServer() server: Server;
 
