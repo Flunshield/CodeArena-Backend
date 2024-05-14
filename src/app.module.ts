@@ -37,7 +37,6 @@ import { PuzzleService } from './services/puzzle/puzzle.service';
 import { UserService } from './services/user/user.service';
 import { EntrepriseController } from './controlleur/entreprise/entreprise.controller';
 import { EntrepriseService } from './services/entreprise/entreprise.service';
-import { WebsocketService } from './websocket/services/websocket.service';
 
 @Module({
   imports: [
@@ -82,7 +81,6 @@ import { WebsocketService } from './websocket/services/websocket.service';
     StripeService,
     PuzzleService,
     EntrepriseService,
-    WebsocketService,
   ],
 })
 export class AppModule implements NestModule {
@@ -98,6 +96,7 @@ export class AppModule implements NestModule {
         { path: '/traduction', method: RequestMethod.GET },
         { path: 'auth/forgotPassWord', method: RequestMethod.POST },
         { path: '/entrepise/puzzleGame', method: RequestMethod.GET },
+        { path: '/websocket(.*)', method: RequestMethod.ALL },
       )
       .forRoutes('*');
   }
