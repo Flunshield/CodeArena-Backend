@@ -7,10 +7,29 @@ export class WebSocketController {
   constructor(private readonly websocketService: WebsocketService) {}
 
   @Get(':userId')
-  async findMatchesForPlayer(
-    @Param('userId') userId: string,
-  ): Promise<UserRanking[]> {
+  async getUserMatches(@Param('userId') userId: string): Promise<{
+    alreadyInQueue: boolean;
+    waitingPlayers: number[];
+    matches: UserRanking[];
+  }> {
     const playerId = parseInt(userId); // Convertir l'ID utilisateur en nombre
-    return this.websocketService.findMatchesForPlayer(playerId);
+
+    // Vérifier si le joueur est déjà en file d'attente
+    const isInQueue = this.websocketService.isPlayerInQueue(playerId);
+    if (isInQueue) {
+      // Le joueur est déjà en file d'attente, récupérer la liste des joueurs en file d'attente
+      const waitingPlayers = this.websocketService.getPlayersInQueue();
+      console.log(
+        `Le joueur avec l'ID ${playerId} est déjà en file d'attente. Joueurs en file d'attente : ${waitingPlayers.join(
+          ', ',
+        )}`,
+      );
+      // Vous pouvez envoyer une réponse appropriée au client ou effectuer d'autres actions
+      return { alreadyInQueue: true, waitingPlayers, matches: [] };
+    }
+
+    // Si le joueur n'est pas en file d'attente, ajoutez-le à la file d'attente
+    const matches = await this.websocketService.findMatchesForPlayer(playerId);
+    return { alreadyInQueue: false, waitingPlayers: [], matches };
   }
 }
