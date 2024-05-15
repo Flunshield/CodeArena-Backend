@@ -15,6 +15,15 @@ export class MatchmakingController {
   @Post('joinQueue')
   async joinQueue(@Body() userId: { id: number }) {
     try {
+      const isInQueue = await this.matchmakingService.isUserInQueue(userId.id);
+
+      if (isInQueue) {
+        return {
+          success: false,
+          message: 'You are already in the queue.',
+        };
+      }
+
       this.matchmakingService.addToQueue(userId.id);
       return {
         success: true,
@@ -44,7 +53,7 @@ export class MatchmakingController {
       if (match !== undefined && match !== userId.id) {
         return {
           success: true,
-          matchId: match,
+          userIdMatched: match,
           message: 'You found a match.',
         };
       } else if (match === userId.id) {
