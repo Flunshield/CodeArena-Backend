@@ -8,7 +8,7 @@ coverage/
 
 # Docker
 .docker/
-docker-compose-prod.yml
+docker-compose-prod*.yml
 
 # Prisma
 prisma/.prisma/client/
@@ -21,6 +21,7 @@ logs/
 
 # Environment variables
 .env
+.env.prod
 
 # NestJS Temp files
 .nest/

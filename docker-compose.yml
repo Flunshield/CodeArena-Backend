@@ -43,7 +43,7 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - ./src:/app/src
+      - ./src:/app/src 
 
 #   networks:
 #       - rcr_network
