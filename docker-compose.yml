@@ -43,21 +43,7 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - ./src:/app/src
-  
-  websocket:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: websocket
-    ports:
-      - '4000:4000'
-    depends_on:
-      - mariadb
-    volumes:
-      - ./websocket:/app/websocket
-    links:
-      - mariadb
+      - ./src:/app/src 
 
 #   networks:
 #       - rcr_network
