@@ -25,6 +25,12 @@ export class MatchmakingService {
     }
 
     const userRanking = await this.getUserRanking(userId);
+
+    if (userRanking === null) {
+      console.log(`User ${userId} has null ranking, cannot find match`); //TODO : log
+      return undefined;
+    }
+
     console.log(`User ${userId} has ranking ${userRanking}`); //TODO : log
 
     const matches = await Promise.all(
