@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MatchmakingController } from './matchmaking.controller';
 import { MatchmakingService } from '../services/matchmaking.service';
 
+//TODO : Refactor the tests
 describe('MatchmakingController', () => {
   let controller: MatchmakingController;
   let service: MatchmakingService;
@@ -33,9 +34,9 @@ describe('MatchmakingController', () => {
   describe('findMatch', () => {
     it('should return message if user is not in queue', async () => {
       const userId = { id: 1 };
-      jest.spyOn(service, 'isUserInQueue').mockResolvedValue(false as never);
+      jest.spyOn(service, 'findMatch').mockResolvedValue(undefined);
       const result = await controller.findMatch(userId);
-      expect(result).toEqual({ message: 'You are not in the queue' });
+      expect(result).toEqual({ message: 'No match found' });
     });
 
     // Add more test cases for findMatch

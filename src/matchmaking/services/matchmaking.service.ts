@@ -18,19 +18,34 @@ export class MatchmakingService {
   }
 
   // Trouver un match pour un utilisateur dans la file d'attente
-  findMatch(userId: number): number | undefined {
+  async findMatch(userId: number): Promise<number | undefined> {
     if (!this.queue.includes(userId)) {
       console.log(`User ${userId} is not in the queue`); //TODO : log
       return undefined;
     }
 
-    const match = this.queue.find((otherUserId) => otherUserId !== userId);
-    if (match !== undefined) {
-      // Supprimer les utilisateurs de la file d'attente
-      this.queue = this.queue.filter((u) => u !== userId && u !== match);
-      console.log(`User ${userId} and User ${match} matched`); //TODO : log
+    const userRanking = await this.getUserRanking(userId);
+    console.log(`User ${userId} has ranking ${userRanking}`); //TODO : log
+
+    const matches = await Promise.all(
+      this.queue
+        .filter((otherUserId) => otherUserId !== userId)
+        .map(async (otherUserId) => {
+          const ranking = await this.getUserRanking(otherUserId);
+          return { userId: otherUserId, ranking };
+        }),
+    );
+
+    const match = matches.find((match) => match.ranking === userRanking);
+
+    if (match) {
+      // Remove users from the queue
+      this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
+      console.log(`User ${userId} and User ${match.userId} matched`); //TODO : log
+      return match.userId;
     }
-    return match !== undefined ? match : undefined;
+
+    return undefined;
   }
 
   isUserInQueue(userId: number): boolean {
@@ -40,5 +55,26 @@ export class MatchmakingService {
   // Obtenir la liste des utilisateurs dans la file d'attente
   getQueue(): number[] {
     return this.queue;
+  }
+
+  async getUserRanking(userId: number): Promise<number | null> {
+    try {
+      const userRanking = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          userRanking: {
+            select: {
+              rankingsID: true,
+            },
+          },
+        },
+      });
+      return userRanking?.userRanking[0]?.rankingsID || null;
+    } catch (error) {
+      console.error('Error fetching user ranking:', error);
+      return null;
+    }
   }
 }
