@@ -31,17 +31,17 @@ import * as path from 'path';
 import { AdminService } from './services/admin/admin.service';
 import { StripeController } from './controlleur/stripe/stripe.controller';
 import { StripeService } from './services/stripe/stripe.service';
-import { WebsocketModule } from './websocket/websocket.module';
 import { PuzzleController } from './controlleur/puzzle/puzzle.controller';
 import { PuzzleService } from './services/puzzle/puzzle.service';
 import { UserService } from './services/user/user.service';
 import { EntrepriseController } from './controlleur/entreprise/entreprise.controller';
 import { EntrepriseService } from './services/entreprise/entreprise.service';
+import { MatchmakingModule } from './matchmaking/matchmaking.module';
 
 @Module({
   imports: [
     EmailModule,
-    WebsocketModule,
+    MatchmakingModule,
     I18nModule.forRoot({
       fallbackLanguage: 'fr',
       loaderOptions: {
@@ -96,7 +96,7 @@ export class AppModule implements NestModule {
         { path: '/traduction', method: RequestMethod.GET },
         { path: 'auth/forgotPassWord', method: RequestMethod.POST },
         { path: '/entrepise/puzzleGame', method: RequestMethod.GET },
-        { path: '/websocket(.*)', method: RequestMethod.ALL },
+        { path: '/matchmaking(.*)', method: RequestMethod.ALL },
       )
       .forRoutes('*');
   }
