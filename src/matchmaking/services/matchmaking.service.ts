@@ -63,6 +63,11 @@ export class MatchmakingService {
     return this.queue;
   }
 
+  removeFromQueue(userId: number): void {
+    this.queue = this.queue.filter((id) => id !== userId);
+    console.log(`User ${userId} left the queue`); //TODO : log
+  }
+
   async getUserRanking(userId: number): Promise<number | null> {
     try {
       const userRanking = await this.prisma.user.findUnique({
