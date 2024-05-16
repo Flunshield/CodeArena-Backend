@@ -36,10 +36,12 @@ import { PuzzleService } from './services/puzzle/puzzle.service';
 import { UserService } from './services/user/user.service';
 import { EntrepriseController } from './controlleur/entreprise/entreprise.controller';
 import { EntrepriseService } from './services/entreprise/entreprise.service';
+import { MatchmakingModule } from './matchmaking/matchmaking.module';
 
 @Module({
   imports: [
     EmailModule,
+    MatchmakingModule,
     I18nModule.forRoot({
       fallbackLanguage: 'fr',
       loaderOptions: {
@@ -94,6 +96,7 @@ export class AppModule implements NestModule {
         { path: '/traduction', method: RequestMethod.GET },
         { path: 'auth/forgotPassWord', method: RequestMethod.POST },
         { path: '/entrepise/puzzleGame', method: RequestMethod.GET },
+        { path: '/matchmaking(.*)', method: RequestMethod.ALL },
       )
       .forRoutes('*');
   }

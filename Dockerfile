@@ -13,6 +13,9 @@ RUN npm ci
 # Copy the rest of the application files
 COPY . .
 
+# Installer les dépendances WebSocket
+RUN npm install @nestjs/websockets
+
 # Build the application#
 RUN npx prisma generate
 
