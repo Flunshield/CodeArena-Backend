@@ -13,9 +13,10 @@ export class MatchmakingController {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 
   @Post('joinQueue')
-  async joinQueue(@Body() userId: { id: number }) {
+  async joinQueue(@Body() requestData: { data: { id: number } }) {
     try {
-      const isInQueue = await this.matchmakingService.isUserInQueue(userId.id);
+      const userId = requestData.data.id;
+      const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
       if (isInQueue) {
         return {
@@ -24,7 +25,7 @@ export class MatchmakingController {
         };
       }
 
-      this.matchmakingService.addToQueue(userId.id);
+      this.matchmakingService.addToQueue(userId);
       return {
         success: true,
         message: 'You have successfully joined the queue.',
