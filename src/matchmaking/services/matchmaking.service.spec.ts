@@ -1,24 +1,23 @@
-// matchmaking.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { MatchmakingService } from './matchmaking.service';
-import { PrismaClient } from '@prisma/client';
+import { UserService } from '../../services/user/user.service'; // Adjust the path as needed
 import { ChatGateway } from './matchmaking.gateway';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 
 describe('MatchmakingService', () => {
   let service: MatchmakingService;
-  let mockPrisma: DeepMockProxy<PrismaClient>;
-  let mockChatGateway: DeepMockProxy<ChatGateway>;
+  let userService: DeepMockProxy<UserService>;
+  let chatGateway: DeepMockProxy<ChatGateway>;
 
   beforeEach(async () => {
-    mockPrisma = mockDeep<PrismaClient>();
-    mockChatGateway = mockDeep<ChatGateway>();
+    userService = mockDeep<UserService>();
+    chatGateway = mockDeep<ChatGateway>();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MatchmakingService,
-        { provide: PrismaClient, useValue: mockPrisma },
-        { provide: ChatGateway, useValue: mockChatGateway },
+        { provide: UserService, useValue: userService },
+        { provide: ChatGateway, useValue: chatGateway },
       ],
     }).compile();
 
@@ -41,58 +40,6 @@ describe('MatchmakingService', () => {
       service.addToQueue(userId);
       service.addToQueue(userId);
       expect(service.getQueue().length).toBe(1);
-    });
-  });
-
-  describe('findMatch', () => {
-    it('should return undefined if user is not in the queue', async () => {
-      const userId = 1;
-      const result = await service.findMatch(userId);
-      expect(result).toBeUndefined();
-    });
-
-    it('should return undefined if user has null ranking', async () => {
-      const userId = 1;
-      service.addToQueue(userId);
-      mockPrisma.user.findUnique.mockResolvedValue(null as any);
-
-      const result = await service.findMatch(userId);
-      expect(result).toBeUndefined();
-    });
-
-    it('should find a match and notify users', async () => {
-      const userId1 = 1;
-      const userId2 = 2;
-      service.addToQueue(userId1);
-      service.addToQueue(userId2);
-
-      mockPrisma.user.findUnique
-        .mockResolvedValueOnce({ userRanking: [{ rankingsID: 100 }] } as any)
-        .mockResolvedValueOnce({ userRanking: [{ rankingsID: 100 }] } as any);
-
-      const result = await service.findMatch(userId1);
-      expect(result).toBe(userId2);
-
-      const roomId = `room-${userId1}-${userId2}`;
-      expect(mockChatGateway.notifyMatch).toHaveBeenCalledWith(
-        userId1,
-        userId2,
-        roomId,
-      );
-    });
-
-    it('should not find a match if no matching users', async () => {
-      const userId1 = 1;
-      const userId2 = 2;
-      service.addToQueue(userId1);
-      service.addToQueue(userId2);
-
-      mockPrisma.user.findUnique
-        .mockResolvedValueOnce({ userRanking: [{ rankingsID: 100 }] } as any)
-        .mockResolvedValueOnce({ userRanking: [{ rankingsID: 200 }] } as any);
-
-      const result = await service.findMatch(userId1);
-      expect(result).toBeUndefined();
     });
   });
 
@@ -128,32 +75,55 @@ describe('MatchmakingService', () => {
     });
   });
 
-  describe('getUserRanking', () => {
-    it('should return the user ranking if user is found', async () => {
+  describe('findMatch', () => {
+    it('should return undefined if user is not in the queue', async () => {
       const userId = 1;
-      const ranking = 100;
-      mockPrisma.user.findUnique.mockResolvedValue({
-        userRanking: [{ rankingsID: ranking }],
-      } as any);
-
-      const result = await service.getUserRanking(userId);
-      expect(result).toBe(ranking);
+      const result = await service.findMatch(userId);
+      expect(result).toBeUndefined();
     });
 
-    it('should return null if user is not found', async () => {
+    it('should return undefined if user has null ranking', async () => {
       const userId = 1;
-      mockPrisma.user.findUnique.mockResolvedValue(null as any);
+      service.addToQueue(userId);
+      userService.getUserRanked.mockResolvedValueOnce(null);
 
-      const result = await service.getUserRanking(userId);
-      expect(result).toBeNull();
+      const result = await service.findMatch(userId);
+      expect(result).toBeUndefined();
     });
 
-    it('should return null if user ranking is not found', async () => {
-      const userId = 1;
-      mockPrisma.user.findUnique.mockResolvedValue({ userRanking: [] } as any);
+    it('should find a match and notify users', async () => {
+      const userId1 = 1;
+      const userId2 = 2;
+      service.addToQueue(userId1);
+      service.addToQueue(userId2);
 
-      const result = await service.getUserRanking(userId);
-      expect(result).toBeNull();
+      userService.getUserRanked
+        .mockResolvedValueOnce(100)
+        .mockResolvedValueOnce(100);
+
+      const result = await service.findMatch(userId1);
+      expect(result).toBe(userId2);
+
+      const roomId = `room-${userId1}-${userId2}`;
+      expect(chatGateway.notifyMatch).toHaveBeenCalledWith(
+        userId1,
+        userId2,
+        roomId,
+      );
+    });
+
+    it('should not find a match if no matching users', async () => {
+      const userId1 = 1;
+      const userId2 = 2;
+      service.addToQueue(userId1);
+      service.addToQueue(userId2);
+
+      userService.getUserRanked
+        .mockResolvedValueOnce(100)
+        .mockResolvedValueOnce(200);
+
+      const result = await service.findMatch(userId1);
+      expect(result).toBeUndefined();
     });
   });
 });
