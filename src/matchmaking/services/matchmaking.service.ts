@@ -1,11 +1,16 @@
+// matchmaking.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { ChatGateway } from './matchmaking.gateway';
 
 @Injectable()
 export class MatchmakingService {
   private queue: number[] = [];
 
-  constructor(private prisma: PrismaClient) {}
+  constructor(
+    private prisma: PrismaClient,
+    private chatGateway: ChatGateway,
+  ) {}
 
   // Ajouter un utilisateur à la file d'attente
   addToQueue(userId: number): void {
@@ -47,7 +52,15 @@ export class MatchmakingService {
     if (match) {
       // Remove users from the queue
       this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
-      console.log(`User ${userId} and User ${match.userId} matched`); //TODO : log
+
+      const roomId = `room-${userId}-${match.userId}`;
+
+      // Notify users about the match and join them in a room
+      this.chatGateway.notifyMatch(userId, match.userId, roomId);
+      console.log(
+        `User ${userId} and User ${match.userId} matched in room ${roomId}`,
+      ); //TODO : log
+
       return match.userId;
     }
 
