@@ -16,8 +16,22 @@ export class MatchmakingService {
     if (!this.queue.includes(userId)) {
       this.queue.push(userId);
       console.log(`User ${userId} joined the queue`);
+      this.processQueue();
     } else {
       console.log(`User ${userId} is already in the queue`);
+    }
+  }
+
+  async processQueue() {
+    for (const userId of this.queue) {
+      const match = await this.findMatch(userId);
+      if (match) {
+        const roomId = `room-${userId}-${match}`;
+        this.chatGateway.notifyMatch(userId, match, roomId);
+        console.log(
+          `User ${userId} and User ${match} matched in room ${roomId}`,
+        );
+      }
     }
   }
 
@@ -49,13 +63,6 @@ export class MatchmakingService {
 
     if (match) {
       this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
-
-      const roomId = `room-${userId}-${match.userId}`;
-      this.chatGateway.notifyMatch(userId, match.userId, roomId);
-      console.log(
-        `User ${userId} and User ${match.userId} matched in room ${roomId}`,
-      );
-
       return match.userId;
     }
 
@@ -78,8 +85,16 @@ export class MatchmakingService {
   async getUserRanking(userId: number): Promise<number | null> {
     try {
       const userRanking = await this.prisma.user.findUnique({
-        where: { id: userId },
-        select: { userRanking: { select: { rankingsID: true } } },
+        where: {
+          id: userId,
+        },
+        select: {
+          userRanking: {
+            select: {
+              rankingsID: true,
+            },
+          },
+        },
       });
       return userRanking?.userRanking[0]?.rankingsID || null;
     } catch (error) {
