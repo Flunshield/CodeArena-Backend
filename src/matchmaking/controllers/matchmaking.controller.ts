@@ -1,3 +1,4 @@
+// matchmaking.controller.ts
 import {
   Controller,
   Post,
@@ -19,10 +20,7 @@ export class MatchmakingController {
       const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
       if (isInQueue) {
-        return {
-          success: false,
-          message: 'You are already in the queue.',
-        };
+        return { success: false, message: 'You are already in the queue.' };
       }
 
       this.matchmakingService.addToQueue(userId);
@@ -93,10 +91,7 @@ export class MatchmakingController {
       const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
       if (!isInQueue) {
-        return {
-          success: false,
-          message: 'You are not in the queue.',
-        };
+        return { success: false, message: 'You are not in the queue.' };
       }
 
       this.matchmakingService.removeFromQueue(userId);
