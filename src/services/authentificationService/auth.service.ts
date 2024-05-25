@@ -153,7 +153,6 @@ export class AuthService {
       });
 
       if (user.groupsId === 3) {
-        console.log('userEntreprise');
         await this.verifEntrepriseGroups(user);
       }
 
@@ -367,49 +366,18 @@ export class AuthService {
    * @returns Une promesse qui se résout sans valeur de retour, après potentiellement avoir réinitialisé le groupe de l'utilisateur.
    */
   async verifEntrepriseGroups(user: User) {
-    let isEntrepriseValid;
-    let abonnement = false;
-
     if (user && user.id) {
-      const commandes = await this.stripeService.getAllCommmandeUser(
-        user.id.toString(),
-      );
-
       const lastCommande = await this.stripeService.getLastCommande(
         user.id.toString(),
       );
-
-      const abonnements = commandes.find((elem) => {
-        return elem.customerId !== null;
-      });
-
-      if (abonnements !== null) {
-        isEntrepriseValid = [abonnements];
-        abonnement = true;
-      } else if (lastCommande !== null) {
-        isEntrepriseValid = [lastCommande];
-      } else {
-        isEntrepriseValid = [];
-      }
-
-      if (isEntrepriseValid.length > 0) {
-        if (!abonnement) {
-          const today = new Date();
-          const dateCommand = isEntrepriseValid[0].dateCommande;
-          const deltaTime = differenceEnAnnees(today, dateCommand);
-          if (deltaTime > 1) {
-            await resetUserGroup(user);
-          }
-        } else {
-          const abonnementValid =
-            await this.stripeService.getSubscriptionStatus(
-              isEntrepriseValid[0].customerId,
-            );
-
-          if (!abonnementValid.active) {
-            await resetUserGroup(user);
-          }
-        }
+      const abonnementValid = await this.stripeService.getSubscriptionStatus(
+        lastCommande.idPayment,
+      );
+      if (
+        (lastCommande && lastCommande.etatCommande === 'Cancel') ||
+        (abonnementValid && !abonnementValid.active)
+      ) {
+        await resetUserGroup(user);
       }
     }
   }
@@ -433,20 +401,4 @@ async function resetUserGroup(user: User) {
       groupsId: 1,
     },
   });
-}
-
-/**
- * Calcule la différence en années entières entre deux dates.
- * Cette fonction détermine le nombre d'années complètes entre deux dates en tenant compte des années bissextiles,
- * en utilisant une approximation du nombre de millisecondes dans une année.
- *
- * @param date1 - La première date de comparaison.
- * @param date2 - La deuxième date de comparaison.
- * @returns Le nombre entier d'années de différence entre les deux dates.
- */
-function differenceEnAnnees(date1: Date, date2: Date): number {
-  const differenceEnMilliseconds = Math.abs(date1.getTime() - date2.getTime());
-  const millisecondsDansAnnee = 1000 * 60 * 60 * 24 * 365.25; // Approximation du nombre de millisecondes dans une année
-  const differenceEnAnnees = differenceEnMilliseconds / millisecondsDansAnnee;
-  return Math.floor(differenceEnAnnees);
 }

@@ -163,26 +163,40 @@ export class StripeService {
   }
 
   async unsuscribeUser(lastCommande) {
-    return await this.stripe.subscriptions.update(lastCommande.idPayment, {
-      cancel_at_period_end: true,
-    });
-  }
-  async getAllCommmandeUser(id: string) {
-    const allCommande = prisma.commandeEntreprise.findMany({
-      where: {
-        userID: parseInt(id),
+    const unsuscribe = await this.stripe.subscriptions.update(
+      lastCommande.idPayment,
+      {
+        cancel_at_period_end: true,
       },
-    });
+    );
 
-    if (allCommande) {
-      return allCommande;
-    } else {
-      return [];
+    if (unsuscribe) {
+      const cancelCommand = await prisma.commandeEntreprise.update({
+        where: {
+          idPayment: lastCommande.idPayment,
+        },
+        data: {
+          etatCommande: 'Cancel',
+        },
+      });
+
+      const resetGroupUser = await prisma.user.update({
+        where: {
+          id: lastCommande.userID,
+        },
+        data: {
+          groupsId: 1,
+        },
+      });
+
+      if (cancelCommand && resetGroupUser) {
+        return unsuscribe;
+      }
     }
   }
 
   async getLastCommande(id: string) {
-    const lastCommande = prisma.commandeEntreprise.findFirst({
+    return prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
       },
@@ -190,11 +204,5 @@ export class StripeService {
         dateCommande: 'desc',
       },
     });
-
-    if (lastCommande) {
-      return lastCommande;
-    } else {
-      return [];
-    }
   }
 }
