@@ -3,6 +3,7 @@ import { Stripe } from 'stripe';
 import { PrismaClient } from '@prisma/client';
 import { PRODUCT } from '../../constantes/contante';
 import { User } from 'src/interfaces/userInterface';
+import { MailerService } from '@nestjs-modules/mailer';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -15,7 +16,7 @@ export class StripeService {
     },
   );
 
-  constructor() {}
+  constructor(private readonly mailerService: MailerService) {}
 
   /**
    * Récupère une session de paiement Stripe spécifiée par son identifiant de session.
@@ -138,6 +139,20 @@ export class StripeService {
     });
   }
 
+  /**
+   * Récupère le statut d'abonnement d'un client en fonction de son ID client Stripe.
+   *
+   * Cette méthode liste tous les abonnements associés au client spécifié, filtre ceux qui sont
+   * actifs, en période d'essai ou en retard de paiement, et retourne leur statut.
+   *
+   * @param {string} customerId - L'ID du client Stripe.
+   *
+   * @returns {Promise<{ active: boolean, subscriptions: Array<Object> }>} - Retourne une promesse qui
+   *     se résout avec un objet contenant un indicateur de statut d'abonnement actif et une liste
+   *     des abonnements actifs.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
   async getSubscriptionStatus(customerId: string) {
     const subscriptions = await this.stripe.subscriptions.list({
       customer: customerId,
@@ -162,6 +177,22 @@ export class StripeService {
     };
   }
 
+  /**
+   * Annule l'abonnement d'un utilisateur à la fin de la période de facturation en cours.
+   *
+   * Cette méthode met à jour l'abonnement Stripe pour qu'il se termine à la fin de la période en cours,
+   * met à jour l'état de la commande dans la base de données pour indiquer qu'elle est annulée,
+   * et réinitialise l'identifiant du groupe de l'utilisateur.
+   *
+   * @param {Object} lastCommande - La dernière commande de l'utilisateur.
+   * @param {string} lastCommande.idPayment - L'ID de paiement de la commande à annuler.
+   * @param {number} lastCommande.userID - L'ID de l'utilisateur dont l'abonnement est annulé.
+   *
+   * @returns {Promise<Object|undefined>} - Retourne l'objet de réponse de l'abonnement annulé de Stripe
+   *                                        si toutes les opérations réussissent, sinon `undefined`.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
   async unsuscribeUser(lastCommande) {
     const unsuscribe = await this.stripe.subscriptions.update(
       lastCommande.idPayment,
@@ -176,7 +207,7 @@ export class StripeService {
           idPayment: lastCommande.idPayment,
         },
         data: {
-          etatCommande: 'Cancel',
+          etatCommande: 'Unsubscribed',
         },
       });
 
@@ -195,6 +226,19 @@ export class StripeService {
     }
   }
 
+  /**
+   * Récupère la dernière commande d'un utilisateur en fonction de son ID.
+   *
+   * Cette méthode recherche la première commande d'un utilisateur triée par date de commande
+   * dans l'ordre décroissant, ce qui correspond à la commande la plus récente.
+   *
+   * @param {string} id - L'ID de l'utilisateur sous forme de chaîne de caractères.
+   *
+   * @returns {Promise<Object|null>} - Retourne une promesse qui se résout avec la dernière commande
+   *                                   de l'utilisateur si elle existe, sinon `null`.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
   async getLastCommande(id: string) {
     return prisma.commandeEntreprise.findFirst({
       where: {

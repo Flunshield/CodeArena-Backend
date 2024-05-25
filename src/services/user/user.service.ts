@@ -400,6 +400,20 @@ export class UserService {
     });
   }
 
+  /**
+   * Récupère la dernière commande d'un utilisateur en fonction de son ID.
+   *
+   * Cette méthode recherche la première commande d'un utilisateur triée par date de commande
+   * dans l'ordre décroissant, ce qui correspond à la commande la plus récente. Si aucune commande
+   * n'est trouvée, une liste vide est retournée.
+   *
+   * @param {string} id - L'ID de l'utilisateur sous forme de chaîne de caractères.
+   *
+   * @returns {Promise<Object|Array>} - Retourne une promesse qui se résout avec la dernière commande
+   *                                    de l'utilisateur si elle existe, sinon une liste vide.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
   async getLastCommande(id: string) {
     const lastCommande = prisma.commandeEntreprise.findFirst({
       where: {
