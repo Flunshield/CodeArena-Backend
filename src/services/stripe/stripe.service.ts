@@ -1,9 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Stripe } from 'stripe';
 import { PrismaClient } from '@prisma/client';
-import { User } from '../../interfaces/userInterface';
-import { UserService } from '../user/user.service';
 import { PRODUCT } from '../../constantes/contante';
+import { User } from 'src/interfaces/userInterface';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -16,7 +15,7 @@ export class StripeService {
     },
   );
 
-  constructor(private readonly userService: UserService) {}
+  constructor() {}
 
   /**
    * Récupère une session de paiement Stripe spécifiée par son identifiant de session.
@@ -88,52 +87,114 @@ export class StripeService {
    *          HttpStatus.NOT_MODIFIED si l'utilisateur n'a pas été modifié, ou lève une HttpException en cas d'erreur.
    * @throws {HttpException} Une erreur est levée si une erreur interne survient lors du processus de création de la commande.
    */
-  async createCommande(session?, user?: User) {
+
+  async createCommande(session, user: User) {
     try {
       const nbCreateTest = PRODUCT.find((elem) => {
         return elem.id === (session ? session.line_items.data[0].price.id : '');
       });
-      let createCommand;
-      if (session) {
-        createCommand = await prisma.commandeEntreprise.create({
-          data: {
-            idSession: session.id,
-            objetSession: [session],
-            idPayment: session.payment_intent,
-            item: session.line_items.data[0].price.id ?? '',
-            userID: user.id,
-            dateCommande: new Date(),
-            etatCommande: session.payment_status,
-            nbCreateTest: nbCreateTest.nbCreate,
-          },
-        });
-      } else {
-        createCommand = await prisma.commandeEntreprise.create({
-          data: {
-            idSession: new Date().getTime().toString(),
-            objetSession: [],
-            idPayment: new Date().getTime().toString(),
-            item: new Date().getTime().toString(),
-            userID: user.id,
-            dateCommande: new Date(),
-            etatCommande: 'Version gratuit',
-            nbCreateTest: nbCreateTest.nbCreate,
-          },
-        });
-      }
+
+      const createCommand = await prisma.commandeEntreprise.create({
+        data: {
+          idSession: session.id,
+          objetSession: [session],
+          idPayment: session.payment_intent ?? session.subscription,
+          item: session.line_items.data[0].price.id ?? '',
+          userID: user.id,
+          customerId: session.customer,
+          dateCommande: new Date(),
+          etatCommande: session.payment_status,
+          nbCreateTest: nbCreateTest.nbCreate,
+        },
+      });
       if (createCommand) {
-        const userUpdate = await this.userService.attributeEntrepriseRole(user);
+        const userUpdate = await this.attributeEntrepriseRole(user);
         if (userUpdate) {
           return HttpStatus.CREATED;
-        } else {
-          return HttpStatus.NOT_MODIFIED;
         }
       }
     } catch (e) {
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Attribue un rôle d'entreprise à un utilisateur en mettant à jour son groupe d'appartenance dans la base de données.
+   * Cette fonction met à jour l'identifiant de groupe de l'utilisateur pour le passer à un identifiant spécifique
+   * représentant le groupe des entreprises (par exemple, groupe ID 3 pour les utilisateurs d'entreprise).
+   *
+   * @param user - L'objet `User` représentant l'utilisateur à qui le rôle d'entreprise sera attribué.
+   * @returns Une promesse résolue avec l'objet utilisateur mis à jour.
+   */
+  async attributeEntrepriseRole(user: User) {
+    return prisma.user.update({
+      where: {
+        userName: user.userName,
+        id: user.id,
+      },
+      data: {
+        groupsId: 3,
+      },
+    });
+  }
+
+  async getSubscriptionStatus(customerId: string) {
+    const subscriptions = await this.stripe.subscriptions.list({
+      customer: customerId,
+      status: 'all',
+      expand: ['data.default_payment_method'],
+    });
+
+    if (subscriptions.data.length === 0) {
+      return { active: false, subscriptions: [] };
+    }
+
+    const activeSubscriptions = subscriptions.data.filter(
+      (subscription) =>
+        subscription.status === 'active' ||
+        subscription.status === 'trialing' ||
+        subscription.status === 'past_due',
+    );
+
+    return {
+      active: activeSubscriptions.length > 0,
+      subscriptions: activeSubscriptions,
+    };
+  }
+
+  async unsuscribeUser(lastCommande) {
+    return await this.stripe.subscriptions.update(lastCommande.idPayment, {
+      cancel_at_period_end: true,
+    });
+  }
+  async getAllCommmandeUser(id: string) {
+    const allCommande = prisma.commandeEntreprise.findMany({
+      where: {
+        userID: parseInt(id),
+      },
+    });
+
+    if (allCommande) {
+      return allCommande;
+    } else {
+      return [];
+    }
+  }
+
+  async getLastCommande(id: string) {
+    const lastCommande = prisma.commandeEntreprise.findFirst({
+      where: {
+        userID: parseInt(id),
+      },
+      orderBy: {
+        dateCommande: 'desc',
+      },
+    });
+
+    if (lastCommande) {
+      return lastCommande;
+    } else {
+      return [];
     }
   }
 }

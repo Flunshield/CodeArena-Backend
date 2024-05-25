@@ -184,6 +184,7 @@ model commandeEntreprise {
   dateCommande DateTime @default(now())
   etatCommande String
   nbCreateTest Int      @default(10)
+  customerId   String?
 }
 
 model puzzlesEntreprise {

@@ -218,5 +218,8 @@
   "unsubscribeSuccess": "La désinscription a réussi !",
   "puzzleDeleted": "Puzzle supprimé",
   "failedDeletePuzzle": "Échec de la suppression du puzzle",
-  "errorCallAPI": "Erreur lors de l'appel à l'API : "
+  "errorCallAPI": "Erreur lors de l'appel à l'API : ",
+  "abonementSuccess": "La demande d'annulation d'abonnement a bien été prise en compte, vous ne serez pas renouvelé",
+  "abonementError": "Une demande d'annulation d'abonnement a déja été pris en compte.",
+  "unscribed": "Désinscription"
 }

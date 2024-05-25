@@ -29,7 +29,7 @@ export class StripeController {
             quantity: 1,
           },
         ],
-        mode: 'payment',
+        mode: req.body.typePayment,
         success_url: `${YOUR_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${YOUR_DOMAIN}/cancel`,
       });
@@ -50,9 +50,12 @@ export class StripeController {
       const checkIfOrderExist =
         await this.stripeService.checkIfOrderExist(session);
       if (checkIfOrderExist) {
-        response.send(
-          await this.stripeService.createCommande(session, data.user.data),
+        // Passer le customerId à la méthode de création de commande
+        const status = await this.stripeService.createCommande(
+          session,
+          data.user.data,
         );
+        response.send(status);
       }
     }
     if (!session) {

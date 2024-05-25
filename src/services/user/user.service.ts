@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
 import { ResponseCreateUser, User } from '../../interfaces/userInterface';
-import { Dto } from '../../dto/./Dto';
+import { Dto } from '../../dto/Dto';
 import { PAGE_SIZE } from '../../constantes/contante';
 import { MailService } from '../../email/service/MailService';
 
@@ -400,27 +400,7 @@ export class UserService {
     });
   }
 
-  /**
-   * Attribue un rôle d'entreprise à un utilisateur en mettant à jour son groupe d'appartenance dans la base de données.
-   * Cette fonction met à jour l'identifiant de groupe de l'utilisateur pour le passer à un identifiant spécifique
-   * représentant le groupe des entreprises (par exemple, groupe ID 3 pour les utilisateurs d'entreprise).
-   *
-   * @param user - L'objet `User` représentant l'utilisateur à qui le rôle d'entreprise sera attribué.
-   * @returns Une promesse résolue avec l'objet utilisateur mis à jour.
-   */
-  async attributeEntrepriseRole(user: User) {
-    return prisma.user.update({
-      where: {
-        userName: user.userName,
-        id: user.id,
-      },
-      data: {
-        groupsId: 3,
-      },
-    });
-  }
-
-  static async getLastCommande(id: string) {
+  async getLastCommande(id: string) {
     const lastCommande = prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),

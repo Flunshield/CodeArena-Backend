@@ -30,7 +30,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-socket.io": "^10.3.8",
     "@nestjs/websockets": "^10.3.8",
-    "@prisma/client": "^5.13.0",
+    "@prisma/client": "^5.14.0",
     "bcrypt": "^5.1.1",
     "ci": "^2.3.0",
     "class-validator": "^0.14.0",

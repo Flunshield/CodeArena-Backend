@@ -11,7 +11,7 @@ import { PrismaClient } from '@prisma/client';
 import { RefreshTokenService } from './RefreshTokenService';
 import { Response } from 'express';
 import { MailService } from '../../email/service/MailService';
-import { UserService } from '../user/user.service';
+import { StripeService } from '../stripe/stripe.service';
 
 const prisma = new PrismaClient();
 
@@ -34,6 +34,7 @@ export class AuthService {
   constructor(
     private readonly refreshTokenService: RefreshTokenService,
     private readonly mailService: MailService,
+    private readonly stripeService: StripeService,
   ) {}
 
   /**
@@ -151,7 +152,10 @@ export class AuthService {
         },
       });
 
-      await this.verifEntrepriseGroups(user);
+      if (user.groupsId === 3) {
+        console.log('userEntreprise');
+        await this.verifEntrepriseGroups(user);
+      }
 
       if (user) {
         const passwordsMatch: boolean = await AuthService.comparePasswords(
@@ -364,25 +368,48 @@ export class AuthService {
    */
   async verifEntrepriseGroups(user: User) {
     let isEntrepriseValid;
+    let abonnement = false;
 
     if (user && user.id) {
-      const lastCommande = await UserService.getLastCommande(
+      const commandes = await this.stripeService.getAllCommmandeUser(
         user.id.toString(),
       );
-      if (lastCommande !== null) {
+
+      const lastCommande = await this.stripeService.getLastCommande(
+        user.id.toString(),
+      );
+
+      const abonnements = commandes.find((elem) => {
+        return elem.customerId !== null;
+      });
+
+      if (abonnements !== null) {
+        isEntrepriseValid = [abonnements];
+        abonnement = true;
+      } else if (lastCommande !== null) {
         isEntrepriseValid = [lastCommande];
       } else {
         isEntrepriseValid = [];
       }
-    } else {
-      isEntrepriseValid = [];
-    }
-    if (isEntrepriseValid.length > 0) {
-      const today = new Date();
-      const dateCommand = isEntrepriseValid[0].dateCommande;
-      const deltaTime = differenceEnAnnees(today, dateCommand);
-      if (deltaTime > 1) {
-        await resetUserGroup(user);
+
+      if (isEntrepriseValid.length > 0) {
+        if (!abonnement) {
+          const today = new Date();
+          const dateCommand = isEntrepriseValid[0].dateCommande;
+          const deltaTime = differenceEnAnnees(today, dateCommand);
+          if (deltaTime > 1) {
+            await resetUserGroup(user);
+          }
+        } else {
+          const abonnementValid =
+            await this.stripeService.getSubscriptionStatus(
+              isEntrepriseValid[0].customerId,
+            );
+
+          if (!abonnementValid.active) {
+            await resetUserGroup(user);
+          }
+        }
       }
     }
   }
