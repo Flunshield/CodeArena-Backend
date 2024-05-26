@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { PRODUCT } from '../../constantes/contante';
 import { User } from 'src/interfaces/userInterface';
 import { MailerService } from '@nestjs-modules/mailer';
+import { PdfService } from '../pdfservice/pdf.service';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -16,7 +17,10 @@ export class StripeService {
     },
   );
 
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   /**
    * Récupère une session de paiement Stripe spécifiée par son identifiant de session.
@@ -248,5 +252,15 @@ export class StripeService {
         dateCommande: 'desc',
       },
     });
+  }
+
+  async getLatestInvoice(customerId: string) {
+    const latestInvoice = await this.stripe.invoices.list({
+      customer: customerId,
+      limit: 1,
+      status: 'paid', // ou tout autre statut pertinent pour votre cas d'utilisation
+      expand: ['data.default_payment_method'],
+    });
+    return await this.pdfService.generateInvoicePDF(latestInvoice.data[0]);
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { Stripe } from 'stripe';
 import { StripeService } from '../../services/stripe/stripe.service';
 import { ENTREPRISE, USER } from '../../constantes/contante';
@@ -63,5 +63,24 @@ export class StripeController {
         await this.stripeService.createCommande('', data.user.data),
       );
     }
+  }
+
+  @Get('lastCommande')
+  @Roles(USER, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getLatestInvoice(@Query('id') id: string, @Req() req, @Res() res) {
+    const lastCommande = await this.stripeService.getLastCommande(id);
+    const latestInvoice = await this.stripeService.getLatestInvoice(
+      lastCommande.customerId,
+    );
+    if (!latestInvoice) {
+      return res.status(404).send('No invoice found');
+    }
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'Content-Disposition; filename=invoice.pdf',
+      'Content-Length': latestInvoice.length,
+    });
+    res.end(latestInvoice);
   }
 }

@@ -222,5 +222,6 @@
   "errormailToSend": "Error sending mail",
   "abonementSuccess": "Your subscription cancellation request has been processed, but you will not be renewed.",
   "abonementError": "A cancellation request has already been processed.",
-  "unscribed": "Unsubscribe"
+  "unscribed": "Unsubscribe",
+  "recupInvoice": "Retrieve invoice"
 }
