@@ -63,6 +63,11 @@ export class MatchmakingService {
 
     if (match) {
       this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
+      this.chatGateway.notifyMatch(
+        userId,
+        match.userId,
+        `room-${userId}-${match.userId}`,
+      );
       return match.userId;
     }
 

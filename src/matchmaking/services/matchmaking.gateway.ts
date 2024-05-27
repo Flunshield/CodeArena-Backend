@@ -31,7 +31,7 @@ export class ChatGateway
   }
 
   notifyMatch(userId1: number, userId2: number, roomId: string): void {
-    this.server.to(roomId).emit('match', { userId1, userId2, roomId });
+    this.server.emit('matchFound', { userId1, userId2, roomId });
   }
 
   afterInit(): void {
