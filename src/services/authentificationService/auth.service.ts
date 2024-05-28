@@ -371,7 +371,7 @@ export class AuthService {
         user.id.toString(),
       );
       const abonnementValid = await this.stripeService.getSubscriptionStatus(
-        lastCommande.idPayment,
+        lastCommande.customerId,
       );
       if (abonnementValid && !abonnementValid.active) {
         await resetUserGroup(user);

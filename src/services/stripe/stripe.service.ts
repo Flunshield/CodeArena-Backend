@@ -158,27 +158,31 @@ export class StripeService {
    * @throws {Error} - Lance une erreur si une opération échoue.
    */
   async getSubscriptionStatus(customerId: string) {
-    const subscriptions = await this.stripe.subscriptions.list({
-      customer: customerId,
-      status: 'all',
-      expand: ['data.default_payment_method'],
-    });
+    try {
+      const subscriptions = await this.stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        expand: ['data.default_payment_method'],
+      });
 
-    if (subscriptions.data.length === 0) {
-      return { active: false, subscriptions: [] };
+      if (subscriptions.data.length === 0) {
+        return { active: false, subscriptions: [] };
+      }
+
+      const activeSubscriptions = subscriptions.data.filter(
+        (subscription) =>
+          subscription.status === 'active' ||
+          subscription.status === 'trialing' ||
+          subscription.status === 'past_due',
+      );
+
+      return {
+        active: activeSubscriptions.length > 0,
+        subscriptions: activeSubscriptions,
+      };
+    } catch (e) {
+      console.log(e);
     }
-
-    const activeSubscriptions = subscriptions.data.filter(
-      (subscription) =>
-        subscription.status === 'active' ||
-        subscription.status === 'trialing' ||
-        subscription.status === 'past_due',
-    );
-
-    return {
-      active: activeSubscriptions.length > 0,
-      subscriptions: activeSubscriptions,
-    };
   }
 
   /**

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Stripe } from 'stripe';
 import { StripeService } from '../../services/stripe/stripe.service';
 import { ENTREPRISE, USER } from '../../constantes/contante';
@@ -36,7 +44,7 @@ export class StripeController {
 
       return res.send({ message: session.url });
     } catch (error) {
-      res.status(500).json({ error: 'An error occurred' });
+      res.sendStatus(500).json({ error: 'An error occurred' });
     }
   }
 
@@ -55,7 +63,7 @@ export class StripeController {
           session,
           data.user.data,
         );
-        response.send(status);
+        response.sendStatus(status);
       }
     }
     if (!session) {
