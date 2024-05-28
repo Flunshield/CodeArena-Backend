@@ -219,5 +219,9 @@
   "puzzleDeleted": "Puzzle deleted",
   "failedDeletePuzzle": "Failed to delete puzzle",
   "errorCallAPI": "Error calling the API: ",
-  "errormailToSend": "Error sending mail"
+  "errormailToSend": "Error sending mail",
+  "abonementSuccess": "Your subscription cancellation request has been processed, but you will not be renewed.",
+  "abonementError": "A cancellation request has already been processed.",
+  "unscribed": "Unsubscribe",
+  "recupInvoice": "Retrieve invoice"
 }

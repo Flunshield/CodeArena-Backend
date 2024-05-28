@@ -1,37 +1,54 @@
+// matchmaking.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { ChatGateway } from './matchmaking.gateway';
 
 @Injectable()
 export class MatchmakingService {
   private queue: number[] = [];
 
-  constructor(private prisma: PrismaClient) {}
+  constructor(
+    private prisma: PrismaClient,
+    private chatGateway: ChatGateway,
+  ) {}
 
-  // Ajouter un utilisateur à la file d'attente
   addToQueue(userId: number): void {
     if (!this.queue.includes(userId)) {
       this.queue.push(userId);
-      console.log(`User ${userId} joined the queue`); //TODO : log
+      console.log(`User ${userId} joined the queue`);
+      this.processQueue();
     } else {
-      console.log(`User ${userId} is already in the queue`); //TODO : log
+      console.log(`User ${userId} is already in the queue`);
     }
   }
 
-  // Trouver un match pour un utilisateur dans la file d'attente
+  async processQueue() {
+    for (const userId of this.queue) {
+      const match = await this.findMatch(userId);
+      if (match) {
+        const roomId = `room-${userId}-${match}`;
+        this.chatGateway.notifyMatch(userId, match, roomId);
+        console.log(
+          `User ${userId} and User ${match} matched in room ${roomId}`,
+        );
+      }
+    }
+  }
+
   async findMatch(userId: number): Promise<number | undefined> {
     if (!this.queue.includes(userId)) {
-      console.log(`User ${userId} is not in the queue`); //TODO : log
+      console.log(`User ${userId} is not in the queue`);
       return undefined;
     }
 
     const userRanking = await this.getUserRanking(userId);
 
     if (userRanking === null) {
-      console.log(`User ${userId} has null ranking, cannot find match`); //TODO : log
+      console.log(`User ${userId} has null ranking, cannot find match`);
       return undefined;
     }
 
-    console.log(`User ${userId} has ranking ${userRanking}`); //TODO : log
+    console.log(`User ${userId} has ranking ${userRanking}`);
 
     const matches = await Promise.all(
       this.queue
@@ -45,9 +62,12 @@ export class MatchmakingService {
     const match = matches.find((match) => match.ranking === userRanking);
 
     if (match) {
-      // Remove users from the queue
       this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
-      console.log(`User ${userId} and User ${match.userId} matched`); //TODO : log
+      this.chatGateway.notifyMatch(
+        userId,
+        match.userId,
+        `room-${userId}-${match.userId}`,
+      );
       return match.userId;
     }
 
@@ -58,14 +78,13 @@ export class MatchmakingService {
     return this.queue.includes(userId);
   }
 
-  // Obtenir la liste des utilisateurs dans la file d'attente
   getQueue(): number[] {
     return this.queue;
   }
 
   removeFromQueue(userId: number): void {
     this.queue = this.queue.filter((id) => id !== userId);
-    console.log(`User ${userId} left the queue`); //TODO : log
+    console.log(`User ${userId} left the queue`);
   }
 
   async getUserRanking(userId: number): Promise<number | null> {

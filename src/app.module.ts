@@ -37,6 +37,7 @@ import { UserService } from './services/user/user.service';
 import { EntrepriseController } from './controlleur/entreprise/entreprise.controller';
 import { EntrepriseService } from './services/entreprise/entreprise.service';
 import { MatchmakingModule } from './matchmaking/matchmaking.module';
+import { PdfService } from './services/pdfservice/pdf.service';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { MatchmakingModule } from './matchmaking/matchmaking.module';
     StripeService,
     PuzzleService,
     EntrepriseService,
+    PdfService,
   ],
 })
 export class AppModule implements NestModule {

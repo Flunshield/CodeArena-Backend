@@ -20,4 +20,4 @@ RUN npm install @nestjs/websockets
 RUN npx prisma generate
 
 # Command to run your application
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:dev"]

@@ -19,6 +19,7 @@ import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../auth/auth.controller';
 import { MailService } from '../../email/service/MailService';
+import { StripeService } from "../../services/stripe/stripe.service";
 
 /**
  * Contrôleur responsable de la gestion des utilisateurs.
@@ -40,10 +41,12 @@ export class UserController {
    *
    * @param userService - Le service utilisateur utilisé pour gérer les opérations liées aux utilisateurs.
    * @param mailService
+   * @param stripeService
    */
   constructor(
     private readonly userService: UserService,
     private readonly mailService: MailService,
+    private readonly stripeService: StripeService
   ) {}
 
   /**
@@ -177,7 +180,7 @@ export class UserController {
     @Res() response,
   ) {
     try {
-      const lastCommande = await UserService.getLastCommande(id);
+      const lastCommande = await this.stripeService.getLastCommande(id);
       if (lastCommande === null) {
         response.send({ message: 'Aucune commande trouvée' });
       } else {

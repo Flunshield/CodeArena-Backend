@@ -1,3 +1,4 @@
+// matchmaking.controller.ts
 import {
   Controller,
   Post,
@@ -19,10 +20,7 @@ export class MatchmakingController {
       const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
       if (isInQueue) {
-        return {
-          success: false,
-          message: 'You are already in the queue.',
-        };
+        return { success: false, message: 'You are already in the queue.' };
       }
 
       this.matchmakingService.addToQueue(userId);
@@ -33,41 +31,6 @@ export class MatchmakingController {
     } catch (error) {
       throw new HttpException(
         `Failed to join queue: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  @Post('findMatch')
-  async findMatch(@Body() userId: { id: number }) {
-    try {
-      const isInQueue = await this.matchmakingService.isUserInQueue(userId.id);
-
-      if (!isInQueue) {
-        throw new HttpException(
-          'You’re not in the queue.',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const match = await this.matchmakingService.findMatch(userId.id);
-      if (match !== undefined && match !== userId.id) {
-        return {
-          success: true,
-          userIdMatched: match,
-          message: 'You found a match.',
-        };
-      } else if (match === userId.id) {
-        throw new HttpException(
-          'You cannot associate with yourself.',
-          HttpStatus.BAD_REQUEST,
-        );
-      } else {
-        throw new HttpException('No matches found.', HttpStatus.NOT_FOUND);
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Failed to find a match: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -93,10 +56,7 @@ export class MatchmakingController {
       const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
       if (!isInQueue) {
-        return {
-          success: false,
-          message: 'You are not in the queue.',
-        };
+        return { success: false, message: 'You are not in the queue.' };
       }
 
       this.matchmakingService.removeFromQueue(userId);
