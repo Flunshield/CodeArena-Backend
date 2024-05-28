@@ -25,6 +25,7 @@ export class ChatGateway
     this.server.to(payload.roomId).emit('message', payload);
   }
 
+  @SubscribeMessage('joinRoom')
   joinRoom(client: Socket, roomId: string): void {
     client.join(roomId);
     this.logger.log(`Client ${client.id} joined room ${roomId}`);
