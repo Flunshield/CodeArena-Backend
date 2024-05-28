@@ -73,6 +73,7 @@ export interface shortUser {
   id?: number;
   firstName?: string;
   lastName?: string;
+  groupsId?: number;
 }
 
 export interface DecodedTokenMail {

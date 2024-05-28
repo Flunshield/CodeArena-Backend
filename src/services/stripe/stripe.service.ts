@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Stripe } from 'stripe';
 import { PrismaClient } from '@prisma/client';
-import { User } from '../../interfaces/userInterface';
-import { UserService } from '../user/user.service';
 import { PRODUCT } from '../../constantes/contante';
+import { User } from 'src/interfaces/userInterface';
+import { MailerService } from '@nestjs-modules/mailer';
+import { PdfService } from '../pdfservice/pdf.service';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -16,7 +17,10 @@ export class StripeService {
     },
   );
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   /**
    * Récupère une session de paiement Stripe spécifiée par son identifiant de session.
@@ -88,52 +92,175 @@ export class StripeService {
    *          HttpStatus.NOT_MODIFIED si l'utilisateur n'a pas été modifié, ou lève une HttpException en cas d'erreur.
    * @throws {HttpException} Une erreur est levée si une erreur interne survient lors du processus de création de la commande.
    */
-  async createCommande(session?, user?: User) {
+
+  async createCommande(session, user: User) {
     try {
       const nbCreateTest = PRODUCT.find((elem) => {
         return elem.id === (session ? session.line_items.data[0].price.id : '');
       });
-      let createCommand;
-      if (session) {
-        createCommand = await prisma.commandeEntreprise.create({
-          data: {
-            idSession: session.id,
-            objetSession: [session],
-            idPayment: session.payment_intent,
-            item: session.line_items.data[0].price.id ?? '',
-            userID: user.id,
-            dateCommande: new Date(),
-            etatCommande: session.payment_status,
-            nbCreateTest: nbCreateTest.nbCreate,
-          },
-        });
-      } else {
-        createCommand = await prisma.commandeEntreprise.create({
-          data: {
-            idSession: new Date().getTime().toString(),
-            objetSession: [],
-            idPayment: new Date().getTime().toString(),
-            item: new Date().getTime().toString(),
-            userID: user.id,
-            dateCommande: new Date(),
-            etatCommande: 'Version gratuit',
-            nbCreateTest: nbCreateTest.nbCreate,
-          },
-        });
-      }
+
+      const createCommand = await prisma.commandeEntreprise.create({
+        data: {
+          idSession: session.id,
+          objetSession: [session],
+          idPayment: session.payment_intent ?? session.subscription,
+          item: session.line_items.data[0].price.id ?? '',
+          userID: user.id,
+          customerId: session.customer,
+          dateCommande: new Date(),
+          etatCommande: session.payment_status,
+          nbCreateTest: nbCreateTest.nbCreate,
+        },
+      });
       if (createCommand) {
-        const userUpdate = await this.userService.attributeEntrepriseRole(user);
+        const userUpdate = await this.attributeEntrepriseRole(user);
         if (userUpdate) {
           return HttpStatus.CREATED;
-        } else {
-          return HttpStatus.NOT_MODIFIED;
         }
       }
     } catch (e) {
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /**
+   * Attribue un rôle d'entreprise à un utilisateur en mettant à jour son groupe d'appartenance dans la base de données.
+   * Cette fonction met à jour l'identifiant de groupe de l'utilisateur pour le passer à un identifiant spécifique
+   * représentant le groupe des entreprises (par exemple, groupe ID 3 pour les utilisateurs d'entreprise).
+   *
+   * @param user - L'objet `User` représentant l'utilisateur à qui le rôle d'entreprise sera attribué.
+   * @returns Une promesse résolue avec l'objet utilisateur mis à jour.
+   */
+  async attributeEntrepriseRole(user: User) {
+    return prisma.user.update({
+      where: {
+        userName: user.userName,
+        id: user.id,
+      },
+      data: {
+        groupsId: 3,
+      },
+    });
+  }
+
+  /**
+   * Récupère le statut d'abonnement d'un client en fonction de son ID client Stripe.
+   *
+   * Cette méthode liste tous les abonnements associés au client spécifié, filtre ceux qui sont
+   * actifs, en période d'essai ou en retard de paiement, et retourne leur statut.
+   *
+   * @param {string} customerId - L'ID du client Stripe.
+   *
+   * @returns {Promise<{ active: boolean, subscriptions: Array<Object> }>} - Retourne une promesse qui
+   *     se résout avec un objet contenant un indicateur de statut d'abonnement actif et une liste
+   *     des abonnements actifs.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
+  async getSubscriptionStatus(customerId: string) {
+    const subscriptions = await this.stripe.subscriptions.list({
+      customer: customerId,
+      status: 'all',
+      expand: ['data.default_payment_method'],
+    });
+
+    if (subscriptions.data.length === 0) {
+      return { active: false, subscriptions: [] };
+    }
+
+    const activeSubscriptions = subscriptions.data.filter(
+      (subscription) =>
+        subscription.status === 'active' ||
+        subscription.status === 'trialing' ||
+        subscription.status === 'past_due',
+    );
+
+    return {
+      active: activeSubscriptions.length > 0,
+      subscriptions: activeSubscriptions,
+    };
+  }
+
+  /**
+   * Annule l'abonnement d'un utilisateur à la fin de la période de facturation en cours.
+   *
+   * Cette méthode met à jour l'abonnement Stripe pour qu'il se termine à la fin de la période en cours,
+   * met à jour l'état de la commande dans la base de données pour indiquer qu'elle est annulée,
+   * et réinitialise l'identifiant du groupe de l'utilisateur.
+   *
+   * @param {Object} lastCommande - La dernière commande de l'utilisateur.
+   * @param {string} lastCommande.idPayment - L'ID de paiement de la commande à annuler.
+   * @param {number} lastCommande.userID - L'ID de l'utilisateur dont l'abonnement est annulé.
+   *
+   * @returns {Promise<Object|undefined>} - Retourne l'objet de réponse de l'abonnement annulé de Stripe
+   *                                        si toutes les opérations réussissent, sinon `undefined`.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
+  async unsuscribeUser(lastCommande) {
+    const unsuscribe = await this.stripe.subscriptions.update(
+      lastCommande.idPayment,
+      {
+        cancel_at_period_end: true,
+      },
+    );
+
+    if (unsuscribe) {
+      const cancelCommand = await prisma.commandeEntreprise.update({
+        where: {
+          idPayment: lastCommande.idPayment,
+        },
+        data: {
+          etatCommande: 'Unsubscribed',
+        },
+      });
+
+      const resetGroupUser = await prisma.user.update({
+        where: {
+          id: lastCommande.userID,
+        },
+        data: {
+          groupsId: 1,
+        },
+      });
+
+      if (cancelCommand && resetGroupUser) {
+        return unsuscribe;
+      }
+    }
+  }
+
+  /**
+   * Récupère la dernière commande d'un utilisateur en fonction de son ID.
+   *
+   * Cette méthode recherche la première commande d'un utilisateur triée par date de commande
+   * dans l'ordre décroissant, ce qui correspond à la commande la plus récente.
+   *
+   * @param {string} id - L'ID de l'utilisateur sous forme de chaîne de caractères.
+   *
+   * @returns {Promise<Object|null>} - Retourne une promesse qui se résout avec la dernière commande
+   *                                   de l'utilisateur si elle existe, sinon `null`.
+   *
+   * @throws {Error} - Lance une erreur si une opération échoue.
+   */
+  async getLastCommande(id: string) {
+    return prisma.commandeEntreprise.findFirst({
+      where: {
+        userID: parseInt(id),
+      },
+      orderBy: {
+        dateCommande: 'desc',
+      },
+    });
+  }
+
+  async getLatestInvoice(customerId: string) {
+    const latestInvoice = await this.stripe.invoices.list({
+      customer: customerId,
+      limit: 1,
+      status: 'paid', // ou tout autre statut pertinent pour votre cas d'utilisation
+      expand: ['data.default_payment_method'],
+    });
+    return await this.pdfService.generateInvoicePDF(latestInvoice.data[0]);
   }
 }
