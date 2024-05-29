@@ -225,5 +225,7 @@
   "create": "Créer",
   "sendYourCode": "Envoyer ton code",
   "searchMatch": "Recherche d&apos;un match en cours...",
-  "attemptConnexion": "Tentative de connexion..."
+  "attemptConnexion": "Tentative de connexion...",
+  "errorDisconnect": "Erreur lors de la déconnexion. Veuillez réessayer.",
+  "disconnectSuccess": "Déconnexion réussie !"
 }

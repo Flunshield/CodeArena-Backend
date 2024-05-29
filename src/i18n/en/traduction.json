@@ -226,5 +226,7 @@
   "create": "Create",
   "sendYourCode": "Send your code",
   "searchMatch": "Search for a match...",
-  "attemptConnexion": "Connection attempt"
+  "attemptConnexion": "Connection attempt",
+  "errorDisconnect": "Error disconnecting",
+  "disconnectSuccess": "Disconnection successful"
 }
