@@ -56,12 +56,14 @@ export class AuthController {
         response,
         frenchCodeAreaCookie,
       );
-
-      if (reponse === HttpStatus.OK) {
-        return response.status(HttpStatus.OK).send('Connecté');
-      } else {
-        return response.status(HttpStatus.NOT_FOUND).send();
-      }
+      // Ajout du setTimeout pour les bruteForce sur la connexion.
+      setTimeout(() => {
+        if (reponse === HttpStatus.OK) {
+          return response.status(HttpStatus.OK).send('Connecté');
+        } else {
+          return response.status(HttpStatus.NOT_FOUND).send();
+        }
+      }, 1000);
     } catch (error: any) {
       const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
       throw new HttpException(error.message, status);

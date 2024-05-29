@@ -17,7 +17,6 @@
   "mdpMandatory": "Password is mandatory",
   "ndcMdpMandatory": "Username and password are mandatory",
   "forgotPassword": "Forgot your password ?",
-  "createAccount": "Create account",
   "forgotPasswordTitle": "Password forgotten",
   "submitRequest": "Submit your request",
   "confirmePassword": "Confirm password",
@@ -223,5 +222,9 @@
   "abonementSuccess": "Your subscription cancellation request has been processed, but you will not be renewed.",
   "abonementError": "A cancellation request has already been processed.",
   "unscribed": "Unsubscribe",
-  "recupInvoice": "Retrieve invoice"
+  "recupInvoice": "Retrieve invoice",
+  "create": "Create",
+  "sendYourCode": "Send your code",
+  "searchMatch": "Search for a match...",
+  "attemptConnexion": "Connection attempt"
 }

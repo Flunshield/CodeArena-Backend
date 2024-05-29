@@ -17,7 +17,6 @@
   "mdpMandatory": "Le mot de passe est obligatoire",
   "ndcMdpMandatory": "Le nom de compte et le mot de passe sont obligatoire",
   "forgotPassword": "Mot de passe oublié ?",
-  "createAccount": "Créer un compte",
   "forgotPasswordTitle": "Mot de passe oublié",
   "submitRequest": "Soumettre la demande",
   "confirmePassword": "Confirmer le mot de passe",
@@ -222,5 +221,9 @@
   "abonementSuccess": "La demande d'annulation d'abonnement a bien été prise en compte, vous ne serez pas renouvelé",
   "abonementError": "Une demande d'annulation d'abonnement a déja été pris en compte.",
   "unscribed": "Désinscription",
-  "recupInvoice": "Récupérer la facture"
+  "recupInvoice": "Récupérer la facture",
+  "create": "Créer",
+  "sendYourCode": "Envoyer ton code",
+  "searchMatch": "Recherche d&apos;un match en cours...",
+  "attemptConnexion": "Tentative de connexion..."
 }
