@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmation de commande</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      margin: 0;
+      background-color: #0D1117;
+      color: #E3E8EF;
+      text-align: center;
+    }
+    .container {
+      background-color: #161B22;
+      padding: 40px;
+      border-radius: 8px;
+      border: 1px solid #E3E8EF;
+      margin: auto;
+      max-width: 600px;
+    }
+    h1 {
+      color: #E3E8EF;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #E3E8EF;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    a {
+      display: inline-block;
+      background-color: #336699;
+      color: #ffffff;
+      padding: 12px 25px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    a:hover {
+      background-color: #255584;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #E3E8EF;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Confirmation de commande</h1>
+  <p>Bonjour {{firstName}} {{lastName}},</p>
+  <p>Nous avons le plaisir de vous confirmer que votre achat a été réalisé avec succès.</p>
+  <p>Vous trouverez ci-joint votre facture détaillée pour votre commande.</p>
+  <p>Si vous avez des questions ou des préoccupations concernant votre commande, n'hésitez pas à répondre à cet email ou à nous contacter directement.</p>
+  <p>Merci pour votre confiance et à bientôt sur notre site.</p>
+  <div class="footer">
+    <p>Cordialement,</p>
+    <p>L'équipe de Code Arena</p>
+  </div>
+</div>
+</body>
+</html>

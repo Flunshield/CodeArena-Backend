@@ -216,14 +216,14 @@ export interface Puzzle {
 export interface CommandeEntreprise {
   id: number;
   idSession: string;
-  objetSession: JSON;
+  objetSession: JsonValue;
   idPayment: string;
   item: string;
   userID: number;
-  user: User;
   dateCommande: Date;
   etatCommande: string;
   nbCreateTest: number;
+  customerId: string;
 }
 
 export interface PuzzlesEntreprise {
