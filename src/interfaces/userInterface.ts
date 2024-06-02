@@ -29,6 +29,7 @@ export interface User {
   userMatch?: UserMatch;
   puzzlesEntreprise?: PuzzlesEntreprise;
   commandeEntreprise?: CommandeEntreprise;
+  siren?: string;
 }
 
 export interface Titles {

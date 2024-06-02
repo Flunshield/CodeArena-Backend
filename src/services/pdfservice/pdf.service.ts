@@ -103,6 +103,7 @@ export class PdfService {
     doc.text('Quantité', 200, startY);
     doc.text('Prix unitaire HT', 300, startY);
     doc.text('Prix total HT', 400, startY);
+    doc.text('', 400, startY);
     doc.moveDown(0.5).font('Helvetica').fontSize(10);
 
     const columnWidths = [150, 50, 100, 100]; // Adjust the column widths as needed

@@ -76,8 +76,12 @@ export class StripeController {
   @Get('lastCommande')
   @Roles(USER, ENTREPRISE)
   @UseGuards(RolesGuard)
-  async getLatestInvoice(@Query('id') id: string, @Req() req, @Res() res) {
-    const lastCommande = await this.stripeService.getLastCommande(id);
+  async getLatestInvoice(
+    @Query('customerId') customerId: string,
+    @Req() req,
+    @Res() res,
+  ) {
+    const lastCommande = await this.stripeService.getLastCommande(customerId);
     const latestInvoice = await this.stripeService.getLatestInvoice(
       lastCommande.customerId.toString(),
     );

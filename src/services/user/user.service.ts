@@ -138,6 +138,7 @@ export class UserService {
         lastName: user.lastName,
         firstName: user.firstName,
         titlesId: parseInt(String(user.titlesId)),
+        siren: user.siren,
       },
     });
 
@@ -229,6 +230,51 @@ export class UserService {
       });
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs :', error);
+      throw error;
+    }
+  }
+
+  async getUserById(id: number) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          Histories: true,
+          groups: true,
+          commandeEntreprise: {
+            take: 1, // Limite à un seul enregistrement
+            orderBy: {
+              dateCommande: 'desc', // Trie par dateCommande décroissante pour obtenir la dernière commande
+            },
+          },
+          titles: {
+            select: {
+              id: true,
+              label: true,
+              value: true,
+            },
+          },
+          userRanking: true,
+          userTournament: true,
+          userEvent: true,
+          // Pour inclure les champs du modèle `user`
+          _count: {
+            select: {
+              userRanking: true,
+              userTournament: true,
+              userEvent: true,
+            },
+          },
+        },
+      });
+      if (user) {
+        delete user.password;
+      }
+      return user;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur :", error);
       throw error;
     }
   }

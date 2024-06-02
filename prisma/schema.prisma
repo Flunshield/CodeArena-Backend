@@ -41,6 +41,7 @@ model user {
   commandeEntreprise commandeEntreprise[]
   puzzlesEntreprise  puzzlesEntreprise[]
   puzzleSend         puzzleSend[]
+  siren              String?
 }
 
 model Title {
