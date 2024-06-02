@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as cookie from 'cookie';
 import { Response } from 'express';
@@ -41,7 +41,7 @@ export class RefreshTokenService {
   public async generateRefreshToken(
     userId: number,
     res: Response,
-  ): Promise<HttpStatus> {
+  ): Promise<string> {
     try {
       const privateKey = fs.readFileSync('private_key.pem', 'utf-8');
       const payload = { sub: userId };
@@ -62,7 +62,7 @@ export class RefreshTokenService {
 
       res.setHeader('Set-Cookie', cookies);
 
-      return HttpStatus.OK;
+      return refreshToken;
     } catch {
       throw new Error("Une erreur s'est produite");
     }
@@ -128,6 +128,7 @@ export class RefreshTokenService {
           presentation: true,
           Histories: true,
           groups: true,
+          siren: true,
           titles: {
             select: {
               id: true,

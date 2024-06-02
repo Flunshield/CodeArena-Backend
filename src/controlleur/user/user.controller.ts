@@ -113,6 +113,18 @@ export class UserController {
     }
   }
 
+  @Get('/getUser')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getUser(@Query('id') id: string, @Req() request, @Res() response) {
+    try {
+      const user = await this.userService.getUserById(parseInt(id));
+      response.send(user);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   @Patch('/updateUser')
   @Roles(USER, ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)

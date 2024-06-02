@@ -222,11 +222,16 @@
   "abonementSuccess": "Your subscription cancellation request has been processed, but you will not be renewed.",
   "abonementError": "A cancellation request has already been processed.",
   "unscribed": "Unsubscribe",
-  "recupInvoice": "Retrieve invoice",
+  "recupInvoice": "Download invoice",
   "create": "Create",
   "sendYourCode": "Send your code",
   "searchMatch": "Search for a match...",
   "attemptConnexion": "Connection attempt",
   "errorDisconnect": "Error disconnecting",
-  "disconnectSuccess": "Disconnection successful"
+  "disconnectSuccess": "Disconnection successful",
+  "item": "Item",
+  "dateCommande": "Order date",
+  "idPayment": "Payment ID",
+  "etatCommande": "Order status",
+  "historiqueAchat": "Purchase history"
 }

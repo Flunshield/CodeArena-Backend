@@ -286,6 +286,7 @@ export class StripeService {
       status: 'paid',
       expand: ['data.default_payment_method'],
     });
+    console.log(latestInvoice.data[0]);
     return await this.pdfService.generateInvoicePDF(latestInvoice.data[0]);
   }
 }

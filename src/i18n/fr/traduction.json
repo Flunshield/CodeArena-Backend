@@ -221,11 +221,16 @@
   "abonementSuccess": "La demande d'annulation d'abonnement a bien été prise en compte, vous ne serez pas renouvelé",
   "abonementError": "Une demande d'annulation d'abonnement a déja été pris en compte.",
   "unscribed": "Désinscription",
-  "recupInvoice": "Récupérer la facture",
+  "recupInvoice": "Télécharger la facture",
   "create": "Créer",
   "sendYourCode": "Envoyer ton code",
   "searchMatch": "Recherche d&apos;un match en cours...",
   "attemptConnexion": "Tentative de connexion...",
   "errorDisconnect": "Erreur lors de la déconnexion. Veuillez réessayer.",
-  "disconnectSuccess": "Déconnexion réussie !"
+  "disconnectSuccess": "Déconnexion réussie !",
+  "item": "Article",
+  "dateCommande": "Date de la commande",
+  "idPayment": "Identifiant de paiement",
+  "etatCommande": "État de la commande",
+  "historiqueAchat": "Historique des achats"
 }
