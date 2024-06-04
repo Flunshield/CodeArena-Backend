@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import * as PDFDocument from 'pdfkit';
+import { User } from 'src/interfaces/userInterface';
 
 @Injectable()
 export class PdfService {
-  async generateInvoicePDF(invoice): Promise<Buffer> {
+  async generateInvoicePDF(invoice, user: User): Promise<Buffer> {
     return await new Promise((resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
@@ -20,7 +22,7 @@ export class PdfService {
 
       // Company and Client Information
       let startY = doc.y;
-      this.drawCompanyAndClientInfo(doc, invoice, startY);
+      this.drawCompanyAndClientInfo(doc, invoice, startY, user);
 
       // Invoice Dates
       startY = doc.y + 20; // Adding some space between sections
@@ -52,7 +54,7 @@ export class PdfService {
     });
   }
 
-  private drawCompanyAndClientInfo(doc, invoice, startY) {
+  private drawCompanyAndClientInfo(doc, invoice, startY, user) {
     const companyInfo = [
       'CodeArena',
       '26 Av. Tony Garnier',
@@ -62,11 +64,11 @@ export class PdfService {
       'Tél : 04 27 18 14 40',
     ];
     const clientInfo = [
-      `Nom du client: ${invoice.customer_name}`,
-      `Adresse: ${invoice.customer_address ? invoice.customer_address.line1 || '' : ''}`,
-      `Code postal: ${invoice.customer_address ? invoice.customer_address.postal_code || '' : ''} Ville: ${invoice.customer_address ? invoice.customer_address.city || '' : ''}`,
+      `Entreprise: ${user.company ? user.company : invoice.customer_name}`,
+      `Adresse: ${user.localisation ? user.localisation : ''}`,
       `Pays: ${invoice.customer_address ? invoice.customer_address.country || '' : ''}`,
-      `Email: ${invoice.customer_email || 'N/A'}`,
+      `Email: ${user.email || 'N/A'}`,
+      `Siren: ${user.siren || 'N/A'}`,
     ];
 
     doc.font('Helvetica-Bold').fontSize(10);

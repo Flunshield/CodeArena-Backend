@@ -66,7 +66,7 @@ export class PuzzleController {
   @UseGuards(RolesGuard)
   async deletePuzzle(@Body() data, @Res() response) {
     try {
-      const result = await this.puzzleService.deletePuzzle(data.id);
+      const result = await this.puzzleService.deletePuzzle(data.puzzleId);
       if (result) {
         response.send();
       } else {
@@ -85,7 +85,7 @@ export class PuzzleController {
   @UseGuards(RolesGuard)
   async deletePuzzleSend(@Body() data, @Res() response) {
     try {
-      const result = await this.puzzleService.deletePuzzleSend(data.id);
+      const result = await this.puzzleService.deletePuzzleSend(data.puzzleId);
       if (result) {
         response.send();
       } else {

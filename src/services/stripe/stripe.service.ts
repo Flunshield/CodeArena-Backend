@@ -117,6 +117,8 @@ export class StripeService {
         if (userUpdate) {
           const getInvoice: Promise<Buffer> = this.getLatestInvoice(
             session.customer,
+            '',
+            user,
           );
           const data = {
             email: user.email,
@@ -279,14 +281,27 @@ export class StripeService {
     });
   }
 
-  async getLatestInvoice(customerId: string): Promise<Buffer> {
+  async getLatestInvoice(
+    customerId: string,
+    id?: string,
+    user?: User,
+  ): Promise<Buffer> {
     const latestInvoice = await this.stripe.invoices.list({
       customer: customerId,
       limit: 1,
       status: 'paid',
       expand: ['data.default_payment_method'],
     });
-    console.log(latestInvoice.data[0]);
-    return await this.pdfService.generateInvoicePDF(latestInvoice.data[0]);
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: {
+          id: parseInt(id),
+        },
+      });
+    }
+    return await this.pdfService.generateInvoicePDF(
+      latestInvoice.data[0],
+      user,
+    );
   }
 }

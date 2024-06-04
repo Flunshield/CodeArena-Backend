@@ -214,7 +214,7 @@
   "inscriptionSuccess": "Registration successful!",
   "inscriptionFail": "Registration failed",
   "unsubscribeFail": "Unsubscription failed",
-  "unsubscribeSuccess": "Unsubscription successful!",
+  "unsubscribeSuccess": "Unsubscription successful! You will go back to the home page",
   "puzzleDeleted": "Puzzle deleted",
   "failedDeletePuzzle": "Failed to delete puzzle",
   "errorCallAPI": "Error calling the API: ",
@@ -251,5 +251,7 @@
   "yes": "Yes",
   "no": "No",
   "historyOrder": "Order History",
-  "errorUserInfos": "Error retrieving user information"
+  "errorUserInfos": "Error retrieving user information",
+  "successSubscription": "Subscription successful! You will be disconnected and redirected to the home page for the changes to take effect.",
+  "noBadges": "No badges"
 }

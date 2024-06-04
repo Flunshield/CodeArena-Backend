@@ -214,7 +214,7 @@
   "inscriptionSuccess": "Inscription réussie !",
   "inscriptionFail": "L'inscription a échoué",
   "unsubscribeFail": "La désinscription a échoué",
-  "unsubscribeSuccess": "La désinscription a réussi !",
+  "unsubscribeSuccess": "La désinscription a réussi ! Vous allez être déconnecté d'ici quelques secondes.",
   "puzzleDeleted": "Puzzle supprimé",
   "failedDeletePuzzle": "Échec de la suppression du puzzle",
   "errorCallAPI": "Erreur lors de l'appel à l'API : ",
@@ -250,5 +250,7 @@
   "yes": "Oui",
   "no": "Non",
   "historyOrder": "Historique des commandes",
-  "errorUserInfos": "Erreur lors de la récupération des informations de l'utilisateur"
+  "errorUserInfos": "Erreur lors de la récupération des informations de l'utilisateur",
+  "successSubscription": "Abonnement réussi !, vous allez être déconnecter d'ici quelques secondes pour activation de l'abonnement.",
+  "noBadges": "Aucun badge"
 }

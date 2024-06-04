@@ -90,8 +90,8 @@ export class PuzzleService {
     }
   }
 
-  async deletePuzzle(id: string): Promise<any> {
-    const puzzleID = parseInt(id, 10);
+  async deletePuzzle(puzzleId: string): Promise<any> {
+    const puzzleID = parseInt(puzzleId, 10);
     try {
       return await prisma.puzzlesEntreprise.delete({
         where: { id: puzzleID }
