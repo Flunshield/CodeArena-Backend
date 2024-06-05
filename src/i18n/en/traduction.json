@@ -253,5 +253,6 @@
   "historyOrder": "Order History",
   "errorUserInfos": "Error retrieving user information",
   "successSubscription": "Subscription successful! You will be disconnected and redirected to the home page for the changes to take effect.",
-  "noBadges": "No badges"
+  "noBadges": "No badges",
+  "loadTest": "Loading tests..."
 }

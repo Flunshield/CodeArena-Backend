@@ -61,13 +61,23 @@ export class PuzzleService {
 
   async findPuzzles(id: string, page: number, limit: number = 4) {
     const offset = (page - 1) * limit;
-    return prisma.puzzlesEntreprise.findMany({
+    const countElement = await prisma.puzzlesEntreprise.count({
+      where: {
+        userID: parseInt(id)
+      }
+    });
+    const puzzleEntreprise = await prisma.puzzlesEntreprise.findMany({
       where: {
         userID: parseInt(id)
       },
       take: limit,
       skip: offset
     });
+
+    return {
+      item: puzzleEntreprise ?? [],
+      total: countElement
+    };
   }
 
   async updatePuzzlePartially(updatePuzzleDto: any) {

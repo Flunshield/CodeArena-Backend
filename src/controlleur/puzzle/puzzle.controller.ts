@@ -4,7 +4,6 @@ import { Roles } from "../auth/auth.controller";
 import { ADMIN, ENTREPRISE } from "../../constantes/contante";
 import { RolesGuard } from "../../guards/roles.guard";
 import { PuzzleService } from "../../services/puzzle/puzzle.service";
-import { puzzlesEntreprise } from "@prisma/client";
 
 @Controller("puzzle")
 export class PuzzleController {
@@ -29,13 +28,13 @@ export class PuzzleController {
   async findPuzzles(@Res() response, @Query("id") id: string,
                     @Query("page") page: number) {
     try {
-      const puzzles: puzzlesEntreprise[] =
+      const puzzles =
         await this.puzzleService.findPuzzles(id, page);
-      if (puzzles.length > 0) {
-        response.send(puzzles);
-      } else {
-        response.send([]);
-      }
+    if (puzzles) {
+      response.status(HttpStatus.OK).json(puzzles);
+    } else {
+      response.status(HttpStatus.NOT_FOUND).send("No puzzles found.");
+    }
     } catch (error) {
       console.log(error);
     }
