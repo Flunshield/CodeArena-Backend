@@ -54,6 +54,17 @@ describe('ChatGateway', () => {
     });
   });
 
+  describe('leaveRoom', () => {
+    it('should allow a client to leave a room', () => {
+      const client = { id: 'client1', leave: jest.fn() } as unknown as Socket;
+      const roomId = 'room1';
+
+      gateway.leaveRoom(client, roomId);
+
+      expect(client.leave).toHaveBeenCalledWith(roomId);
+    });
+  });
+
   describe('notifyMatch', () => {
     it('should notify clients of a match', () => {
       const userId1 = 1;
@@ -67,6 +78,30 @@ describe('ChatGateway', () => {
         userId2,
         roomId,
       });
+    });
+  });
+
+  describe('notifyUserLeft', () => {
+    it('should notify the room when a user leaves', () => {
+      const roomId = 'room1';
+      const userId = 1;
+
+      gateway.notifyUserLeft(roomId, userId);
+
+      expect(server.to).toHaveBeenCalledWith(roomId);
+      expect(server.emit).toHaveBeenCalledWith('userLeft', { userId });
+    });
+  });
+
+  describe('notifyUserAlone', () => {
+    it('should notify the user when they are alone in the room', () => {
+      const userId = 1;
+      const roomId = 'room1';
+
+      gateway.notifyUserAlone(userId, roomId);
+
+      expect(server.to).toHaveBeenCalledWith(roomId);
+      expect(server.emit).toHaveBeenCalledWith('userAlone', { userId });
     });
   });
 
