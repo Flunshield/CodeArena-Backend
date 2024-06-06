@@ -253,5 +253,9 @@
   "errorUserInfos": "Erreur lors de la récupération des informations de l'utilisateur",
   "successSubscription": "Abonnement réussi !, vous allez être déconnecter d'ici quelques secondes pour activation de l'abonnement.",
   "noBadges": "Aucun badge",
-  "loadTest": "Chargement des tests..."
+  "loadTest": "Chargement des tests...",
+  "serachByUsername": "Recherche par nom d'utilisateur",
+  "NoUserFound": "Aucun utilisateur trouvé",
+  "userRanking": "Classement de l'utilisateur",
+  "nbGames": "Nombre de parties jouer"
 }
