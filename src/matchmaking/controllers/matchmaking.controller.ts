@@ -18,9 +18,14 @@ export class MatchmakingController {
     try {
       const userId = requestData.data.id;
       const isInQueue = await this.matchmakingService.isUserInQueue(userId);
+      const isInRoom = this.matchmakingService.isUserInRoom(userId);
 
       if (isInQueue) {
         return { success: false, message: 'You are already in the queue.' };
+      }
+
+      if (isInRoom) {
+        return { success: false, message: 'You are already in a room.' };
       }
 
       this.matchmakingService.addToQueue(userId);
@@ -44,6 +49,19 @@ export class MatchmakingController {
     } catch (error) {
       throw new HttpException(
         `Failed to get queue: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('getRooms')
+  getRooms() {
+    try {
+      const rooms = this.matchmakingService.getRooms();
+      return { success: true, rooms };
+    } catch (error) {
+      throw new HttpException(
+        `Failed to get rooms: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

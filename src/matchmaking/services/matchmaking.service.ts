@@ -1,4 +1,3 @@
-// matchmaking.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './matchmaking.gateway';
@@ -6,6 +5,7 @@ import { ChatGateway } from './matchmaking.gateway';
 @Injectable()
 export class MatchmakingService {
   private queue: number[] = [];
+  private rooms: { roomId: string; user1: number; user2: number }[] = [];
 
   constructor(
     private prisma: PrismaClient,
@@ -24,9 +24,14 @@ export class MatchmakingService {
 
   async processQueue() {
     for (const userId of this.queue) {
+      if (this.isUserInRoom(userId)) {
+        console.log(`User ${userId} is already in a room`);
+        continue;
+      }
       const match = await this.findMatch(userId);
       if (match) {
         const roomId = `room-${userId}-${match}`;
+        this.rooms.push({ roomId, user1: userId, user2: match });
         this.chatGateway.notifyMatch(userId, match, roomId);
         console.log(
           `User ${userId} and User ${match} matched in room ${roomId}`,
@@ -52,7 +57,10 @@ export class MatchmakingService {
 
     const matches = await Promise.all(
       this.queue
-        .filter((otherUserId) => otherUserId !== userId)
+        .filter(
+          (otherUserId) =>
+            otherUserId !== userId && !this.isUserInRoom(otherUserId),
+        )
         .map(async (otherUserId) => {
           const ranking = await this.getUserRanking(otherUserId);
           return { userId: otherUserId, ranking };
@@ -80,6 +88,16 @@ export class MatchmakingService {
 
   getQueue(): number[] {
     return this.queue;
+  }
+
+  getRooms() {
+    return this.rooms;
+  }
+
+  isUserInRoom(userId: number): boolean {
+    return this.rooms.some(
+      (room) => room.user1 === userId || room.user2 === userId,
+    );
   }
 
   removeFromQueue(userId: number): void {
