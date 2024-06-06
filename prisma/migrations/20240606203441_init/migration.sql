@@ -23,6 +23,7 @@ CREATE TABLE `user` (
     `presentation` VARCHAR(191) NULL,
     `nbGames` INTEGER NULL DEFAULT 0,
     `groupsId` INTEGER NOT NULL DEFAULT 1,
+    `siren` VARCHAR(191) NULL,
 
     UNIQUE INDEX `user_userName_key`(`userName`),
     PRIMARY KEY (`id`)
@@ -162,6 +163,7 @@ CREATE TABLE `puzzles` (
     `eventsID` INTEGER NOT NULL,
     `tests` JSON NOT NULL,
     `details` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -177,9 +179,39 @@ CREATE TABLE `commandeEntreprise` (
     `dateCommande` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `etatCommande` VARCHAR(191) NOT NULL,
     `nbCreateTest` INTEGER NOT NULL DEFAULT 10,
+    `customerId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `commandeEntreprise_idSession_key`(`idSession`),
     UNIQUE INDEX `commandeEntreprise_idPayment_key`(`idPayment`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `puzzlesEntreprise` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userID` INTEGER NOT NULL,
+    `tests` JSON NOT NULL,
+    `details` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `puzzleSend` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userID` INTEGER NOT NULL,
+    `puzzlesEntrepriseId` INTEGER NOT NULL,
+    `sendDate` DATETIME(3) NOT NULL,
+    `firstName` VARCHAR(191) NOT NULL,
+    `lastName` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `commentaire` VARCHAR(191) NOT NULL,
+    `validated` BOOLEAN NOT NULL DEFAULT false,
+    `result` JSON NULL,
+    `testValidated` INTEGER NULL,
+    `time` VARCHAR(191) NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -236,3 +268,12 @@ ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_eventsID_fkey` FOREIGN KEY (`event
 
 -- AddForeignKey
 ALTER TABLE `commandeEntreprise` ADD CONSTRAINT `commandeEntreprise_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `puzzlesEntreprise` ADD CONSTRAINT `puzzlesEntreprise_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `puzzleSend` ADD CONSTRAINT `puzzleSend_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `puzzleSend` ADD CONSTRAINT `puzzleSend_puzzlesEntrepriseId_fkey` FOREIGN KEY (`puzzlesEntrepriseId`) REFERENCES `puzzlesEntreprise`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
