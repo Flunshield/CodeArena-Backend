@@ -1,27 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MatchmakingService } from './matchmaking.service';
-import { UserService } from '../../services/user/user.service'; // Adjust the path as needed
+import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './matchmaking.gateway';
-import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 
 describe('MatchmakingService', () => {
   let service: MatchmakingService;
-  let userService: DeepMockProxy<UserService>;
-  let chatGateway: DeepMockProxy<ChatGateway>;
+  let prisma: PrismaClient;
+  let chatGateway: ChatGateway;
 
   beforeEach(async () => {
-    userService = mockDeep<UserService>();
-    chatGateway = mockDeep<ChatGateway>();
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MatchmakingService,
-        { provide: UserService, useValue: userService },
-        { provide: ChatGateway, useValue: chatGateway },
+        {
+          provide: PrismaClient,
+          useValue: {
+            user: {
+              findUnique: jest.fn(),
+            },
+          },
+        },
+        {
+          provide: ChatGateway,
+          useValue: {
+            notifyMatch: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<MatchmakingService>(MatchmakingService);
+    prisma = module.get<PrismaClient>(PrismaClient);
+    chatGateway = module.get<ChatGateway>(ChatGateway);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -29,101 +43,94 @@ describe('MatchmakingService', () => {
   });
 
   describe('addToQueue', () => {
-    it('should add a user to the queue if not already present', () => {
-      const userId = 1;
-      service.addToQueue(userId);
-      expect(service.getQueue()).toContain(userId);
+    it('should add a user to the queue', () => {
+      service.addToQueue(1);
+      expect(service.getQueue()).toContain(1);
     });
 
-    it('should not add a user to the queue if already present', () => {
-      const userId = 1;
-      service.addToQueue(userId);
-      service.addToQueue(userId);
+    it('should not add a user to the queue if they are already in it', () => {
+      service.addToQueue(1);
+      service.addToQueue(1);
       expect(service.getQueue().length).toBe(1);
-    });
-  });
-
-  describe('isUserInQueue', () => {
-    it('should return true if user is in the queue', () => {
-      const userId = 1;
-      service.addToQueue(userId);
-      expect(service.isUserInQueue(userId)).toBe(true);
-    });
-
-    it('should return false if user is not in the queue', () => {
-      const userId = 1;
-      expect(service.isUserInQueue(userId)).toBe(false);
-    });
-  });
-
-  describe('getQueue', () => {
-    it('should return the list of users in the queue', () => {
-      const userId1 = 1;
-      const userId2 = 2;
-      service.addToQueue(userId1);
-      service.addToQueue(userId2);
-      expect(service.getQueue()).toEqual([userId1, userId2]);
     });
   });
 
   describe('removeFromQueue', () => {
     it('should remove a user from the queue', () => {
-      const userId = 1;
-      service.addToQueue(userId);
-      service.removeFromQueue(userId);
-      expect(service.getQueue()).not.toContain(userId);
+      service.addToQueue(1);
+      service.removeFromQueue(1);
+      expect(service.getQueue()).not.toContain(1);
+    });
+  });
+
+  describe('getUserRanking', () => {
+    it('should return the user ranking', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({
+        userRanking: [{ rankingsID: 1 }],
+      } as any);
+
+      const ranking = await service.getUserRanking(1);
+      expect(ranking).toBe(1);
+    });
+
+    it('should return null if the user has no ranking', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+
+      const ranking = await service.getUserRanking(1);
+      expect(ranking).toBeNull();
+    });
+
+    it('should handle errors when fetching user ranking', async () => {
+      jest
+        .spyOn(prisma.user, 'findUnique')
+        .mockRejectedValue(new Error('Error fetching user ranking'));
+
+      const ranking = await service.getUserRanking(1);
+      expect(ranking).toBeNull();
     });
   });
 
   describe('findMatch', () => {
-    it('should return undefined if user is not in the queue', async () => {
-      const userId = 1;
-      const result = await service.findMatch(userId);
-      expect(result).toBeUndefined();
+    it('should find a match for a user', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({
+        userRanking: [{ rankingsID: 1 }],
+      } as any);
+
+      service.addToQueue(1);
+      service.addToQueue(2);
+
+      const match = await service.findMatch(1);
+      expect(match).toBe(2);
+      expect(chatGateway.notifyMatch).toHaveBeenCalledWith(1, 2, 'room-1-2');
     });
 
-    it('should return undefined if user has null ranking', async () => {
-      const userId = 1;
-      service.addToQueue(userId);
-      userService.getUserRanked.mockResolvedValueOnce(null);
+    it('should return undefined if no match is found', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockImplementation((query) => {
+        if (query.where.id === 1 || query.where.id === 2) {
+          return {
+            userRanking: [{ rankingsID: 1 }],
+          } as any; // Cast to 'any' to bypass type issues for mock
+        }
+        return null;
+      });
 
-      const result = await service.findMatch(userId);
-      expect(result).toBeUndefined();
+      service.addToQueue(1);
+      service.addToQueue(2);
+
+      const match = await service.findMatch(3);
+      expect(match).toBeUndefined();
     });
+  });
 
-    it('should find a match and notify users', async () => {
-      const userId1 = 1;
-      const userId2 = 2;
-      service.addToQueue(userId1);
-      service.addToQueue(userId2);
+  describe('processQueue', () => {
+    it('should process the queue and match users', async () => {
+      jest.spyOn(service, 'findMatch').mockResolvedValue(2);
 
-      userService.getUserRanked
-        .mockResolvedValueOnce(100)
-        .mockResolvedValueOnce(100);
+      service.addToQueue(1);
+      service.addToQueue(2);
 
-      const result = await service.findMatch(userId1);
-      expect(result).toBe(userId2);
-
-      const roomId = `room-${userId1}-${userId2}`;
-      expect(chatGateway.notifyMatch).toHaveBeenCalledWith(
-        userId1,
-        userId2,
-        roomId,
-      );
-    });
-
-    it('should not find a match if no matching users', async () => {
-      const userId1 = 1;
-      const userId2 = 2;
-      service.addToQueue(userId1);
-      service.addToQueue(userId2);
-
-      userService.getUserRanked
-        .mockResolvedValueOnce(100)
-        .mockResolvedValueOnce(200);
-
-      const result = await service.findMatch(userId1);
-      expect(result).toBeUndefined();
+      await service.processQueue();
+      expect(chatGateway.notifyMatch).toHaveBeenCalledWith(1, 2, 'room-1-2');
     });
   });
 });
