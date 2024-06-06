@@ -1,3 +1,4 @@
+// matchmaking.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './matchmaking.gateway';
@@ -124,5 +125,27 @@ export class MatchmakingService {
       console.error('Error fetching user ranking:', error);
       return null;
     }
+  }
+
+  leaveRoom(userId: number): boolean {
+    const roomIndex = this.rooms.findIndex(
+      (room) => room.user1 === userId || room.user2 === userId,
+    );
+
+    if (roomIndex === -1) {
+      return false;
+    }
+
+    const room = this.rooms[roomIndex];
+    const otherUserId = room.user1 === userId ? room.user2 : room.user1;
+
+    this.rooms.splice(roomIndex, 1);
+    this.chatGateway.notifyUserLeft(room.roomId, userId);
+
+    if (this.isUserInRoom(otherUserId)) {
+      this.chatGateway.notifyUserAlone(otherUserId, room.roomId);
+    }
+
+    return true;
   }
 }

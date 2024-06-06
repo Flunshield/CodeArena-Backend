@@ -89,4 +89,26 @@ export class MatchmakingController {
       );
     }
   }
+
+  @Post('leaveRoom')
+  async leaveRoom(@Body() requestData: { data: { id: number } }) {
+    try {
+      const userId = requestData.data.id;
+      const leftRoom = this.matchmakingService.leaveRoom(userId);
+
+      if (!leftRoom) {
+        return { success: false, message: 'You are not in any room.' };
+      }
+
+      return {
+        success: true,
+        message: 'You have successfully left the room.',
+      };
+    } catch (error) {
+      throw new HttpException(
+        `Failed to leave room: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
