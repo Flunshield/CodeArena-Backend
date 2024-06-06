@@ -24,6 +24,8 @@ describe('MatchmakingService', () => {
           provide: ChatGateway,
           useValue: {
             notifyMatch: jest.fn(),
+            notifyUserLeft: jest.fn(),
+            notifyUserAlone: jest.fn(),
           },
         },
       ],
@@ -109,7 +111,7 @@ describe('MatchmakingService', () => {
         if (query.where.id === 1 || query.where.id === 2) {
           return {
             userRanking: [{ rankingsID: 1 }],
-          } as any; // Cast to 'any' to bypass type issues for mock
+          } as any;
         }
         return null;
       });
@@ -131,6 +133,48 @@ describe('MatchmakingService', () => {
 
       await service.processQueue();
       expect(chatGateway.notifyMatch).toHaveBeenCalledWith(1, 2, 'room-1-2');
+    });
+  });
+
+  describe('isUserInQueue', () => {
+    it('should return true if the user is in the queue', () => {
+      service.addToQueue(1);
+      expect(service.isUserInQueue(1)).toBe(true);
+    });
+
+    it('should return false if the user is not in the queue', () => {
+      expect(service.isUserInQueue(1)).toBe(false);
+    });
+  });
+
+  describe('isUserInRoom', () => {
+    it('should return true if the user is in a room', () => {
+      service.addToQueue(1);
+      service.addToQueue(2);
+      service['rooms'] = [{ roomId: 'room-1-2', user1: 1, user2: 2 }];
+      expect(service.isUserInRoom(1)).toBe(true);
+    });
+
+    it('should return false if the user is not in a room', () => {
+      service.addToQueue(1);
+      expect(service.isUserInRoom(1)).toBe(false);
+    });
+  });
+
+  describe('leaveRoom', () => {
+    it('should remove a user from a room', () => {
+      service.addToQueue(1);
+      service.addToQueue(2);
+      service['rooms'] = [{ roomId: 'room-1-2', user1: 1, user2: 2 }];
+      const result = service.leaveRoom(1);
+      expect(result).toBe(true);
+      expect(service.isUserInRoom(1)).toBe(false);
+      expect(chatGateway.notifyUserLeft).toHaveBeenCalledWith('room-1-2', 1);
+    });
+
+    it('should return false if the user is not in a room', () => {
+      const result = service.leaveRoom(1);
+      expect(result).toBe(false);
     });
   });
 });
