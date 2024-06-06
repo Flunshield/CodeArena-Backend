@@ -58,7 +58,7 @@ export class AuthController {
       );
       // Ajout du setTimeout pour les bruteForce sur la connexion.
       setTimeout(() => {
-        if (reponse) {
+        if (reponse !== 500) {
           return response.status(HttpStatus.OK).send({ message: reponse });
         } else {
           return response.status(HttpStatus.NOT_FOUND).send();
