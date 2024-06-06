@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MatchmakingService } from './matchmaking.service';
+import { MatchmakingService } from '../services/matchmaking.service';
 import { PrismaClient } from '@prisma/client';
-import { ChatGateway } from './matchmaking.gateway';
+import { ChatGateway } from '../services/matchmaking.gateway';
 
 describe('MatchmakingService', () => {
   let service: MatchmakingService;
