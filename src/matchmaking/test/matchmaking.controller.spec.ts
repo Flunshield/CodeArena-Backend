@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MatchmakingController } from './matchmaking.controller';
+import { MatchmakingController } from '../controllers/matchmaking.controller';
 import { MatchmakingService } from '../services/matchmaking.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
