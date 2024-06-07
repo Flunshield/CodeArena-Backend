@@ -11,8 +11,8 @@ export class MatchmakingController {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 
   @Post('joinQueue')
-  async joinQueue(@Body() joinQueueDto: JoinQueueDto) {
-    const userId = joinQueueDto.id;
+  async joinQueue(@Body() joinQueueDto: { data: JoinQueueDto }) {
+    const userId = joinQueueDto.data.id;
     const isInQueue = await this.matchmakingService.isUserInQueue(userId);
     const isInRoom = this.matchmakingService.isUserInRoom(userId);
 
@@ -44,8 +44,8 @@ export class MatchmakingController {
   }
 
   @Post('leaveQueue')
-  async leaveQueue(@Body() leaveQueueDto: LeaveQueueDto) {
-    const userId = leaveQueueDto.id;
+  async leaveQueue(@Body() leaveQueueDto: { data: LeaveQueueDto }) {
+    const userId = leaveQueueDto.data.id;
     const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
     if (!isInQueue) {
@@ -60,8 +60,8 @@ export class MatchmakingController {
   }
 
   @Post('leaveRoom')
-  async leaveRoom(@Body() leaveRoomDto: LeaveRoomDto) {
-    const userId = leaveRoomDto.id;
+  async leaveRoom(@Body() leaveRoomDto: { data: LeaveRoomDto }) {
+    const userId = leaveRoomDto.data.id;
     const leftRoom = this.matchmakingService.leaveRoom(userId);
 
     if (!leftRoom) {
