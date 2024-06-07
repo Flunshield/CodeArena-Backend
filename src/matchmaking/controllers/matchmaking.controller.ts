@@ -1,14 +1,18 @@
 // matchmaking.controller.ts
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { MatchmakingService } from '../services/matchmaking.service';
-
+import {
+  JoinQueueDto,
+  LeaveQueueDto,
+  LeaveRoomDto,
+} from '../../dto/matchmaking';
 @Controller('matchmaking')
 export class MatchmakingController {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 
   @Post('joinQueue')
-  async joinQueue(@Body() requestData: { data: { id: number } }) {
-    const userId = requestData.data.id;
+  async joinQueue(@Body() joinQueueDto: JoinQueueDto) {
+    const userId = joinQueueDto.id;
     const isInQueue = await this.matchmakingService.isUserInQueue(userId);
     const isInRoom = this.matchmakingService.isUserInRoom(userId);
 
@@ -40,8 +44,8 @@ export class MatchmakingController {
   }
 
   @Post('leaveQueue')
-  async leaveQueue(@Body() requestData: { data: { id: number } }) {
-    const userId = requestData.data.id;
+  async leaveQueue(@Body() leaveQueueDto: LeaveQueueDto) {
+    const userId = leaveQueueDto.id;
     const isInQueue = await this.matchmakingService.isUserInQueue(userId);
 
     if (!isInQueue) {
@@ -56,8 +60,8 @@ export class MatchmakingController {
   }
 
   @Post('leaveRoom')
-  async leaveRoom(@Body() requestData: { data: { id: number } }) {
-    const userId = requestData.data.id;
+  async leaveRoom(@Body() leaveRoomDto: LeaveRoomDto) {
+    const userId = leaveRoomDto.id;
     const leftRoom = this.matchmakingService.leaveRoom(userId);
 
     if (!leftRoom) {

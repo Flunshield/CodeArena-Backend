@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatGateway } from '../services/matchmaking.gateway';
-import { AddMessageDto } from '../../dto/message';
+import { AddMessageDto } from '../../interfaces/matchmaking';
 import { Server, Socket } from 'socket.io';
 
 describe('ChatGateway', () => {
