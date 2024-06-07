@@ -183,7 +183,7 @@ export class PuzzleService {
 
   async getPuzzlePlaying(data, page: number, limit: number = 3) {
     const offset = (page - 1) * limit;
-    return prisma.puzzleSend.findMany({
+    const puzzle = await prisma.puzzleSend.findMany({
       where: {
         userID: data.userID,
         validated: true
@@ -194,6 +194,15 @@ export class PuzzleService {
       take: limit,
       skip: offset
     });
+
+    const countPuzzle = await prisma.puzzleSend.count({
+      where: {
+        userID: data.userID,
+        validated: true
+      }
+    });
+
+    return {item: puzzle, total: countPuzzle};
   }
 
   async countPuzzlesPlayed(id) {

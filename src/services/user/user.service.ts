@@ -194,18 +194,23 @@ export class UserService {
     }
   }
 
-  async getUsers(pageNumber: number, itemPerPage: number) {
+  async getUsers(
+    pageNumber: number,
+    itemPerPage: number,
+    isEntreprise: string,
+  ) {
     const offset = (pageNumber - 1) * itemPerPage;
-
+    const testEntreprise = isEntreprise === 'true' ? true : false;
     try {
       const users = await prisma.user.findMany({
         take: itemPerPage,
         skip: offset,
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          firstName: testEntreprise,
+          lastName: testEntreprise,
           userName: true,
+          email: testEntreprise,
           nbGames: true,
           userRanking: {
             include: {
@@ -282,8 +287,13 @@ export class UserService {
     }
   }
 
-  async getUsersByUserName(userNameSubstring: string, itemPerPage: number) {
+  async getUsersByUserName(
+    userNameSubstring: string,
+    itemPerPage: number,
+    isEntreprise: string,
+  ) {
     try {
+      const testEntreprise = isEntreprise === 'true' ? true : false;
       const users = await prisma.user.findMany({
         take: itemPerPage,
         where: {
@@ -293,9 +303,10 @@ export class UserService {
         },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          firstName: testEntreprise,
+          lastName: testEntreprise,
           userName: true,
+          email: testEntreprise,
           nbGames: true,
           userRanking: {
             include: {
