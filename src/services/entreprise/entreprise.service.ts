@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MailService } from '../../email/service/MailService';
 import { PrismaClient } from '@prisma/client';
-import { PAGE_SIZE } from 'src/constantes/contante';
 
 const prisma: PrismaClient = new PrismaClient();
 @Injectable()
@@ -14,11 +13,11 @@ export class EntrepriseService {
 
   async getAllCommandeForUser(id: string, pageNumber: number) {
     try {
-      const offset = (pageNumber - 1) * PAGE_SIZE;
+      const offset = (pageNumber - 1) * 10;
       const userID = parseInt(id);
 
       const commandes = await prisma.commandeEntreprise.findMany({
-        take: PAGE_SIZE,
+        take: 10,
         skip: offset,
         where: {
           userID: userID,
