@@ -1,5 +1,5 @@
 // matchmaking.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './matchmaking.gateway';
 
@@ -7,6 +7,7 @@ import { ChatGateway } from './matchmaking.gateway';
 export class MatchmakingService {
   private queue: number[] = [];
   private rooms: { roomId: string; user1: number; user2: number }[] = [];
+  private readonly logger = new Logger(MatchmakingService.name);
 
   constructor(
     private prisma: PrismaClient,
@@ -16,17 +17,17 @@ export class MatchmakingService {
   addToQueue(userId: number): void {
     if (!this.queue.includes(userId)) {
       this.queue.push(userId);
-      console.log(`User ${userId} joined the queue`);
+      this.logger.log(`User ${userId} joined the queue`);
       this.processQueue();
     } else {
-      console.log(`User ${userId} is already in the queue`);
+      this.logger.log(`User ${userId} is already in the queue`);
     }
   }
 
-  async processQueue() {
+  async processQueue(): Promise<void> {
     for (const userId of this.queue) {
       if (this.isUserInRoom(userId)) {
-        console.log(`User ${userId} is already in a room`);
+        this.logger.log(`User ${userId} is already in a room`);
         continue;
       }
       const match = await this.findMatch(userId);
@@ -34,7 +35,7 @@ export class MatchmakingService {
         const roomId = `room-${userId}-${match}`;
         this.rooms.push({ roomId, user1: userId, user2: match });
         this.chatGateway.notifyMatch(userId, match, roomId);
-        console.log(
+        this.logger.log(
           `User ${userId} and User ${match} matched in room ${roomId}`,
         );
       }
@@ -43,18 +44,17 @@ export class MatchmakingService {
 
   async findMatch(userId: number): Promise<number | undefined> {
     if (!this.queue.includes(userId)) {
-      console.log(`User ${userId} is not in the queue`);
+      this.logger.log(`User ${userId} is not in the queue`);
       return undefined;
     }
 
     const userRanking = await this.getUserRanking(userId);
-
     if (userRanking === null) {
-      console.log(`User ${userId} has null ranking, cannot find match`);
+      this.logger.log(`User ${userId} has null ranking, cannot find match`);
       return undefined;
     }
 
-    console.log(`User ${userId} has ranking ${userRanking}`);
+    this.logger.log(`User ${userId} has ranking ${userRanking}`);
 
     const matches = await Promise.all(
       this.queue
@@ -103,26 +103,18 @@ export class MatchmakingService {
 
   removeFromQueue(userId: number): void {
     this.queue = this.queue.filter((id) => id !== userId);
-    console.log(`User ${userId} left the queue`);
+    this.logger.log(`User ${userId} left the queue`);
   }
 
   async getUserRanking(userId: number): Promise<number | null> {
     try {
       const userRanking = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-        select: {
-          userRanking: {
-            select: {
-              rankingsID: true,
-            },
-          },
-        },
+        where: { id: userId },
+        select: { userRanking: { select: { rankingsID: true } } },
       });
       return userRanking?.userRanking[0]?.rankingsID || null;
     } catch (error) {
-      console.error('Error fetching user ranking:', error);
+      this.logger.error('Error fetching user ranking:', error);
       return null;
     }
   }
@@ -131,14 +123,12 @@ export class MatchmakingService {
     const roomIndex = this.rooms.findIndex(
       (room) => room.user1 === userId || room.user2 === userId,
     );
-
     if (roomIndex === -1) {
       return false;
     }
 
     const room = this.rooms[roomIndex];
     const otherUserId = room.user1 === userId ? room.user2 : room.user1;
-
     this.rooms.splice(roomIndex, 1);
     this.chatGateway.notifyUserLeft(room.roomId, userId);
 
