@@ -2,6 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MatchmakingController } from '../controllers/matchmaking.controller';
 import { MatchmakingService } from '../services/matchmaking.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import {
+  JoinQueueDto,
+  LeaveQueueDto,
+  LeaveRoomDto,
+} from '../../dto/matchmaking';
 
 describe('MatchmakingController', () => {
   let matchmakingController: MatchmakingController;
@@ -34,15 +39,13 @@ describe('MatchmakingController', () => {
 
   describe('joinQueue', () => {
     it('should return success when user joins the queue', async () => {
-      const requestData = { data: { id: 1 } };
+      const joinQueueDto: JoinQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockResolvedValue(false);
-      (
-        jest.spyOn(matchmakingService, 'isUserInRoom') as jest.Mock
-      ).mockReturnValue(false);
+      jest.spyOn(matchmakingService, 'isUserInRoom').mockReturnValue(false);
 
-      const result = await matchmakingController.joinQueue(requestData);
+      const result = await matchmakingController.joinQueue(joinQueueDto);
 
       expect(result).toEqual({
         success: true,
@@ -52,12 +55,12 @@ describe('MatchmakingController', () => {
     });
 
     it('should return failure when user is already in the queue', async () => {
-      const requestData = { data: { id: 1 } };
+      const joinQueueDto: JoinQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockResolvedValue(true);
 
-      const result = await matchmakingController.joinQueue(requestData);
+      const result = await matchmakingController.joinQueue(joinQueueDto);
 
       expect(result).toEqual({
         success: false,
@@ -66,13 +69,13 @@ describe('MatchmakingController', () => {
     });
 
     it('should return failure when user is already in a room', async () => {
-      const requestData = { data: { id: 1 } };
+      const joinQueueDto: JoinQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockResolvedValue(false);
       jest.spyOn(matchmakingService, 'isUserInRoom').mockReturnValue(true);
 
-      const result = await matchmakingController.joinQueue(requestData);
+      const result = await matchmakingController.joinQueue(joinQueueDto);
 
       expect(result).toEqual({
         success: false,
@@ -81,13 +84,13 @@ describe('MatchmakingController', () => {
     });
 
     it('should throw an exception when an error occurs', async () => {
-      const requestData = { data: { id: 1 } };
+      const joinQueueDto: JoinQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockRejectedValue(new Error('Test error'));
 
       await expect(
-        matchmakingController.joinQueue(requestData),
+        matchmakingController.joinQueue(joinQueueDto),
       ).rejects.toThrow(
         new HttpException(
           'Failed to join queue: Test error',
@@ -99,10 +102,8 @@ describe('MatchmakingController', () => {
 
   describe('getQueue', () => {
     it('should return the queue', () => {
-      const queue = [{ id: 1 }, { id: 2 }];
-      (jest.spyOn(matchmakingService, 'getQueue') as jest.Mock).mockReturnValue(
-        queue,
-      );
+      const queue = [1, 2];
+      jest.spyOn(matchmakingService, 'getQueue').mockReturnValue(queue);
 
       const result = matchmakingController.getQueue();
 
@@ -149,12 +150,12 @@ describe('MatchmakingController', () => {
 
   describe('leaveQueue', () => {
     it('should return success when user leaves the queue', async () => {
-      const requestData = { data: { id: 1 } };
+      const leaveQueueDto: LeaveQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockResolvedValue(true);
 
-      const result = await matchmakingController.leaveQueue(requestData);
+      const result = await matchmakingController.leaveQueue(leaveQueueDto);
 
       expect(result).toEqual({
         success: true,
@@ -164,12 +165,12 @@ describe('MatchmakingController', () => {
     });
 
     it('should return failure when user is not in the queue', async () => {
-      const requestData = { data: { id: 1 } };
+      const leaveQueueDto: LeaveQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockResolvedValue(false);
 
-      const result = await matchmakingController.leaveQueue(requestData);
+      const result = await matchmakingController.leaveQueue(leaveQueueDto);
 
       expect(result).toEqual({
         success: false,
@@ -178,13 +179,13 @@ describe('MatchmakingController', () => {
     });
 
     it('should throw an exception when an error occurs', async () => {
-      const requestData = { data: { id: 1 } };
+      const leaveQueueDto: LeaveQueueDto = { id: 1 };
       (
         jest.spyOn(matchmakingService, 'isUserInQueue') as jest.Mock
       ).mockRejectedValue(new Error('Test error'));
 
       await expect(
-        matchmakingController.leaveQueue(requestData),
+        matchmakingController.leaveQueue(leaveQueueDto),
       ).rejects.toThrow(
         new HttpException(
           'Failed to leave queue: Test error',
@@ -196,10 +197,10 @@ describe('MatchmakingController', () => {
 
   describe('leaveRoom', () => {
     it('should return success when user leaves the room', async () => {
-      const requestData = { data: { id: 1 } };
+      const leaveRoomDto: LeaveRoomDto = { id: 1 };
       jest.spyOn(matchmakingService, 'leaveRoom').mockReturnValue(true);
 
-      const result = await matchmakingController.leaveRoom(requestData);
+      const result = await matchmakingController.leaveRoom(leaveRoomDto);
 
       expect(result).toEqual({
         success: true,
@@ -209,10 +210,10 @@ describe('MatchmakingController', () => {
     });
 
     it('should return failure when user is not in any room', async () => {
-      const requestData = { data: { id: 1 } };
+      const leaveRoomDto: LeaveRoomDto = { id: 1 };
       jest.spyOn(matchmakingService, 'leaveRoom').mockReturnValue(false);
 
-      const result = await matchmakingController.leaveRoom(requestData);
+      const result = await matchmakingController.leaveRoom(leaveRoomDto);
 
       expect(result).toEqual({
         success: false,
@@ -221,13 +222,13 @@ describe('MatchmakingController', () => {
     });
 
     it('should throw an exception when an error occurs', async () => {
-      const requestData = { data: { id: 1 } };
+      const leaveRoomDto: LeaveRoomDto = { id: 1 };
       jest.spyOn(matchmakingService, 'leaveRoom').mockImplementation(() => {
         throw new Error('Test error');
       });
 
       await expect(
-        matchmakingController.leaveRoom(requestData),
+        matchmakingController.leaveRoom(leaveRoomDto),
       ).rejects.toThrow(
         new HttpException(
           'Failed to leave room: Test error',

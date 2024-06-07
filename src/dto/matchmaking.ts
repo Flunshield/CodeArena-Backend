@@ -1,4 +1,4 @@
-// dto/join-queue.dto.ts
+// dto/matchmaking.ts
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class JoinQueueDto {
