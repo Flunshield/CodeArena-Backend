@@ -107,12 +107,21 @@ export class MatchmakingService {
   }
 
   async getUserRanking(userId: number): Promise<number | null> {
+    if (!userId) {
+      this.logger.error('User ID is not defined');
+      return null;
+    }
+
     try {
       const userRanking = await this.prisma.user.findUnique({
         where: { id: userId },
         select: { userRanking: { select: { rankingsID: true } } },
       });
-      return userRanking?.userRanking[0]?.rankingsID || null;
+      if (!userRanking || !userRanking.userRanking.length) {
+        this.logger.warn(`No ranking found for user ID ${userId}`);
+        return null;
+      }
+      return userRanking.userRanking[0].rankingsID;
     } catch (error) {
       this.logger.error('Error fetching user ranking:', error);
       return null;
