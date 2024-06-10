@@ -41,6 +41,22 @@ export class ChatGateway
     this.logger.log(`Client ${client.id} left room ${roomId}`);
   }
 
+  @SubscribeMessage('typing')
+  handleTyping(
+    client: Socket,
+    payload: {
+      roomId: string;
+      isTyping: boolean;
+      userId: number;
+      username: string;
+    },
+  ): void {
+    this.logger.log(
+      `User ${payload.userId} is typing in room ${payload.roomId}`,
+    );
+    this.server.to(payload.roomId).emit('typing', payload);
+  }
+
   /*
    ************************
    * Notification Methods *

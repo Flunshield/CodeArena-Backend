@@ -75,7 +75,9 @@ describe('MatchmakingController', () => {
       ).mockResolvedValue(false);
       jest.spyOn(matchmakingService, 'isUserInRoom').mockReturnValue(true);
 
-      const result = await matchmakingController.joinQueue(joinQueueDto);
+      const result = await matchmakingController.joinQueue({
+        data: joinQueueDto,
+      });
 
       expect(result).toEqual({
         success: false,
