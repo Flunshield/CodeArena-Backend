@@ -1,4 +1,3 @@
-// matchmaking.gateway.ts
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -19,6 +18,11 @@ export class ChatGateway
   server: Server;
   private readonly logger = new Logger(ChatGateway.name);
 
+  /*
+   ****************************
+   * WebSocket Event Handlers *
+   ****************************
+   */
   @SubscribeMessage('message')
   handleMessage(client: Socket, payload: AddMessageDto): void {
     this.logger.log(`Message from ${payload.userId}: ${payload.body}`);
@@ -37,6 +41,11 @@ export class ChatGateway
     this.logger.log(`Client ${client.id} left room ${roomId}`);
   }
 
+  /*
+   ************************
+   * Notification Methods *
+   ************************
+   */
   notifyMatch(
     userId1: number,
     userId2: number,
@@ -44,6 +53,9 @@ export class ChatGateway
     puzzleId: number,
   ): void {
     this.server.emit('matchFound', { userId1, userId2, roomId, puzzleId });
+    this.logger.log(
+      `Match found: User ${userId1} and User ${userId2} in room ${roomId} with puzzle ${puzzleId}`,
+    );
   }
 
   notifyUserLeft(roomId: string, userId: number): void {
@@ -56,8 +68,13 @@ export class ChatGateway
     this.logger.log(`User ${userId} is alone in room ${roomId}`);
   }
 
+  /*
+   ****************************
+   * Lifecycle Event Handlers *
+   ****************************
+   */
   afterInit(): void {
-    this.logger.log('Init');
+    this.logger.log('WebSocket Gateway Initialized');
   }
 
   handleConnection(client: Socket): void {
