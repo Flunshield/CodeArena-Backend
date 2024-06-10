@@ -37,8 +37,13 @@ export class ChatGateway
     this.logger.log(`Client ${client.id} left room ${roomId}`);
   }
 
-  notifyMatch(userId1: number, userId2: number, roomId: string): void {
-    this.server.emit('matchFound', { userId1, userId2, roomId });
+  notifyMatch(
+    userId1: number,
+    userId2: number,
+    roomId: string,
+    puzzleId: number,
+  ): void {
+    this.server.emit('matchFound', { userId1, userId2, roomId, puzzleId });
   }
 
   notifyUserLeft(roomId: string, userId: number): void {

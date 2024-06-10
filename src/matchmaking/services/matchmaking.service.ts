@@ -6,7 +6,13 @@ import { ChatGateway } from './matchmaking.gateway';
 @Injectable()
 export class MatchmakingService {
   private queue: number[] = [];
-  private rooms: { roomId: string; user1: number; user2: number }[] = [];
+  private rooms: {
+    roomId: string;
+    user1: number;
+    user2: number;
+    puzzleId: number;
+  }[] = [];
+
   private readonly logger = new Logger(MatchmakingService.name);
 
   constructor(
@@ -30,19 +36,41 @@ export class MatchmakingService {
         this.logger.log(`User ${userId} is already in a room`);
         continue;
       }
-      const match = await this.findMatch(userId);
-      if (match) {
-        const roomId = `room-${userId}-${match}`;
-        this.rooms.push({ roomId, user1: userId, user2: match });
-        this.chatGateway.notifyMatch(userId, match, roomId);
+      const matchData = await this.findMatch(userId);
+      if (matchData) {
+        const { matchId, puzzleId } = matchData;
+        const roomId = `room-${userId}-${matchId}`;
+        this.rooms.push({
+          roomId,
+          user1: userId,
+          user2: matchId,
+          puzzleId: puzzleId,
+        });
+        this.chatGateway.notifyMatch(userId, matchId, roomId, puzzleId);
         this.logger.log(
-          `User ${userId} and User ${match} matched in room ${roomId}`,
+          `User ${userId} and User ${matchId} matched in room ${roomId} with puzzle ${puzzleId}`,
         );
       }
     }
   }
 
-  async findMatch(userId: number): Promise<number | undefined> {
+  async getRandomPuzzle(rankingsId: number): Promise<number> {
+    const puzzles = await this.prisma.puzzles.findMany({
+      where: { rankingsID: rankingsId },
+    });
+
+    if (puzzles.length === 0) {
+      this.logger.warn(`No puzzles found for ranking ID ${rankingsId}`);
+      throw new Error('No puzzles found for the given ranking');
+    }
+
+    const randomIndex = Math.floor(Math.random() * puzzles.length);
+    return puzzles[randomIndex].id;
+  }
+
+  async findMatch(
+    userId: number,
+  ): Promise<{ matchId: number; puzzleId: number } | undefined> {
     if (!this.queue.includes(userId)) {
       this.logger.log(`User ${userId} is not in the queue`);
       return undefined;
@@ -71,13 +99,15 @@ export class MatchmakingService {
     const match = matches.find((match) => match.ranking === userRanking);
 
     if (match) {
+      const puzzleId = await this.getRandomPuzzle(userRanking);
       this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
       this.chatGateway.notifyMatch(
         userId,
         match.userId,
         `room-${userId}-${match.userId}`,
+        puzzleId,
       );
-      return match.userId;
+      return { matchId: match.userId, puzzleId };
     }
 
     return undefined;
