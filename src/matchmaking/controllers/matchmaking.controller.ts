@@ -1,4 +1,3 @@
-// matchmaking.controller.ts
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { MatchmakingService } from '../services/matchmaking.service';
 import {
@@ -6,13 +5,24 @@ import {
   LeaveQueueDto,
   LeaveRoomDto,
 } from '../../dto/matchmaking';
+
 @Controller('matchmaking')
 export class MatchmakingController {
   constructor(private readonly matchmakingService: MatchmakingService) {}
 
+  /*
+   ******************************
+   * Queue Management Endpoints *
+   ******************************
+   */
   @Post('joinQueue')
   async joinQueue(@Body() joinQueueDto: { data: JoinQueueDto }) {
     const userId = joinQueueDto.data.id;
+
+    if (!this.matchmakingService.isValidUserId(userId)) {
+      return { success: false, message: 'Invalid user ID.' };
+    }
+
     const isInQueue = await this.matchmakingService.isUserInQueue(userId);
     const isInRoom = this.matchmakingService.isUserInRoom(userId);
 
@@ -31,18 +41,6 @@ export class MatchmakingController {
     };
   }
 
-  @Get('getQueue')
-  getQueue() {
-    const queue = this.matchmakingService.getQueue();
-    return { success: true, queue };
-  }
-
-  @Get('getRooms')
-  getRooms() {
-    const rooms = this.matchmakingService.getRooms();
-    return { success: true, rooms };
-  }
-
   @Post('leaveQueue')
   async leaveQueue(@Body() leaveQueueDto: { data: LeaveQueueDto }) {
     const userId = leaveQueueDto.data.id;
@@ -59,6 +57,17 @@ export class MatchmakingController {
     };
   }
 
+  @Get('getQueue')
+  getQueue() {
+    const queue = this.matchmakingService.getQueue();
+    return { success: true, queue };
+  }
+
+  /*
+   *****************************
+   * Room Management Endpoints *
+   *****************************
+   */
   @Post('leaveRoom')
   async leaveRoom(@Body() leaveRoomDto: { data: LeaveRoomDto }) {
     const userId = leaveRoomDto.data.id;
@@ -72,5 +81,11 @@ export class MatchmakingController {
       success: true,
       message: 'You have successfully left the room.',
     };
+  }
+
+  @Get('getRooms')
+  getRooms() {
+    const rooms = this.matchmakingService.getRooms();
+    return { success: true, rooms };
   }
 }

@@ -1,4 +1,3 @@
-// matchmaking.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './matchmaking.gateway';
@@ -20,7 +19,16 @@ export class MatchmakingService {
     private chatGateway: ChatGateway,
   ) {}
 
+  /*
+   ****************************
+   * Queue Management Methods *
+   ****************************
+   */
   addToQueue(userId: number): void {
+    if (!this.isValidUserId(userId)) {
+      this.logger.log(`Invalid userId: ${userId}`);
+      return;
+    }
     if (!this.queue.includes(userId)) {
       this.queue.push(userId);
       this.logger.log(`User ${userId} joined the queue`);
@@ -30,6 +38,59 @@ export class MatchmakingService {
     }
   }
 
+  removeFromQueue(userId: number): void {
+    this.queue = this.queue.filter((id) => id !== userId);
+    this.logger.log(`User ${userId} left the queue`);
+  }
+
+  isUserInQueue(userId: number): boolean {
+    return this.queue.includes(userId);
+  }
+
+  getQueue(): number[] {
+    return this.queue;
+  }
+
+  /*
+   ***************************
+   * Room Management Methods *
+   ***************************
+   */
+  isUserInRoom(userId: number): boolean {
+    return this.rooms.some(
+      (room) => room.user1 === userId || room.user2 === userId,
+    );
+  }
+
+  getRooms() {
+    return this.rooms;
+  }
+
+  leaveRoom(userId: number): boolean {
+    const roomIndex = this.rooms.findIndex(
+      (room) => room.user1 === userId || room.user2 === userId,
+    );
+    if (roomIndex === -1) {
+      return false;
+    }
+
+    const room = this.rooms[roomIndex];
+    const otherUserId = room.user1 === userId ? room.user2 : room.user1;
+    this.rooms.splice(roomIndex, 1);
+    this.chatGateway.notifyUserLeft(room.roomId, userId);
+
+    if (this.isUserInRoom(otherUserId)) {
+      this.chatGateway.notifyUserAlone(otherUserId, room.roomId);
+    }
+
+    return true;
+  }
+
+  /*
+   ***********************************
+   * Matching and Processing Methods *
+   ***********************************
+   */
   async processQueue(): Promise<void> {
     for (const userId of this.queue) {
       if (this.isUserInRoom(userId)) {
@@ -52,20 +113,6 @@ export class MatchmakingService {
         );
       }
     }
-  }
-
-  async getRandomPuzzle(rankingsId: number): Promise<number> {
-    const puzzles = await this.prisma.puzzles.findMany({
-      where: { rankingsID: rankingsId },
-    });
-
-    if (puzzles.length === 0) {
-      this.logger.warn(`No puzzles found for ranking ID ${rankingsId}`);
-      throw new Error('No puzzles found for the given ranking');
-    }
-
-    const randomIndex = Math.floor(Math.random() * puzzles.length);
-    return puzzles[randomIndex].id;
   }
 
   async findMatch(
@@ -113,27 +160,32 @@ export class MatchmakingService {
     return undefined;
   }
 
-  isUserInQueue(userId: number): boolean {
-    return this.queue.includes(userId);
+  /*
+   *****************************
+   * Puzzle Management Methods *
+   *****************************
+   */
+  async getRandomPuzzle(rankingsId: number): Promise<number> {
+    const puzzles = await this.prisma.puzzles.findMany({
+      where: { rankingsID: rankingsId },
+    });
+
+    if (puzzles.length === 0) {
+      this.logger.warn(`No puzzles found for ranking ID ${rankingsId}`);
+      throw new Error('No puzzles found for the given ranking');
+    }
+
+    const randomIndex = Math.floor(Math.random() * puzzles.length);
+    return puzzles[randomIndex].id;
   }
 
-  getQueue(): number[] {
-    return this.queue;
-  }
-
-  getRooms() {
-    return this.rooms;
-  }
-
-  isUserInRoom(userId: number): boolean {
-    return this.rooms.some(
-      (room) => room.user1 === userId || room.user2 === userId,
-    );
-  }
-
-  removeFromQueue(userId: number): void {
-    this.queue = this.queue.filter((id) => id !== userId);
-    this.logger.log(`User ${userId} left the queue`);
+  /*
+   *******************
+   * Utility Methods *
+   *******************
+   */
+  isValidUserId(userId: number): boolean {
+    return Number.isInteger(userId) && userId > 0;
   }
 
   async getUserRanking(userId: number): Promise<number | null> {
@@ -156,25 +208,5 @@ export class MatchmakingService {
       this.logger.error('Error fetching user ranking:', error);
       return null;
     }
-  }
-
-  leaveRoom(userId: number): boolean {
-    const roomIndex = this.rooms.findIndex(
-      (room) => room.user1 === userId || room.user2 === userId,
-    );
-    if (roomIndex === -1) {
-      return false;
-    }
-
-    const room = this.rooms[roomIndex];
-    const otherUserId = room.user1 === userId ? room.user2 : room.user1;
-    this.rooms.splice(roomIndex, 1);
-    this.chatGateway.notifyUserLeft(room.roomId, userId);
-
-    if (this.isUserInRoom(otherUserId)) {
-      this.chatGateway.notifyUserAlone(otherUserId, room.roomId);
-    }
-
-    return true;
   }
 }
