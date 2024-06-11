@@ -76,10 +76,16 @@ export class MatchmakingService {
 
     const room = this.rooms[roomIndex];
     const otherUserId = room.user1 === userId ? room.user2 : room.user1;
-    this.rooms.splice(roomIndex, 1);
+
+    if (room.user1 === userId) {
+      room.user1 = null;
+    } else {
+      room.user2 = null;
+    }
+
     this.chatGateway.notifyUserLeft(room.roomId, userId);
 
-    if (this.isUserInRoom(otherUserId)) {
+    if (otherUserId !== null) {
       this.chatGateway.notifyUserAlone(otherUserId, room.roomId);
     }
 
