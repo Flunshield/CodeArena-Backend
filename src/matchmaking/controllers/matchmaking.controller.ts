@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { MatchmakingService } from '../services/matchmaking.service';
 import {
   JoinQueueDto,
@@ -9,7 +9,7 @@ import {
 @Controller('matchmaking')
 export class MatchmakingController {
   constructor(private readonly matchmakingService: MatchmakingService) {}
-
+  //TODO: add @Roles(USER) to all methods
   /*
    ******************************
    * Queue Management Endpoints *
@@ -63,6 +63,14 @@ export class MatchmakingController {
     return { success: true, queue };
   }
 
+  @Get('isInQueue')
+  isUserInQueue(@Query('userId') userId: string) {
+    if (!this.matchmakingService.isValidUserId(parseInt(userId))) {
+      return { success: false, message: 'Invalid user ID.' };
+    }
+    const isInQueue = this.matchmakingService.isUserInQueue(parseInt(userId));
+    return { success: true, isInQueue };
+  }
   /*
    *****************************
    * Room Management Endpoints *
@@ -87,5 +95,14 @@ export class MatchmakingController {
   getRooms() {
     const rooms = this.matchmakingService.getRooms();
     return { success: true, rooms };
+  }
+
+  @Get('isInRoom')
+  isUserInRoom(@Query('userId') userId: string) {
+    if (!this.matchmakingService.isValidUserId(parseInt(userId))) {
+      return { success: false, message: 'Invalid user ID.' };
+    }
+    const isInRoom = this.matchmakingService.isUserInRoom(parseInt(userId));
+    return { success: true, isInRoom };
   }
 }
