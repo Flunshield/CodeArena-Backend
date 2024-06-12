@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './matchmaking.gateway';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MatchmakingService {
@@ -62,6 +63,13 @@ export class MatchmakingService {
     );
   }
 
+  getRoomIdByUserId(userId: number): string | null {
+    const room = this.rooms.find(
+      (room) => room.user1 === userId || room.user2 === userId,
+    );
+    return room ? room.roomId : null;
+  }
+
   getRooms() {
     return this.rooms;
   }
@@ -106,7 +114,7 @@ export class MatchmakingService {
       const matchData = await this.findMatch(userId);
       if (matchData) {
         const { matchId, puzzleId } = matchData;
-        const roomId = `room-${userId}-${matchId}`;
+        const roomId = uuidv4();
         this.rooms.push({
           roomId,
           user1: userId,
@@ -154,12 +162,8 @@ export class MatchmakingService {
     if (match) {
       const puzzleId = await this.getRandomPuzzle(userRanking);
       this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
-      this.chatGateway.notifyMatch(
-        userId,
-        match.userId,
-        `room-${userId}-${match.userId}`,
-        puzzleId,
-      );
+      const roomId = uuidv4();
+      this.chatGateway.notifyMatch(userId, match.userId, roomId, puzzleId);
       return { matchId: match.userId, puzzleId };
     }
 

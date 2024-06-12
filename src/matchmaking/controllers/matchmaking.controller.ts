@@ -103,6 +103,12 @@ export class MatchmakingController {
       return { success: false, message: 'Invalid user ID.' };
     }
     const isInRoom = this.matchmakingService.isUserInRoom(parseInt(userId));
-    return { success: true, isInRoom };
+    return {
+      success: true,
+      isInRoom,
+      roomId: isInRoom
+        ? this.matchmakingService.getRoomIdByUserId(parseInt(userId))
+        : null,
+    };
   }
 }
