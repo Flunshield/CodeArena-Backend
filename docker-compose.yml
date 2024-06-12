@@ -43,7 +43,7 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - ./src:/app/src 
+      - ./src:/usr/src/app/src 
     command: npm run start:dev
 
 #   networks:
