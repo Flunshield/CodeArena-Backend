@@ -96,7 +96,7 @@ export class MatchmakingService {
     this.chatGateway.notifyUserLeft(room.roomId, userId);
 
     if (winnerId !== null) {
-      const matchDuration = (Date.now() - room.startTimestamp) / 1000 / 60;
+      const matchDuration = (Date.now() - room.startTimestamp) / 1000;
       this.endMatch(
         room.roomId,
         userId,
@@ -114,37 +114,61 @@ export class MatchmakingService {
     return true;
   }
 
-  endMatch(
+  async endMatch(
     roomId: string,
     loserId: number,
     winnerId: number,
     matchDuration: number,
     startTimestamp: number,
-  ): void {
+  ): Promise<void> {
     const points = this.calculatePoints(matchDuration, '0-0');
-    this.prisma.matches
-      .create({
-        data: {
-          date: startTimestamp.toString(),
-          time: matchDuration.toString(),
-          location: roomId,
-          status: 'Completed',
-          score: '0-0',
-          tournamentID: null,
-          rankingsID: 1,
-          eventsID: null,
-          winnerId: winnerId,
-          winnerPoints: points.winnerPoints,
-          loserId: loserId,
-          loserPoints: points.loserPoints,
-        },
-      })
-      .then(() => {
-        this.logger.log(`Match record created for room ${roomId}`);
-      })
-      .catch((err) => {
-        this.logger.error(`Error creating match record: ${err.message}`);
-      });
+    const startDate = startTimestamp.toString();
+    const winnerRankingsId = await this.getUserRanking(winnerId);
+    const loserRankingsId = await this.getUserRanking(loserId);
+
+    const match = await this.prisma.matches.create({
+      data: {
+        date: startDate,
+        time: matchDuration.toString(),
+        location: roomId,
+        status: 'Completed',
+        score: '0-0',
+        tournamentID: null,
+        rankingsID: 1,
+        eventsID: null,
+        winnerId: winnerId,
+        winnerPoints: points.winnerPoints,
+        loserId: loserId,
+        loserPoints: points.loserPoints,
+      },
+    });
+
+    await this.prisma.userRanking.update({
+      where: {
+        userID_rankingsID: { userID: winnerId, rankingsID: winnerRankingsId },
+      },
+      data: { points: { increment: points.winnerPoints } },
+    });
+
+    await this.prisma.userRanking.update({
+      where: {
+        userID_rankingsID: { userID: loserId, rankingsID: loserRankingsId },
+      },
+      data: { points: { increment: points.loserPoints } },
+    });
+
+    await this.prisma.userMatch.create({
+      data: {
+        userID: winnerId,
+        matchID: match.id,
+      },
+    });
+    await this.prisma.userMatch.create({
+      data: {
+        userID: loserId,
+        matchID: match.id,
+      },
+    });
   }
 
   calculatePoints(
@@ -154,32 +178,34 @@ export class MatchmakingService {
     const [winnerScore, loserScore] = finalScore.split('-').map(Number);
 
     let winnerPoints = 10; // Points de base pour le gagnant
-    let loserPoints = 5; // Points de base pour le perdant
+    let loserPoints = 0; // Points de base pour le perdant
 
     // Ajustement des points en fonction de la durée du match (exemple)
     if (matchDuration < 1) {
       // Si le match a duré moins d'une minute
       winnerPoints = 0;
-      loserPoints = -5;
+      loserPoints = -10;
     } else if (matchDuration < 5) {
       // Si le match a duré moins de 5 minutes
       winnerPoints += 5;
-      loserPoints += 2;
+      loserPoints += 0;
     } else if (matchDuration >= 5 && matchDuration <= 10) {
       // Si le match a duré entre 5 et 10 minutes
       winnerPoints += 3;
-      loserPoints += 1;
+      loserPoints += 0;
     }
-    // Ajustement des points en fonction de l'écart de score (exemple)
-    const scoreDifference = Math.abs(winnerScore - loserScore);
-    if (scoreDifference <= 2) {
-      // Match serré
-      winnerPoints += 2;
-      loserPoints += 2;
-    } else if (scoreDifference > 2 && scoreDifference <= 5) {
-      // Match avec un écart modéré
-      winnerPoints += 1;
-      loserPoints += 1;
+    // Ajustement des points en fonction de l'écart de score, seulement si le match a duré plus d'une minute
+    if (matchDuration >= 1) {
+      const scoreDifference = Math.abs(winnerScore - loserScore);
+      if (scoreDifference <= 2) {
+        // Match serré
+        winnerPoints += 2;
+        loserPoints += 2;
+      } else if (scoreDifference > 2 && scoreDifference <= 5) {
+        // Match avec un écart modéré
+        winnerPoints += 1;
+        loserPoints += 0;
+      }
     }
     return { winnerPoints, loserPoints };
   }
@@ -195,27 +221,14 @@ export class MatchmakingService {
         this.logger.log(`User ${userId} is already in a room`);
         continue;
       }
+
       const matchData = await this.findMatch(userId);
       if (matchData) {
-        const { matchId, puzzleId, startTimestamp } = matchData;
-
-        const roomId = uuidv4();
-        this.rooms.push({
-          roomId,
-          user1: userId,
-          user2: matchId,
-          puzzleId: puzzleId,
-          startTimestamp: startTimestamp,
-        });
-        this.chatGateway.notifyMatch(
+        this.createRoomAndNotify(
           userId,
-          matchId,
-          roomId,
-          puzzleId,
-          startTimestamp,
-        );
-        this.logger.log(
-          `User ${userId} and User ${matchId} matched in room ${roomId} with puzzle ${puzzleId}`,
+          matchData.firstUser,
+          matchData.puzzleId,
+          matchData.startTimestamp,
         );
       }
     }
@@ -224,7 +237,7 @@ export class MatchmakingService {
   async findMatch(
     userId: number,
   ): Promise<
-    { matchId: number; puzzleId: number; startTimestamp: number } | undefined
+    { firstUser: number; puzzleId: number; startTimestamp: number } | undefined
   > {
     if (!this.queue.includes(userId)) {
       this.logger.log(`User ${userId} is not in the queue`);
@@ -239,6 +252,24 @@ export class MatchmakingService {
 
     this.logger.log(`User ${userId} has ranking ${userRanking}`);
 
+    const match = await this.findMatchingUser(userId, userRanking);
+    if (match) {
+      const puzzleId = await this.getRandomPuzzle(userRanking);
+      this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
+      return {
+        firstUser: match.userId,
+        puzzleId,
+        startTimestamp: Date.now(),
+      };
+    }
+
+    return undefined;
+  }
+
+  private async findMatchingUser(
+    userId: number,
+    userRanking: number,
+  ): Promise<{ userId: number; ranking: number } | undefined> {
     const matches = await Promise.all(
       this.queue
         .filter(
@@ -251,28 +282,31 @@ export class MatchmakingService {
         }),
     );
 
-    const match = matches.find((match) => match.ranking === userRanking);
+    return matches.find((match) => match.ranking === userRanking);
+  }
 
-    if (match) {
-      const puzzleId = await this.getRandomPuzzle(userRanking);
-      this.queue = this.queue.filter((u) => u !== userId && u !== match.userId);
-      const roomId = uuidv4();
-      const startTimestamp = Date.now();
-      this.chatGateway.notifyMatch(
-        userId,
-        match.userId,
-        roomId,
-        puzzleId,
-        startTimestamp,
-      );
-      return {
-        matchId: match.userId,
-        puzzleId,
-        startTimestamp,
-      };
-    }
+  private createRoomAndNotify(
+    user1: number,
+    user2: number,
+    puzzleId: number,
+    startTimestamp: number,
+  ): void {
+    const roomId = uuidv4();
+    this.rooms.push({
+      roomId,
+      user1,
+      user2,
+      puzzleId,
+      startTimestamp,
+    });
 
-    return undefined;
+    this.chatGateway.notifyMatch(
+      user1,
+      user2,
+      roomId,
+      puzzleId,
+      startTimestamp,
+    );
   }
 
   /*

@@ -123,6 +123,8 @@ model userRanking {
   rankingsID Int
   rankings   rankings @relation(fields: [rankingsID], references: [id])
   points     Float
+
+  @@unique([userID, rankingsID])
 }
 
 model userTournament {

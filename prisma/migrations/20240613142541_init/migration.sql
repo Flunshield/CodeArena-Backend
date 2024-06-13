@@ -113,6 +113,7 @@ CREATE TABLE `userRanking` (
     `rankingsID` INTEGER NOT NULL,
     `points` DOUBLE NOT NULL,
 
+    UNIQUE INDEX `userRanking_userID_rankingsID_key`(`userID`, `rankingsID`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
