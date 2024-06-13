@@ -98,22 +98,22 @@ model rankings {
 
 model matches {
   id           Int         @id @default(autoincrement())
-  date         DateTime
-  time         DateTime
+  date         String
+  time         String
   location     String
   status       String
   score        String
-  tournamentID Int
-  tournaments  tournaments @relation(fields: [tournamentID], references: [id])
-  rankingsID   Int
-  rankings     rankings    @relation(fields: [rankingsID], references: [id])
+  tournamentID Int?
+  tournaments  tournaments? @relation(fields: [tournamentID], references: [id])
+  rankingsID   Int?
+  rankings     rankings?    @relation(fields: [rankingsID], references: [id])
   userMatch    userMatch[]
-  eventsID     Int
-  events       events      @relation(fields: [eventsID], references: [id])
-  winnerId      Int?
-  winnerPoints  Float?
-  loserId       Int?
-  loserPoints   Float?
+  eventsID     Int?
+  events       events?      @relation(fields: [eventsID], references: [id])
+  winnerId     Int?
+  winnerPoints Float?
+  loserId      Int?
+  loserPoints  Float?
 }
 
 model userRanking {

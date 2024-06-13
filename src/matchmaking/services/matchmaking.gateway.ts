@@ -35,12 +35,6 @@ export class ChatGateway
     this.logger.log(`Client ${client.id} joined room ${roomId}`);
   }
 
-  @SubscribeMessage('leaveRoom')
-  leaveRoom(client: Socket, roomId: string): void {
-    client.leave(roomId);
-    this.logger.log(`Client ${client.id} left room ${roomId}`);
-  }
-
   @SubscribeMessage('typing')
   handleTyping(
     client: Socket,
@@ -67,8 +61,15 @@ export class ChatGateway
     userId2: number,
     roomId: string,
     puzzleId: number,
+    startTimestamp: number,
   ): void {
-    this.server.emit('matchFound', { userId1, userId2, roomId, puzzleId });
+    this.server.emit('matchFound', {
+      userId1,
+      userId2,
+      roomId,
+      puzzleId,
+      startTimestamp,
+    });
     this.logger.log(
       `Match found: User ${userId1} and User ${userId2} in room ${roomId} with puzzle ${puzzleId}`,
     );

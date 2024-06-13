@@ -122,11 +122,15 @@ export interface Match {
   time: Date;
   location: string;
   status: string;
-  score: number;
+  score: string;
   tournamentID: number;
   tournament: Tournament;
   rankingsID: number;
   rankings: Ranking;
+  winnerId: number;
+  winnerPoints: number;
+  loserId: number;
+  loserPoints: number;
 }
 
 export interface Ranking {

@@ -90,14 +90,14 @@ CREATE TABLE `rankings` (
 -- CreateTable
 CREATE TABLE `matches` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `date` DATETIME(3) NOT NULL,
-    `time` DATETIME(3) NOT NULL,
+    `date` VARCHAR(191) NOT NULL,
+    `time` VARCHAR(191) NOT NULL,
     `location` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
     `score` VARCHAR(191) NOT NULL,
-    `tournamentID` INTEGER NOT NULL,
-    `rankingsID` INTEGER NOT NULL,
-    `eventsID` INTEGER NOT NULL,
+    `tournamentID` INTEGER NULL,
+    `rankingsID` INTEGER NULL,
+    `eventsID` INTEGER NULL,
     `winnerId` INTEGER NULL,
     `winnerPoints` DOUBLE NULL,
     `loserId` INTEGER NULL,
@@ -229,13 +229,13 @@ ALTER TABLE `user` ADD CONSTRAINT `user_groupsId_fkey` FOREIGN KEY (`groupsId`) 
 ALTER TABLE `histories` ADD CONSTRAINT `histories_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `matches` ADD CONSTRAINT `matches_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `matches` ADD CONSTRAINT `matches_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `matches` ADD CONSTRAINT `matches_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `matches` ADD CONSTRAINT `matches_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `matches` ADD CONSTRAINT `matches_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `matches` ADD CONSTRAINT `matches_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `userRanking` ADD CONSTRAINT `userRanking_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
