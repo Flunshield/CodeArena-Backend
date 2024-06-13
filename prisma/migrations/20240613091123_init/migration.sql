@@ -94,7 +94,7 @@ CREATE TABLE `matches` (
     `time` DATETIME(3) NOT NULL,
     `location` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
-    `score` DOUBLE NOT NULL,
+    `score` VARCHAR(191) NOT NULL,
     `tournamentID` INTEGER NOT NULL,
     `rankingsID` INTEGER NOT NULL,
     `eventsID` INTEGER NOT NULL,
@@ -162,9 +162,9 @@ CREATE TABLE `userEvent` (
 -- CreateTable
 CREATE TABLE `puzzles` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `rankingsID` INTEGER NOT NULL,
-    `tournamentID` INTEGER NOT NULL,
-    `eventsID` INTEGER NOT NULL,
+    `rankingsID` INTEGER NULL,
+    `tournamentID` INTEGER NULL,
+    `eventsID` INTEGER NULL,
     `tests` JSON NOT NULL,
     `details` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
@@ -262,13 +262,13 @@ ALTER TABLE `userEvent` ADD CONSTRAINT `userEvent_userID_fkey` FOREIGN KEY (`use
 ALTER TABLE `userEvent` ADD CONSTRAINT `userEvent_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `commandeEntreprise` ADD CONSTRAINT `commandeEntreprise_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

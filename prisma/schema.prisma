@@ -102,7 +102,7 @@ model matches {
   time         DateTime
   location     String
   status       String
-  score        Float
+  score        String
   tournamentID Int
   tournaments  tournaments @relation(fields: [tournamentID], references: [id])
   rankingsID   Int
@@ -167,12 +167,12 @@ model userEvent {
 
 model puzzles {
   id           Int         @id @default(autoincrement())
-  rankingsID   Int
-  rankings     rankings    @relation(fields: [rankingsID], references: [id])
-  tournamentID Int
-  tournaments  tournaments @relation(fields: [tournamentID], references: [id])
-  eventsID     Int
-  events       events      @relation(fields: [eventsID], references: [id])
+  rankingsID   Int?
+  rankings     rankings?   @relation(fields: [rankingsID], references: [id])
+  tournamentID Int?
+  tournaments  tournaments? @relation(fields: [tournamentID], references: [id])
+  eventsID     Int?
+  events       events?     @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
   title        String
