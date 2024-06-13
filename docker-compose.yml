@@ -1,20 +1,22 @@
 services:
   mariadb:
+    networks:
+      - rcr_network
     image: mariadb:${MARIADBVERSION}
     container_name: mariadb
-    #restart: always
     environment:
       MARIADB_ROOT_PASSWORD: admin
       MYSQL_DATABASE: ${MARIADB}
     ports:
       - ${MARIADB_PORTS}:3306
     volumes:
-      - ${MARIADB_PATH}:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
 
   phpmyadmin:
+    networks:
+      - rcr_network
     image: phpmyadmin/phpmyadmin:5.2
     container_name: phpmyadmin
-    #restart: always
     environment:
       PMA_ARBITRARY: 1
     ports:
@@ -27,7 +29,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nest
-    #restart: always
+    networks:
+      - rcr_network
     ports:
       - '3000:3000'
     environment:
@@ -43,7 +46,8 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - ./src:/usr/src/app/src 
+      - ./src:/usr/src/app/src
+      - ./prisma/migrations:/usr/src/app/prisma/migrations
     command: npm run start:dev
 
 #   networks:
@@ -55,6 +59,10 @@ services:
 #       - "traefik.http.routers.rcr-api.tls.certresolver=myresolver"
 #       - "traefik.http.services.rcr-api.loadbalancer.server.port=3000"
 
-# networks:
-#   rcr_network:
-#     external: true
+
+volumes:
+  mariadb_data:
+
+networks:
+  rcr_network:
+    driver: bridge

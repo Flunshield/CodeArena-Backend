@@ -110,6 +110,10 @@ model matches {
   userMatch    userMatch[]
   eventsID     Int
   events       events      @relation(fields: [eventsID], references: [id])
+  winnerId      Int?
+  winnerPoints  Float?
+  loserId       Int?
+  loserPoints   Float?
 }
 
 model userRanking {

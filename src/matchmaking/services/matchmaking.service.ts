@@ -81,10 +81,7 @@ export class MatchmakingService {
     if (roomIndex === -1) {
       return false;
     }
-
     const room = this.rooms[roomIndex];
-    const otherUserId = room.user1 === userId ? room.user2 : room.user1;
-
     if (room.user1 === userId) {
       room.user1 = null;
     } else {
@@ -92,13 +89,31 @@ export class MatchmakingService {
     }
 
     this.chatGateway.notifyUserLeft(room.roomId, userId);
-
-    if (otherUserId !== null) {
-      this.chatGateway.notifyUserAlone(otherUserId, room.roomId);
-    }
-
+    //this.endMatch(room.roomId);
     return true;
   }
+
+  // endMatch(roomId: string): void {
+  //   this.prisma.matches
+  //     .create({
+  //       data: {
+  //         date: new Date(),
+  //         time: new Date(),
+  //         location: 'Online',
+  //         status: 'Completed',
+  //         score: 0,
+  //         tournamentID: room.tournamentId,
+  //         rankingsID: room.rankingsId,
+  //         eventsID: room.eventsId,
+  //       },
+  //     })
+  //     .then(() => {
+  //       this.logger.log(`Match record created for room ${roomId}`);
+  //     })
+  //     .catch((err) => {
+  //       this.logger.error(`Error creating match record: ${err.message}`);
+  //     });
+  // }
 
   /*
    ***********************************

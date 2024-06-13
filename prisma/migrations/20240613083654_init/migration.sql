@@ -98,6 +98,10 @@ CREATE TABLE `matches` (
     `tournamentID` INTEGER NOT NULL,
     `rankingsID` INTEGER NOT NULL,
     `eventsID` INTEGER NOT NULL,
+    `winnerId` INTEGER NULL,
+    `winnerPoints` DOUBLE NULL,
+    `loserId` INTEGER NULL,
+    `loserPoints` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

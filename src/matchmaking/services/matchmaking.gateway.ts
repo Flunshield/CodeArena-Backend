@@ -79,11 +79,6 @@ export class ChatGateway
     this.logger.log(`User ${userId} left room ${roomId}`);
   }
 
-  notifyUserAlone(userId: number, roomId: string): void {
-    this.server.to(roomId).emit('userAlone', { userId });
-    this.logger.log(`User ${userId} is alone in room ${roomId}`);
-  }
-
   /*
    ****************************
    * Lifecycle Event Handlers *
