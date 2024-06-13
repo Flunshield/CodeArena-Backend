@@ -4,6 +4,11 @@ import { Injectable } from '@nestjs/common';
 export class QueueService {
   private queue: number[] = [];
 
+  /*
+   ****************************
+   * Queue Management Methods *
+   ****************************
+   */
   addUser(userId: number): void {
     if (!this.queue.includes(userId)) {
       this.queue.push(userId);

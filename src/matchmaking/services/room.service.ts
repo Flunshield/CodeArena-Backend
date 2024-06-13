@@ -16,6 +16,11 @@ export class RoomService {
     private readonly chatGateway: ChatGateway,
   ) {}
 
+  /*
+   **********************************
+   * Room Creation and Notification *
+   **********************************
+   */
   createRoomAndNotify(user1: number, matchData: CreateRoomDto): void {
     const roomId = uuidv4();
     const room = {
@@ -36,6 +41,11 @@ export class RoomService {
     );
   }
 
+  /*
+   ***************************
+   * Room Management Methods *
+   ***************************
+   */
   isUserInRoom(userId: number): boolean {
     return this.rooms.some(
       (room) => room.user1 === userId || room.user2 === userId,
@@ -80,6 +90,11 @@ export class RoomService {
     return true;
   }
 
+  /*
+   ************************
+   * Match End Management *
+   ************************
+   */
   private async endMatch(
     roomId: string,
     loserId: number,
@@ -137,6 +152,11 @@ export class RoomService {
     });
   }
 
+  /*
+   *******************
+   * Utility Methods *
+   *******************
+   */
   private async getUserRanking(userId: number): Promise<number | null> {
     if (!userId) {
       this.logger.error('User ID is not defined');
@@ -159,6 +179,11 @@ export class RoomService {
     }
   }
 
+  /*
+   ****************************
+   * Getters for Room Details *
+   ****************************
+   */
   getRooms() {
     return this.rooms;
   }

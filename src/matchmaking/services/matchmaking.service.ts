@@ -16,6 +16,11 @@ export class MatchmakingService {
     private readonly roomService: RoomService,
   ) {}
 
+  /*
+   ****************************
+   * Queue Management Methods *
+   ****************************
+   */
   addToQueue(userId: number): void {
     if (!this.isValidUserId(userId)) {
       this.logger.log(`Invalid userId: ${userId}`);
@@ -41,6 +46,11 @@ export class MatchmakingService {
     }
   }
 
+  /*
+   ********************************
+   * Matching and Finding Methods *
+   ********************************
+   */
   async findMatch(userId: number): Promise<CreateRoomDto | undefined> {
     if (!this.queueService.isUserInQueue(userId)) {
       this.logger.log(`User ${userId} is not in the queue`);
@@ -91,6 +101,11 @@ export class MatchmakingService {
     return matches.find((match) => match.ranking === userRanking);
   }
 
+  /*
+   *******************
+   * Utility Methods *
+   *******************
+   */
   isValidUserId(userId: number): boolean {
     return Number.isInteger(userId) && userId > 0;
   }
