@@ -38,3 +38,9 @@ export class MatchFoundDto {
   userId2: number;
   roomId: string;
 }
+
+export class CreateRoomDto {
+  firstUser: number;
+  puzzleId: number;
+  startTimestamp: number;
+}

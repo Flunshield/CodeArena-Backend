@@ -1,14 +1,20 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { MatchmakingService } from '../services/matchmaking.service';
+import { QueueService } from '../services/queue.service';
+import { RoomService } from '../services/room.service';
 import {
   JoinQueueDto,
   LeaveQueueDto,
   LeaveRoomDto,
 } from '../../dto/matchmaking';
-
 @Controller('matchmaking')
 export class MatchmakingController {
-  constructor(private readonly matchmakingService: MatchmakingService) {}
+  constructor(
+    private readonly matchmakingService: MatchmakingService,
+    private readonly queueService: QueueService,
+    private readonly roomService: RoomService,
+  ) {}
+
   //TODO: add @Roles(USER) to all methods
   /*
    ******************************
@@ -23,8 +29,8 @@ export class MatchmakingController {
       return { success: false, message: 'Invalid user ID.' };
     }
 
-    const isInQueue = await this.matchmakingService.isUserInQueue(userId);
-    const isInRoom = this.matchmakingService.isUserInRoom(userId);
+    const isInQueue = this.queueService.isUserInQueue(userId);
+    const isInRoom = this.roomService.isUserInRoom(userId);
 
     if (isInQueue) {
       return { success: false, message: 'You are already in the queue.' };
@@ -44,13 +50,13 @@ export class MatchmakingController {
   @Post('leaveQueue')
   async leaveQueue(@Body() leaveQueueDto: { data: LeaveQueueDto }) {
     const userId = leaveQueueDto.data.id;
-    const isInQueue = await this.matchmakingService.isUserInQueue(userId);
+    const isInQueue = this.queueService.isUserInQueue(userId);
 
     if (!isInQueue) {
       return { success: false, message: 'You are not in the queue.' };
     }
 
-    this.matchmakingService.removeFromQueue(userId);
+    this.queueService.removeUser(userId);
     return {
       success: true,
       message: 'You have successfully left the queue.',
@@ -59,7 +65,7 @@ export class MatchmakingController {
 
   @Get('getQueue')
   getQueue() {
-    const queue = this.matchmakingService.getQueue();
+    const queue = this.queueService.getQueue();
     return { success: true, queue };
   }
 
@@ -68,9 +74,10 @@ export class MatchmakingController {
     if (!this.matchmakingService.isValidUserId(parseInt(userId))) {
       return { success: false, message: 'Invalid user ID.' };
     }
-    const isInQueue = this.matchmakingService.isUserInQueue(parseInt(userId));
+    const isInQueue = this.queueService.isUserInQueue(parseInt(userId));
     return { success: true, isInQueue };
   }
+
   /*
    *****************************
    * Room Management Endpoints *
@@ -79,7 +86,7 @@ export class MatchmakingController {
   @Post('leaveRoom')
   async leaveRoom(@Body() leaveRoomDto: { data: LeaveRoomDto }) {
     const userId = leaveRoomDto.data.id;
-    const leftRoom = this.matchmakingService.leaveRoom(userId);
+    const leftRoom = this.roomService.leaveRoom(userId);
 
     if (!leftRoom) {
       return { success: false, message: 'You are not in any room.' };
@@ -93,7 +100,7 @@ export class MatchmakingController {
 
   @Get('getRooms')
   getRooms() {
-    const rooms = this.matchmakingService.getRooms();
+    const rooms = this.roomService.getRooms();
     return { success: true, rooms };
   }
 
@@ -102,12 +109,12 @@ export class MatchmakingController {
     if (!this.matchmakingService.isValidUserId(parseInt(userId))) {
       return { success: false, message: 'Invalid user ID.' };
     }
-    const isInRoom = this.matchmakingService.isUserInRoom(parseInt(userId));
+    const isInRoom = this.roomService.isUserInRoom(parseInt(userId));
     return {
       success: true,
       isInRoom,
       roomId: isInRoom
-        ? this.matchmakingService.getRoomIdByUserId(parseInt(userId))
+        ? this.roomService.getRoomIdByUserId(parseInt(userId))
         : null,
     };
   }
