@@ -113,9 +113,9 @@ export class RoomService {
         time: matchDuration.toString(),
         location: roomId,
         status: 'Completed',
-        score: '0-0',
+        score: '0-0', //TODO: Implement score calculation
         tournamentID: null,
-        rankingsID: 1,
+        rankingsID: winnerRankingsId,
         eventsID: null,
         winnerId: winnerId,
         winnerPoints: points.winnerPoints,
