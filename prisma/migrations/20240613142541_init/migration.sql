@@ -23,6 +23,7 @@ CREATE TABLE `user` (
     `presentation` VARCHAR(191) NULL,
     `nbGames` INTEGER NULL DEFAULT 0,
     `groupsId` INTEGER NOT NULL DEFAULT 1,
+    `siren` VARCHAR(191) NULL,
 
     UNIQUE INDEX `user_userName_key`(`userName`),
     PRIMARY KEY (`id`)
@@ -89,14 +90,18 @@ CREATE TABLE `rankings` (
 -- CreateTable
 CREATE TABLE `matches` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `date` DATETIME(3) NOT NULL,
-    `time` DATETIME(3) NOT NULL,
+    `date` VARCHAR(191) NOT NULL,
+    `time` VARCHAR(191) NOT NULL,
     `location` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
-    `score` DOUBLE NOT NULL,
-    `tournamentID` INTEGER NOT NULL,
-    `rankingsID` INTEGER NOT NULL,
-    `eventsID` INTEGER NOT NULL,
+    `score` VARCHAR(191) NOT NULL,
+    `tournamentID` INTEGER NULL,
+    `rankingsID` INTEGER NULL,
+    `eventsID` INTEGER NULL,
+    `winnerId` INTEGER NULL,
+    `winnerPoints` DOUBLE NULL,
+    `loserId` INTEGER NULL,
+    `loserPoints` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -108,6 +113,7 @@ CREATE TABLE `userRanking` (
     `rankingsID` INTEGER NOT NULL,
     `points` DOUBLE NOT NULL,
 
+    UNIQUE INDEX `userRanking_userID_rankingsID_key`(`userID`, `rankingsID`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -157,11 +163,12 @@ CREATE TABLE `userEvent` (
 -- CreateTable
 CREATE TABLE `puzzles` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `rankingsID` INTEGER NOT NULL,
-    `tournamentID` INTEGER NOT NULL,
-    `eventsID` INTEGER NOT NULL,
+    `rankingsID` INTEGER NULL,
+    `tournamentID` INTEGER NULL,
+    `eventsID` INTEGER NULL,
     `tests` JSON NOT NULL,
     `details` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -177,9 +184,39 @@ CREATE TABLE `commandeEntreprise` (
     `dateCommande` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `etatCommande` VARCHAR(191) NOT NULL,
     `nbCreateTest` INTEGER NOT NULL DEFAULT 10,
+    `customerId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `commandeEntreprise_idSession_key`(`idSession`),
     UNIQUE INDEX `commandeEntreprise_idPayment_key`(`idPayment`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `puzzlesEntreprise` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userID` INTEGER NOT NULL,
+    `tests` JSON NOT NULL,
+    `details` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `puzzleSend` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userID` INTEGER NOT NULL,
+    `puzzlesEntrepriseId` INTEGER NOT NULL,
+    `sendDate` DATETIME(3) NOT NULL,
+    `firstName` VARCHAR(191) NOT NULL,
+    `lastName` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `commentaire` VARCHAR(191) NOT NULL,
+    `validated` BOOLEAN NOT NULL DEFAULT false,
+    `result` JSON NULL,
+    `testValidated` INTEGER NULL,
+    `time` VARCHAR(191) NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -193,13 +230,13 @@ ALTER TABLE `user` ADD CONSTRAINT `user_groupsId_fkey` FOREIGN KEY (`groupsId`) 
 ALTER TABLE `histories` ADD CONSTRAINT `histories_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `matches` ADD CONSTRAINT `matches_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `matches` ADD CONSTRAINT `matches_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `matches` ADD CONSTRAINT `matches_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `matches` ADD CONSTRAINT `matches_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `matches` ADD CONSTRAINT `matches_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `matches` ADD CONSTRAINT `matches_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `userRanking` ADD CONSTRAINT `userRanking_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -226,13 +263,22 @@ ALTER TABLE `userEvent` ADD CONSTRAINT `userEvent_userID_fkey` FOREIGN KEY (`use
 ALTER TABLE `userEvent` ADD CONSTRAINT `userEvent_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_rankingsID_fkey` FOREIGN KEY (`rankingsID`) REFERENCES `rankings`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `puzzles` ADD CONSTRAINT `puzzles_eventsID_fkey` FOREIGN KEY (`eventsID`) REFERENCES `events`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `commandeEntreprise` ADD CONSTRAINT `commandeEntreprise_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `puzzlesEntreprise` ADD CONSTRAINT `puzzlesEntreprise_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `puzzleSend` ADD CONSTRAINT `puzzleSend_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `puzzleSend` ADD CONSTRAINT `puzzleSend_puzzlesEntrepriseId_fkey` FOREIGN KEY (`puzzlesEntrepriseId`) REFERENCES `puzzlesEntreprise`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
