@@ -122,7 +122,7 @@ export class AuthService {
     credentials: shortUser,
     @Res() res: Response,
     frenchCodeAreaCookie: string,
-  ): Promise<HttpException | HttpStatus> {
+  ) {
     try {
       // Vérifier si le cookie existe
       const existingToken = frenchCodeAreaCookie;
@@ -166,8 +166,10 @@ export class AuthService {
           try {
             const tokenGenerated =
               await this.refreshTokenService.generateRefreshToken(user.id, res);
-            if (tokenGenerated === HttpStatus.OK) {
-              return HttpStatus.OK;
+            if (tokenGenerated) {
+              return await this.refreshTokenService.generateAccessTokenFromRefreshToken(
+                tokenGenerated,
+              );
             }
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
@@ -371,7 +373,7 @@ export class AuthService {
         user.id.toString(),
       );
       const abonnementValid = await this.stripeService.getSubscriptionStatus(
-        lastCommande.idPayment,
+        lastCommande.customerId,
       );
       if (abonnementValid && !abonnementValid.active) {
         await resetUserGroup(user);

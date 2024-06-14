@@ -29,6 +29,7 @@ export interface User {
   userMatch?: UserMatch;
   puzzlesEntreprise?: PuzzlesEntreprise;
   commandeEntreprise?: CommandeEntreprise;
+  siren?: string;
 }
 
 export interface Titles {
@@ -121,11 +122,15 @@ export interface Match {
   time: Date;
   location: string;
   status: string;
-  score: number;
+  score: string;
   tournamentID: number;
   tournament: Tournament;
   rankingsID: number;
   rankings: Ranking;
+  winnerId: number;
+  winnerPoints: number;
+  loserId: number;
+  loserPoints: number;
 }
 
 export interface Ranking {
@@ -216,14 +221,14 @@ export interface Puzzle {
 export interface CommandeEntreprise {
   id: number;
   idSession: string;
-  objetSession: JSON;
+  objetSession: JsonValue;
   idPayment: string;
   item: string;
   userID: number;
-  user: User;
   dateCommande: Date;
   etatCommande: string;
   nbCreateTest: number;
+  customerId: string;
 }
 
 export interface PuzzlesEntreprise {

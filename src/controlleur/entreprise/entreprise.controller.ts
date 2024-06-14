@@ -108,4 +108,14 @@ export class EntrepriseController {
     const lastCommande = await this.stripeService.getLastCommande(userId);
     return await this.stripeService.unsuscribeUser(lastCommande);
   }
+
+  @Get('/getAllCommandeForUser')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async getAllCommandeForUser(
+    @Query('id') id: string,
+    @Query('page') page: number,
+  ) {
+    return await this.entrepriseService.getAllCommandeForUser(id, page);
+  }
 }

@@ -92,9 +92,9 @@ export class UserController {
   @Get('/getUsers')
   @Roles(ADMIN, ENTREPRISE, USER)
   @UseGuards(RolesGuard)
-  async getUsers(@Query('page') page: string, @Req() request, @Res() response) {
+  async getUsers(@Query('page') page: string, @Query('itemPerPage') itemPerPage: string, @Query('isEntreprise') isEntreprise: string, @Req() request, @Res() response) {
     try {
-      const users = await this.userService.getUsers(parseInt(page));
+      const users = await this.userService.getUsers(parseInt(page), parseInt(itemPerPage), isEntreprise);
       response.send(users);
     } catch (error) {
       console.log(error);
@@ -104,10 +104,22 @@ export class UserController {
   @Get('/getUsersByUsername')
   @Roles(ADMIN, ENTREPRISE, USER)
   @UseGuards(RolesGuard)
-  async getUsersByUsername(@Query('page') page: string, @Query('username') username: string, @Req() request, @Res() response) {
+  async getUsersByUsername(@Query('username') username: string, @Query('itemPerPage') itemPerPage: string, @Query('isEntreprise') isEntreprise: string, @Req() request, @Res() response) {
     try {
-      const users = await this.userService.getUsersByUserName(parseInt(page), username.toString());
+      const users = await this.userService.getUsersByUserName(username.toString(), parseInt(itemPerPage), isEntreprise);
       response.send(users);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('/getUser')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getUser(@Query('id') id: string, @Req() request, @Res() response) {
+    try {
+      const user = await this.userService.getUserById(parseInt(id));
+      response.send(user);
     } catch (error) {
       console.log(error);
     }

@@ -5,3 +5,10 @@ export interface AddMessageDto {
   timestamp: number;
   roomId: string;
 }
+export interface Room {
+  roomId: string;
+  user1: number;
+  user2: number;
+  puzzleId: number;
+  startTimestamp: number;
+}

@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Stripe } from 'stripe';
 import { PrismaClient } from '@prisma/client';
 import { PRODUCT } from '../../constantes/contante';
-import { User } from 'src/interfaces/userInterface';
-import { MailerService } from '@nestjs-modules/mailer';
+import { CommandeEntreprise, User } from 'src/interfaces/userInterface';
 import { PdfService } from '../pdfservice/pdf.service';
+import { MailService } from '../../email/service/MailService';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -18,7 +18,7 @@ export class StripeService {
   );
 
   constructor(
-    private readonly mailerService: MailerService,
+    private readonly mailService: MailService,
     private readonly pdfService: PdfService,
   ) {}
 
@@ -115,7 +115,28 @@ export class StripeService {
       if (createCommand) {
         const userUpdate = await this.attributeEntrepriseRole(user);
         if (userUpdate) {
-          return HttpStatus.CREATED;
+          const getInvoice: Promise<Buffer> = this.getLatestInvoice(
+            session.customer,
+            '',
+            user,
+          );
+          const data = {
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            pdfBuffer: getInvoice,
+          };
+          // Realise les actions necessaire à l'envoie du mail de création de compte.
+          const responseSendMail = await this.mailService.prepareMail(
+            undefined,
+            data,
+            4,
+          );
+          if (responseSendMail) {
+            return HttpStatus.CREATED;
+          } else {
+            return HttpStatus.NOT_MODIFIED;
+          }
         }
       }
     } catch (e) {
@@ -157,28 +178,34 @@ export class StripeService {
    *
    * @throws {Error} - Lance une erreur si une opération échoue.
    */
-  async getSubscriptionStatus(customerId: string) {
-    const subscriptions = await this.stripe.subscriptions.list({
-      customer: customerId,
-      status: 'all',
-      expand: ['data.default_payment_method'],
-    });
+  async getSubscriptionStatus(
+    customerId: string,
+  ): Promise<{ active: boolean; subscriptions: Array<object> }> {
+    try {
+      const subscriptions = await this.stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        expand: ['data.default_payment_method'],
+      });
 
-    if (subscriptions.data.length === 0) {
-      return { active: false, subscriptions: [] };
+      if (subscriptions.data.length === 0) {
+        return { active: false, subscriptions: [] };
+      }
+
+      const activeSubscriptions = subscriptions.data.filter(
+        (subscription) =>
+          subscription.status === 'active' ||
+          subscription.status === 'trialing' ||
+          subscription.status === 'past_due',
+      );
+
+      return {
+        active: activeSubscriptions.length > 0,
+        subscriptions: activeSubscriptions,
+      };
+    } catch (e) {
+      console.log(e);
     }
-
-    const activeSubscriptions = subscriptions.data.filter(
-      (subscription) =>
-        subscription.status === 'active' ||
-        subscription.status === 'trialing' ||
-        subscription.status === 'past_due',
-    );
-
-    return {
-      active: activeSubscriptions.length > 0,
-      subscriptions: activeSubscriptions,
-    };
   }
 
   /**
@@ -243,7 +270,7 @@ export class StripeService {
    *
    * @throws {Error} - Lance une erreur si une opération échoue.
    */
-  async getLastCommande(id: string) {
+  async getLastCommande(id: string): Promise<CommandeEntreprise> {
     return prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
@@ -254,13 +281,27 @@ export class StripeService {
     });
   }
 
-  async getLatestInvoice(customerId: string) {
+  async getLatestInvoice(
+    customerId: string,
+    id?: string,
+    user?: User,
+  ): Promise<Buffer> {
     const latestInvoice = await this.stripe.invoices.list({
       customer: customerId,
       limit: 1,
-      status: 'paid', // ou tout autre statut pertinent pour votre cas d'utilisation
+      status: 'paid',
       expand: ['data.default_payment_method'],
     });
-    return await this.pdfService.generateInvoicePDF(latestInvoice.data[0]);
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: {
+          id: parseInt(id),
+        },
+      });
+    }
+    return await this.pdfService.generateInvoicePDF(
+      latestInvoice.data[0],
+      user,
+    );
   }
 }

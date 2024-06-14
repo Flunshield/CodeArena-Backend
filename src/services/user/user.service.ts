@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
 import { ResponseCreateUser, User } from '../../interfaces/userInterface';
 import { Dto } from '../../dto/Dto';
-import { PAGE_SIZE } from '../../constantes/contante';
 import { MailService } from '../../email/service/MailService';
 
 const prisma: PrismaClient = new PrismaClient();
@@ -138,6 +137,7 @@ export class UserService {
         lastName: user.lastName,
         firstName: user.firstName,
         titlesId: parseInt(String(user.titlesId)),
+        siren: user.siren,
       },
     });
 
@@ -194,18 +194,23 @@ export class UserService {
     }
   }
 
-  async getUsers(pageNumber: number) {
-    const offset = (pageNumber - 1) * PAGE_SIZE;
-
+  async getUsers(
+    pageNumber: number,
+    itemPerPage: number,
+    isEntreprise: string,
+  ) {
+    const offset = (pageNumber - 1) * itemPerPage;
+    const testEntreprise = isEntreprise === 'true' ? true : false;
     try {
       const users = await prisma.user.findMany({
-        take: PAGE_SIZE,
+        take: itemPerPage,
         skip: offset,
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          firstName: testEntreprise,
+          lastName: testEntreprise,
           userName: true,
+          email: testEntreprise,
           nbGames: true,
           userRanking: {
             include: {
@@ -222,23 +227,75 @@ export class UserService {
 
       // Trier les utilisateurs en fonction de la somme des points dans userRanking
       // Cela nécessite une récupération et un tri côté serveur/app, car Prisma ne gère pas encore le tri par relations multiples
-      return users.sort((a, b) => {
+      const userSorted = users.sort((a, b) => {
         const sumA = a.userRanking.reduce((acc, cur) => acc + cur.points, 0);
         const sumB = b.userRanking.reduce((acc, cur) => acc + cur.points, 0);
         return sumB - sumA; // Pour un tri décroissant
       });
+
+      const countUser = await prisma.user.count();
+
+      return { item: userSorted, total: countUser };
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs :', error);
       throw error;
     }
   }
 
-  async getUsersByUserName(pageNumber: number, userNameSubstring) {
+  async getUserById(id: number) {
     try {
-      const offset = (pageNumber - 1) * PAGE_SIZE;
+      const user = await prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          Histories: true,
+          groups: true,
+          commandeEntreprise: {
+            take: 1, // Limite à un seul enregistrement
+            orderBy: {
+              dateCommande: 'desc', // Trie par dateCommande décroissante pour obtenir la dernière commande
+            },
+          },
+          titles: {
+            select: {
+              id: true,
+              label: true,
+              value: true,
+            },
+          },
+          userRanking: true,
+          userTournament: true,
+          userEvent: true,
+          // Pour inclure les champs du modèle `user`
+          _count: {
+            select: {
+              userRanking: true,
+              userTournament: true,
+              userEvent: true,
+            },
+          },
+        },
+      });
+      if (user) {
+        delete user.password;
+      }
+      return user;
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur :", error);
+      throw error;
+    }
+  }
+
+  async getUsersByUserName(
+    userNameSubstring: string,
+    itemPerPage: number,
+    isEntreprise: string,
+  ) {
+    try {
+      const testEntreprise = isEntreprise === 'true' ? true : false;
       const users = await prisma.user.findMany({
-        take: PAGE_SIZE,
-        skip: offset,
+        take: itemPerPage,
         where: {
           userName: {
             contains: userNameSubstring,
@@ -246,9 +303,10 @@ export class UserService {
         },
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          firstName: testEntreprise,
+          lastName: testEntreprise,
           userName: true,
+          email: testEntreprise,
           nbGames: true,
           userRanking: {
             include: {
@@ -262,7 +320,15 @@ export class UserService {
           },
         },
       });
-      return users;
+
+      const countUser = await prisma.user.count({
+        where: {
+          userName: {
+            contains: userNameSubstring,
+          },
+        },
+      });
+      return { item: users, total: countUser };
     } catch (error) {
       console.error(
         'Error fetching users with userName containing:',

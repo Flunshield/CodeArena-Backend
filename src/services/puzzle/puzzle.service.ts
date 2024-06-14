@@ -61,13 +61,23 @@ export class PuzzleService {
 
   async findPuzzles(id: string, page: number, limit: number = 4) {
     const offset = (page - 1) * limit;
-    return prisma.puzzlesEntreprise.findMany({
+    const countElement = await prisma.puzzlesEntreprise.count({
+      where: {
+        userID: parseInt(id)
+      }
+    });
+    const puzzleEntreprise = await prisma.puzzlesEntreprise.findMany({
       where: {
         userID: parseInt(id)
       },
       take: limit,
       skip: offset
     });
+
+    return {
+      item: puzzleEntreprise ?? [],
+      total: countElement
+    };
   }
 
   async updatePuzzlePartially(updatePuzzleDto: any) {
@@ -90,8 +100,8 @@ export class PuzzleService {
     }
   }
 
-  async deletePuzzle(id: string): Promise<any> {
-    const puzzleID = parseInt(id, 10);
+  async deletePuzzle(puzzleId: string): Promise<any> {
+    const puzzleID = parseInt(puzzleId, 10);
     try {
       return await prisma.puzzlesEntreprise.delete({
         where: { id: puzzleID }
@@ -173,7 +183,7 @@ export class PuzzleService {
 
   async getPuzzlePlaying(data, page: number, limit: number = 3) {
     const offset = (page - 1) * limit;
-    return prisma.puzzleSend.findMany({
+    const puzzle = await prisma.puzzleSend.findMany({
       where: {
         userID: data.userID,
         validated: true
@@ -184,6 +194,15 @@ export class PuzzleService {
       take: limit,
       skip: offset
     });
+
+    const countPuzzle = await prisma.puzzleSend.count({
+      where: {
+        userID: data.userID,
+        validated: true
+      }
+    });
+
+    return {item: puzzle, total: countPuzzle};
   }
 
   async countPuzzlesPlayed(id) {
