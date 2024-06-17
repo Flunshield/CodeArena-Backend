@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
+import { HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import {
   DecodedTokenMail,
@@ -134,15 +134,12 @@ export class AuthService {
             id: number;
           };
           if (decodedToken) {
-            new HttpException(
-              'Utilisateur déjà connecté',
-              HttpStatus.NOT_FOUND,
-            );
+            return HttpStatus.UNAUTHORIZED;
           } else {
-            new HttpException('Token erroné', HttpStatus.BAD_REQUEST);
+            return HttpStatus.BAD_REQUEST;
           }
         } catch (verifyError) {
-          new HttpException('Vérification erronée', HttpStatus.BAD_REQUEST);
+          return HttpStatus.BAD_REQUEST;
         }
       }
 
@@ -173,22 +170,13 @@ export class AuthService {
             }
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
-            new HttpException(
-              'Erreur sur la lecture de la clé privée',
-              HttpStatus.EXPECTATION_FAILED,
-            );
+            return HttpStatus.BAD_REQUEST;
           }
         } else {
-          new HttpException(
-            'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
-            HttpStatus.BAD_REQUEST,
-          );
+          return HttpStatus.BAD_REQUEST;
         }
       } else {
-        new HttpException(
-          'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
-          HttpStatus.BAD_REQUEST,
-        );
+        return HttpStatus.BAD_REQUEST;
       }
     } catch (error) {
       return HttpStatus.INTERNAL_SERVER_ERROR;

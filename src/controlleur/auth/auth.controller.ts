@@ -51,7 +51,7 @@ export class AuthController {
   async login(@Body() userLogin: shortUser, @Req() request, @Res() response) {
     try {
       const frenchCodeAreaCookie = request.cookies['frenchcodeareatoken'];
-      const reponse = await this.authService.connect(
+      const reponse: string | HttpStatus = await this.authService.connect(
         userLogin,
         response,
         frenchCodeAreaCookie,
@@ -59,7 +59,7 @@ export class AuthController {
       // Ajout du setTimeout pour les bruteForce sur la connexion.
       setTimeout(() => {
         // 500 = Il y a eu un problème lors de la connexion, on renvoie un NOT_FOUND pour ne pas donner d'information sur l'utilisateur.
-        if (reponse !== 500) {
+        if (typeof reponse === 'string') {
           return response.status(HttpStatus.OK).send({ message: reponse });
         } else {
           return response.status(HttpStatus.NOT_FOUND).send();
