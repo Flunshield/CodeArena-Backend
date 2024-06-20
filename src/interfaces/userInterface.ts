@@ -228,7 +228,7 @@ export interface CommandeEntreprise {
   dateCommande: Date;
   etatCommande: string;
   nbCreateTest: number;
-  customerId: string;
+  customerId?: string;
 }
 
 export interface PuzzlesEntreprise {

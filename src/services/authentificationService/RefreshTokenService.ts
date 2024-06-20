@@ -47,7 +47,7 @@ export class RefreshTokenService {
       const payload = { sub: userId };
       const options: SignOptions = {
         algorithm: 'RS256',
-        expiresIn: '7d',
+        expiresIn: '1d',
         header: { alg: 'RS256', typ: 'refresh' },
       };
       const refreshToken = sign(payload, privateKey, options);
@@ -107,38 +107,7 @@ export class RefreshTokenService {
         where: { id: parseInt(userId as string, 10) },
         select: {
           id: true,
-          userName: true,
-          password: false,
-          email: true,
-          emailVerified: true,
-          createdAt: true,
-          lastLogin: true,
-          status: true,
-          avatar: true,
-          firstName: true,
-          lastName: true,
-          groupsId: true,
-          languagePreference: true,
-          localisation: true,
-          company: true,
-          badgesWin: true,
-          url: true,
-          school: true,
-          github: true,
-          presentation: true,
-          Histories: true,
           groups: true,
-          siren: true,
-          titles: {
-            select: {
-              id: true,
-              label: true,
-              value: true,
-            },
-          },
-          userRanking: true,
-          userTournament: true,
-          userEvent: true,
         },
       });
 

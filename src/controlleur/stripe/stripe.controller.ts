@@ -61,14 +61,14 @@ export class StripeController {
         // Passer le customerId à la méthode de création de commande
         const status = await this.stripeService.createCommande(
           session,
-          data.user.data,
+          data.userId,
         );
         response.sendStatus(status);
       }
     }
     if (!session) {
       response.send(
-        await this.stripeService.createCommande('', data.user.data),
+        await this.stripeService.createCommande('', parseInt(data.userId)),
       );
     }
   }

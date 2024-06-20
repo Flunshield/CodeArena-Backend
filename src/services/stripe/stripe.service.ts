@@ -93,7 +93,7 @@ export class StripeService {
    * @throws {HttpException} Une erreur est levée si une erreur interne survient lors du processus de création de la commande.
    */
 
-  async createCommande(session, user: User) {
+  async createCommande(session, userId: number) {
     try {
       const nbCreateTest = PRODUCT.find((elem) => {
         return elem.id === (session ? session.line_items.data[0].price.id : '');
@@ -105,7 +105,7 @@ export class StripeService {
           objetSession: [session],
           idPayment: session.payment_intent ?? session.subscription,
           item: session.line_items.data[0].price.id ?? '',
-          userID: user.id,
+          userID: userId,
           customerId: session.customer,
           dateCommande: new Date(),
           etatCommande: session.payment_status,
@@ -113,6 +113,11 @@ export class StripeService {
         },
       });
       if (createCommand) {
+        const user = await prisma.user.findFirst({
+          where: {
+            id: userId,
+          },
+        });
         const userUpdate = await this.attributeEntrepriseRole(user);
         if (userUpdate) {
           const getInvoice: Promise<Buffer> = this.getLatestInvoice(
