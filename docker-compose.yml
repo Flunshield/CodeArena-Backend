@@ -5,7 +5,7 @@ services:
     image: mariadb:${MARIADBVERSION}
     container_name: mariadb
     environment:
-      MARIADB_ROOT_PASSWORD: admin
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MARIADB}
     ports:
       - ${MARIADB_PORTS}:3306
