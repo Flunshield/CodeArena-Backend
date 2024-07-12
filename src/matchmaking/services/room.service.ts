@@ -113,7 +113,7 @@ export class RoomService {
         time: matchDuration.toString(),
         location: roomId,
         status: 'Completed',
-        score: '0-0', //TODO: Implement score calculation
+        score: `(${points.winnerPoints}) / (${points.loserPoints})`,
         tournamentID: null,
         rankingsID: winnerRankingsId,
         eventsID: null,
