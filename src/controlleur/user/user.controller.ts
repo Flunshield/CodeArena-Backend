@@ -2,6 +2,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -197,6 +198,72 @@ export class UserController {
         response.send({ message: 'Aucune commande trouvée' });
       } else {
         response.send(lastCommande);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Post('createCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async createCv(@Body() data: any, @Req() request, @Res() response) {
+    try {
+      const nbCv = await this.userService.getNbCv(data.data.userId);
+      if(nbCv <= 4) {
+      const createCv = await this.userService.createCv(data.data);
+      if (createCv) {
+      response.send(createCv);
+      }
+    } else {
+      response.send({message: 'Vous avez atteint le nombre maximal de cv', status: 400});
+    }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('getCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getCv(@Query('id') id: string, @Req() request, @Res() response) {
+    try {
+      const cv = await this.userService.getCv(id);
+      if(cv) {
+        response.send(cv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Delete('deleteCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async deleteCv(@Req() request, @Res() response, @Body() data: any) {
+    try {
+      const deleteCv = await this.userService.deleteCv(data.idElementToDelete, data.userId);
+      if(deleteCv) {
+        response.send(deleteCv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('pdfCvUser')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async cvUser(@Query('id') id: string, @Query('idCv') idCv: string, @Req() request, @Res() response) {
+    try {
+      const cv = await this.userService.generateCvPDF(id, idCv);
+      if(cv) {
+        response.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'Content-Disposition; filename=invoice.pdf',
+          'Content-Length': cv.length,
+        });
+        response.end(cv);
       }
     } catch (error) {
       console.log(error);

@@ -47,7 +47,7 @@ services:
       - mariadb
     volumes:
       - ./src:/usr/src/app/src
-      - ./prisma/migrations:/usr/src/app/prisma/migrations
+      - ./prisma:/usr/src/app/prisma
     command: npm run start:dev
 
 #   networks:

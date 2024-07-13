@@ -238,3 +238,44 @@ export interface PuzzlesEntreprise {
   tests: JSON;
   details: string;
 }
+
+export interface CvUser {
+  id: number;
+  cvName: string;
+  userID: number;
+  user: User;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  summary: string;
+  experiences: Experience[];
+  educations: Education[];
+  technicalSkills: TechnicalSkill[];
+  softSkills: SoftSkill[];
+}
+
+interface Experience {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+}
+
+interface Education {
+  institution: string;
+  degree: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+}
+
+export interface TechnicalSkill {
+  name: string;
+}
+
+export interface SoftSkill {
+  name: string;
+}

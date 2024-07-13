@@ -42,6 +42,7 @@ model user {
   puzzlesEntreprise  puzzlesEntreprise[]
   puzzleSend         puzzleSend[]
   siren              String?
+  cvUser             cvUser[]
 }
 
 model Title {
@@ -219,4 +220,22 @@ model puzzleSend {
   result              Json?
   testValidated       Int?
   time                String?
+}
+
+model cvUser {
+  id                  Int               @id @default(autoincrement())
+  cvName              String?
+  userID              Int
+  user                user              @relation(fields: [userID], references: [id])
+  firstName           String?
+  lastName            String?
+  email               String?
+  phone               String?
+  address             String?
+  summary             String?
+  experiences         Json?
+  educations          Json?
+  technicalSkills     Json?
+  softSkills          Json?
+  activate            Boolean?    @default(false)
 }

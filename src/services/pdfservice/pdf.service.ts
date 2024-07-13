@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import * as PDFDocument from 'pdfkit';
-import { User } from 'src/interfaces/userInterface';
+import { CvUser, SoftSkill, TechnicalSkill, User } from 'src/interfaces/userInterface';
+import * as fs from 'fs';
 
 @Injectable()
 export class PdfService {
@@ -168,5 +169,188 @@ export class PdfService {
     });
 
     doc.moveDown(table.length * 0.5);
+  }
+
+  async generateCvPDF(cv: CvUser): Promise<Buffer> {
+    return await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        margin: 50,
+        bufferPages: true,
+      });
+
+      // Colors
+      const primaryColor = '#3498db';
+      const secondaryColor = '#2ecc71';
+      const textColor = '#333333';
+
+      // Load your logo image
+      const logoPath = 'src/images/logo.png'; // Replace with your actual logo path
+      const logoBuffer = fs.readFileSync(logoPath);
+ 
+      // Add logo to the PDF
+      doc.image(logoBuffer, {
+        fit: [100, 100], // Adjust width and height as needed
+        align: 'center',
+        valign: 'center', // or 'bottom'
+      });
+
+      // Title
+      doc
+        .fillColor(primaryColor)
+        .font('Helvetica-Bold')
+        .fontSize(26)
+        .text('Curriculum Vitae', { align: 'center' })
+        .moveDown(2);
+
+      // Personal Information
+      this.drawPersonalInfo(doc, cv, primaryColor, textColor);
+      // Summary
+      if (cv.summary) {
+        this.drawSectionTitle(doc, 'Résumé', secondaryColor);
+        this.drawSummary(doc, cv.summary, textColor);
+      }
+
+      // Experiences
+      if (cv.experiences.length > 0) {
+        this.drawSectionTitle(doc, cv.experiences.length > 1 ? 'Expériences' : 'Expérience', secondaryColor);
+        this.drawExperiences(doc, cv.experiences, textColor);
+      }
+
+      // Educations
+      if (cv.educations.length > 0) {
+        this.drawSectionTitle(doc, cv.educations.length > 1 ? 'Formations' : 'Formation', secondaryColor);
+        this.drawEducations(doc, cv.educations, textColor);
+      }
+
+      // Technical Skills
+      if (cv.technicalSkills.length > 0) {
+        this.drawSectionTitle(doc, cv.technicalSkills.length > 1 ? 'Compétences techniques' : 'Compétence technique', secondaryColor);
+        this.drawTechnicalSkills(doc, cv.technicalSkills, textColor);
+      }
+
+      // Soft Skills
+      if (cv.softSkills.length > 0) {
+        this.drawSectionTitle(doc, cv.softSkills.length > 1 ? 'Compétences humaines' : 'Compétence humaine', secondaryColor);
+        this.drawSoftSkills(doc, cv.softSkills, textColor);
+      }
+
+      doc.end();
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+    });
+  }
+
+  private drawPersonalInfo(doc, cv, primaryColor, textColor) {
+    doc
+      .fillColor(primaryColor)
+      .font('Helvetica-Bold')
+      .fontSize(14)
+      .text(`${cv.firstName} ${cv.lastName}`, { align: 'center' })
+      .moveDown(1);
+
+    doc
+      .fillColor(textColor)
+      .font('Helvetica')
+      .fontSize(10)
+      .text(`Email: ${cv.email}`, { align: 'center' })
+      .text(`Phone: ${cv.phone}`, { align: 'center' })
+      .text(`Address: ${cv.address}`, { align: 'center' })
+      .moveDown(2);
+  }
+
+  private drawSectionTitle(doc, title, color) {
+    doc
+      .fillColor(color)
+      .font('Helvetica-Bold')
+      .fontSize(18)
+      .text(title, { align: 'left' })
+      .moveDown(1)
+      .strokeColor(color)
+      .lineWidth(2)
+      .moveTo(doc.x, doc.y)
+      .lineTo(doc.page.width - doc.page.margins.right, doc.y)
+      .stroke()
+      .moveDown(2);
+  }
+
+  private drawExperiences(doc, experiences, textColor) {
+    experiences.forEach(exp => {
+      if(exp.position !== "") {
+      doc
+        .fillColor(textColor)
+        .font('Helvetica-Bold')
+        .fontSize(12)
+        .text(exp.position, { continued: true })
+        .font('Helvetica')
+        .text(` at ${exp.company}`)
+        .font('Helvetica')
+        .fontSize(10)
+        .text(`From: ${exp.startDate} To: ${exp.endDate}`)
+        .moveDown(0.5)
+        .text(exp.description)
+        .moveDown(1.5);
+      }
+    });
+  }
+
+  private drawEducations(doc, educations, textColor) {
+    educations.forEach(edu => {
+      if(edu.degree !== "") {
+      doc
+        .fillColor(textColor)
+        .font('Helvetica-Bold')
+        .fontSize(12)
+        .text(edu.degree, { continued: true })
+        .font('Helvetica')
+        .text(` at ${edu.institution}`)
+        .font('Helvetica')
+        .fontSize(10)
+        .text(`From: ${edu.startDate} To: ${edu.endDate}`)
+        .moveDown(0.5)
+        .text(edu.description)
+        .moveDown(1.5);
+      }
+    });
+  }
+
+  private drawTechnicalSkills(doc: any, technicalSkills: TechnicalSkill[], textColor: string) {
+    technicalSkills.forEach((skill, index) => {
+      if(skill.name !== "") {
+      doc
+        .fillColor(textColor)
+        .font('Helvetica-Bold')
+        .fontSize(12)
+        .text('Compétence ' + (index + 1) + ' : ' + skill.name)
+        .moveDown(2);
+    }
+  });
+  }
+  
+  private drawSoftSkills(doc: any, softSkills: SoftSkill[], textColor: string) {
+    softSkills.forEach((skill, index) => {
+      if(skill.name !== "") {
+      doc
+        .fillColor(textColor)
+        .font('Helvetica-Bold')
+        .fontSize(12)
+        .text('Compétence ' + (index + 1) + ' : ' + skill.name)
+        .moveDown(2);
+      }
+    });
+  }
+
+  private drawSummary(doc, summary, textColor) {
+    doc
+      .fillColor(textColor)
+      .font('Helvetica')
+      .fontSize(12)
+      .text(summary)
+      .moveDown(2);
   }
 }

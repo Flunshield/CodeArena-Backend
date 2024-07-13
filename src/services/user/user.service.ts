@@ -1,9 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
-import { ResponseCreateUser, User } from '../../interfaces/userInterface';
+import {
+  CvUser,
+  ResponseCreateUser,
+  User,
+} from '../../interfaces/userInterface';
 import { Dto } from '../../dto/Dto';
 import { MailService } from '../../email/service/MailService';
+import { PdfService } from '../pdfservice/pdf.service';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -26,7 +31,10 @@ const prisma: PrismaClient = new PrismaClient();
  */
 @Injectable()
 export class UserService {
-  constructor(private readonly mailService: MailService) {}
+  constructor(
+    private readonly mailService: MailService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   /**
    * Crée un nouvel utilisateur avec des vérifications d'existence et hachage sécurisé du mot de passe.
@@ -495,5 +503,102 @@ export class UserService {
     } else {
       return [];
     }
+  }
+
+  async createCv(data: any) {
+    const userExist = await prisma.user.findFirst({
+      where: {
+        id: data.id,
+      },
+    });
+
+    if (userExist) {
+      try {
+        const createCv = await prisma.cvUser.create({
+          data: {
+            userID: data.id,
+            cvName: data.cvName,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+            summary: data.summary,
+            experiences: data.experiences,
+            educations: data.educations,
+            softSkills: data.softSkills,
+            technicalSkills: data.technicalSkills,
+            activate: data.activated ?? false,
+          },
+        });
+        if (createCv) {
+          return HttpStatus.CREATED;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la création du CV :', error);
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  }
+
+  async getCv(id: string) {
+    const cv: any[] = await prisma.cvUser.findMany({
+      where: {
+        userID: parseInt(id),
+      },
+    });
+    if (cv) {
+      return cv;
+    } else {
+      return [];
+    }
+  }
+
+  async getNbCv(userId: any) {
+    const nbCv = await prisma.cvUser.count({
+      where: {
+        userID: userId,
+      },
+    });
+    return nbCv;
+  }
+
+  async deleteCv(idElementToDelete: any, userId: any) {
+    const cvExist = await prisma.cvUser.findFirst({
+      where: {
+        id: idElementToDelete,
+        userID: userId,
+      },
+    });
+
+    if (cvExist) {
+      try {
+        const deleteCv = await prisma.cvUser.delete({
+          where: {
+            id: idElementToDelete,
+          },
+        });
+        if (deleteCv) {
+          return HttpStatus.OK;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la suppression du CV :', error);
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  }
+
+  async generateCvPDF(id: string, idCv: string) {
+    const cv = await prisma.cvUser.findFirst({
+      where: {
+        id: parseInt(idCv),
+        userID: parseInt(id),
+      },
+    });
+    return await this.pdfService.generateCvPDF(cv as unknown as CvUser);
   }
 }
