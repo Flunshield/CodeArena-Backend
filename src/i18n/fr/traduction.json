@@ -284,5 +284,7 @@
   "createCv": "Créer un CV",
   "visualiser": "Visualiser",
   "action": "Action",
-  "voscvs": "Vos CVs"
+  "voscvs": "Vos CVs",
+  "cvActivated": "CV activé",
+  "cvDesactived": "CV désactivé"
 }

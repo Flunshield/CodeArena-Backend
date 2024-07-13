@@ -269,4 +269,18 @@ export class UserController {
       console.log(error);
     }
   }
+
+  @Post('activateCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async activateCv(@Body() data: any, @Req() request, @Res() response) {
+    try {
+      const activateCv = await this.userService.activateCv(data.data.idElementToActivate, data.data.userId);
+      if(activateCv) {
+        response.send(activateCv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

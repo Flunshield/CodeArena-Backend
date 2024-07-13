@@ -601,4 +601,47 @@ export class UserService {
     });
     return await this.pdfService.generateCvPDF(cv as unknown as CvUser);
   }
+
+  async activateCv(idCv: any, userId: any) {
+    const cvExist = await prisma.cvUser.findFirst({
+      where: {
+        id: idCv,
+        userID: userId,
+      },
+    });
+
+    if (cvExist) {
+      try {
+        const desactivAllCv = await prisma.cvUser.updateMany({
+          where: {
+            userID: userId,
+          },
+          data: {
+            activate: false,
+          },
+        });
+
+        if (desactivAllCv && cvExist.activate === false) {
+          const activateCv = await prisma.cvUser.update({
+            where: {
+              id: idCv,
+            },
+            data: {
+              activate: true,
+            },
+          });
+          if (activateCv) {
+            return HttpStatus.OK;
+          }
+        } else {
+          return HttpStatus.ACCEPTED;
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'activation du CV :", error);
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  }
 }
