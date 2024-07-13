@@ -118,4 +118,31 @@ export class EntrepriseController {
   ) {
     return await this.entrepriseService.getAllCommandeForUser(id, page);
   }
+
+  @Get('pdfCvUser')
+  @Roles(ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async cvUser(
+    @Query('id') id: string,
+    @Query('idCv') idCv: string,
+    @Req() request,
+    @Res() response,
+  ) {
+    try {
+      const cv = await this.entrepriseService.generateCvPDFForEntreprise(
+        id,
+        idCv,
+      );
+      if (cv) {
+        response.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'Content-Disposition; filename=invoice.pdf',
+          'Content-Length': cv.length,
+        });
+        response.end(cv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

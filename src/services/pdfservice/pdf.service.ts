@@ -251,7 +251,7 @@ export class PdfService {
       .fillColor(primaryColor)
       .font('Helvetica-Bold')
       .fontSize(14)
-      .text(`${cv.firstName} ${cv.lastName}`, { align: 'center' })
+      .text(`${cv.firstName ?? ""} ${cv.lastName ?? ""}`, { align: 'center' })
       .moveDown(1);
 
     doc

@@ -219,6 +219,16 @@ export class UserService {
           lastName: testEntreprise,
           userName: true,
           email: testEntreprise,
+          cvUser: testEntreprise
+            ? {
+                select: {
+                  id: true,
+                },
+                where: {
+                  activate: true, // Condition pour sélectionner uniquement activate === true
+                },
+              }
+            : undefined, // Si testEntreprise est faux, exclure cvUser
           nbGames: true,
           userRanking: {
             include: {
@@ -592,13 +602,22 @@ export class UserService {
     }
   }
 
-  async generateCvPDF(id: string, idCv: string) {
-    const cv = await prisma.cvUser.findFirst({
-      where: {
-        id: parseInt(idCv),
-        userID: parseInt(id),
-      },
-    });
+  async generateCvPDF(id: string, idCv: string, isEntreprise: boolean) {
+    let cv;
+    if (isEntreprise) {
+      cv = await prisma.cvUser.findFirst({
+        where: {
+          id: parseInt(idCv),
+        },
+      });
+    } else {
+      cv = await prisma.cvUser.findFirst({
+        where: {
+          id: parseInt(idCv),
+          userID: parseInt(id),
+        },
+      });
+    }
     return await this.pdfService.generateCvPDF(cv as unknown as CvUser);
   }
 

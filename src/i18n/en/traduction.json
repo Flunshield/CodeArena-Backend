@@ -287,5 +287,8 @@
   "action": "Action",
   "voscvs": "Vos CVs",
   "cvActivated": "CV activated",
-  "cvDesactived": "CV desactivated"
+  "cvDesactived": "CV desactivated",
+  "listUtilisateurs": "List of users",
+  "Cv": "CV",
+  "getCv": "Get CV"
 }
