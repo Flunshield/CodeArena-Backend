@@ -164,6 +164,15 @@ export class AuthService {
             const tokenGenerated =
               await this.refreshTokenService.generateRefreshToken(user.id, res);
             if (tokenGenerated) {
+              await prisma.user.update({
+                where: {
+                  id: user.id,
+                  userName: user.userName,
+                },
+                data: {
+                  lastLogin: new Date(),
+                },
+              });
               return await this.refreshTokenService.generateAccessTokenFromRefreshToken(
                 tokenGenerated,
               );

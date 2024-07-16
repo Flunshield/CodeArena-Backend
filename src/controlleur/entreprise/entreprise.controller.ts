@@ -142,7 +142,7 @@ export class EntrepriseController {
         response.end(cv);
       }
     } catch (error) {
-      console.log(error);
+      response.status(500).send('Error generating CV');
     }
   }
 }

@@ -357,6 +357,45 @@ export class UserService {
     }
   }
 
+  async getUserByUserName(username: string) {
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          userName: username,
+        },
+        include: {
+          Histories: true,
+          groups: true,
+          titles: {
+            select: {
+              id: true,
+              label: true,
+              value: true,
+            },
+          },
+          userRanking: true,
+          userTournament: true,
+          userEvent: true,
+          _count: {
+            select: {
+              userRanking: true,
+              userTournament: true,
+              userEvent: true,
+            },
+          },
+        },
+      });
+
+      if (user) {
+        delete user.password;
+        return user;
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur :", error);
+      throw error;
+    }
+  }
+
   /**
    * Récupère les informations sur un utilisateur classé spécifique en fonction de son nom d'utilisateur.
    *

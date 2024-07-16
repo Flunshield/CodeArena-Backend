@@ -289,5 +289,13 @@
   "cvDesactived": "CV désactivé",
   "listUtilisateurs": "Liste des utilisateurs",
   "Cv": "CV",
-  "getCv": "Voir CV"
+  "getCv": "Voir CV",
+  "gitHub": "GitHub",
+  "school": "École",
+  "company": "Entreprise",
+  "localisation": "Adresse",
+  "lastLogin": "Dernière connexion",
+  "urlWebsite": "Site web",
+  "userInfos": "Informations de l'utilisateur",
+  "noRenseignement": "Aucun renseignement"
 }

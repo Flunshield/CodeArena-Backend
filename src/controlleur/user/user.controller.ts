@@ -117,10 +117,17 @@ export class UserController {
   @Get('/getUser')
   @Roles(USER, ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
-  async getUser(@Query('id') id: string, @Req() request, @Res() response) {
+  async getUser(@Query('id') id: string, @Query('isEntreprise') isEntreprise: string, @Query('username') username: string,  @Req() request, @Res() response) {
     try {
+      const testEntreprise = isEntreprise === 'true' ? true : false;
+
+      if(testEntreprise) {
+        const user = await this.userService.getUserByUserName(username.toString());
+        response.send(user);
+      } else {
       const user = await this.userService.getUserById(parseInt(id));
       response.send(user);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -260,7 +267,7 @@ export class UserController {
       if(cv) {
         response.set({
           'Content-Type': 'application/pdf',
-          'Content-Disposition': 'Content-Disposition; filename=invoice.pdf',
+          'Content-Disposition': 'Content-Disposition; filename=cv.pdf',
           'Content-Length': cv.length,
         });
         response.end(cv);
