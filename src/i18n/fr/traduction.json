@@ -297,5 +297,8 @@
   "lastLogin": "Dernière connexion",
   "urlWebsite": "Site web",
   "userInfos": "Informations de l'utilisateur",
-  "noRenseignement": "Aucun renseignement"
+  "noRenseignement": "Aucun renseignement",
+  "elementPerPage": "Éléments par page",
+  "technologiePreference": "Préférence de technologie",
+  "all": "Tous"
 }

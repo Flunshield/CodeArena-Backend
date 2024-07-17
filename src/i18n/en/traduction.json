@@ -298,5 +298,8 @@
   "lastLogin": "Last login",
   "urlWebsite": "Website",
   "userInfos": "User information",
-  "noRenseignement": "No information"
+  "noRenseignement": "No information",
+  "elementPerPage": "Elements per page",
+  "technologiePreferences": "Preferred technologies",
+  "all": "All"
 }

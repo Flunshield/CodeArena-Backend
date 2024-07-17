@@ -146,6 +146,7 @@ export class UserService {
         firstName: user.firstName,
         titlesId: parseInt(String(user.titlesId)),
         siren: user.siren,
+        languagePreference: user.languagePreference,
       },
     });
 
@@ -206,6 +207,7 @@ export class UserService {
     pageNumber: number,
     itemPerPage: number,
     isEntreprise: string,
+    languagePreference: string,
   ) {
     const offset = (pageNumber - 1) * itemPerPage;
     const testEntreprise = isEntreprise === 'true' ? true : false;
@@ -213,12 +215,21 @@ export class UserService {
       const users = await prisma.user.findMany({
         take: itemPerPage,
         skip: offset,
+        where: {
+          // Si testEntreprise est vrai, on cherche les utilisateurs avec les préférences de langue spécifiées si elles existent
+          languagePreference: testEntreprise
+            ? languagePreference === 'all'
+              ? undefined
+              : languagePreference
+            : undefined,
+        },
         select: {
           id: true,
           firstName: testEntreprise,
           lastName: testEntreprise,
           userName: true,
           email: testEntreprise,
+          languagePreference: testEntreprise,
           cvUser: testEntreprise
             ? {
                 select: {
@@ -251,7 +262,12 @@ export class UserService {
         return sumB - sumA; // Pour un tri décroissant
       });
 
-      const countUser = await prisma.user.count();
+      const countUser = await prisma.user.count({
+        where: {
+          languagePreference:
+            languagePreference === 'all' ? undefined : languagePreference,
+        },
+      });
 
       return { item: userSorted, total: countUser };
     } catch (error) {
