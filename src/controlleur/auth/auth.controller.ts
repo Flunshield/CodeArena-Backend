@@ -110,10 +110,7 @@ export class AuthController {
         response.send({ accessToken: accessToken });
       }
     } catch (error: any) {
-      throw new HttpException(
-        `Merci de vous authentifier ${refreshToken}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      response.send({ message: 'Unauthorized' });
     }
   }
 

@@ -137,7 +137,6 @@ export class UserController {
   @Roles(USER, ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
   async update(@Body() user: User): Promise<HttpException> {
-    console.log(user);
     const response = await this.userService.update(user);
     if (response === HttpStatus.OK) {
       // Si la création réussi, on envoie un code HTTP 200.
