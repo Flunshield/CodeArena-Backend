@@ -300,5 +300,6 @@
   "noRenseignement": "Aucun renseignement",
   "elementPerPage": "Éléments par page",
   "technologiePreference": "Préférence de technologie",
-  "all": "Tous"
+  "all": "Tous",
+  "perMonth": "par mois"
 }
