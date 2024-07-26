@@ -45,20 +45,21 @@ export class EntrepriseService {
     }
   }
 
-  async generateCvPDFForEntreprise(id: string, idCv: string) {
+  async generateCvPDFForEntreprise(id: string, userId: string) {
     const isEntreprise = await prisma.user.findFirst({
       where: { id: parseInt(id as string, 10) },
       select: {
         groups: true,
       },
     });
-
-    if (isEntreprise.groups.roles === ENTREPRISE) {
-      try {
-        return await this.userService.generateCvPDF(id, idCv, true);
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      return await this.userService.generateCvPDF(
+        id,
+        isEntreprise.groups.roles === ENTREPRISE,
+        userId,
+      );
+    } catch (error) {
+      console.log(error);
     }
   }
 }

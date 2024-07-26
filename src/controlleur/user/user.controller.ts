@@ -263,7 +263,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   async cvUser(@Query('id') id: string, @Query('idCv') idCv: string, @Req() request, @Res() response) {
     try {
-      const cv = await this.userService.generateCvPDF(id, idCv, false);
+      const cv = await this.userService.generateCvPDF(id, false, "", idCv);
       if(cv) {
         response.set({
           'Content-Type': 'application/pdf',

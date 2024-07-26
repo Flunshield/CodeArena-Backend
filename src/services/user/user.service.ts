@@ -657,12 +657,18 @@ export class UserService {
     }
   }
 
-  async generateCvPDF(id: string, idCv: string, isEntreprise: boolean) {
+  async generateCvPDF(
+    id: string,
+    isEntreprise: boolean,
+    userId?: string,
+    idCv?: string,
+  ) {
     let cv;
     if (isEntreprise) {
       cv = await prisma.cvUser.findFirst({
         where: {
-          id: parseInt(idCv),
+          userID: parseInt(userId),
+          activate: true,
         },
       });
     } else {

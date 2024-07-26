@@ -124,14 +124,14 @@ export class EntrepriseController {
   @UseGuards(RolesGuard)
   async cvUser(
     @Query('id') id: string,
-    @Query('idCv') idCv: string,
+    @Query('userId') userId: string,
     @Req() request,
     @Res() response,
   ) {
     try {
       const cv = await this.entrepriseService.generateCvPDFForEntreprise(
         id,
-        idCv,
+        userId,
       );
       if (cv) {
         response.set({
