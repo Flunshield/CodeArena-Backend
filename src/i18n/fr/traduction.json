@@ -301,5 +301,6 @@
   "elementPerPage": "Éléments par page",
   "technologiePreference": "Préférence de technologie",
   "all": "Tous",
-  "perMonth": "par mois"
+  "perMonth": "par mois",
+  "selectTimer": "Sélectionner le temps"
 }

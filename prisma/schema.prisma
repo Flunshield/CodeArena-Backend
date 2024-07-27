@@ -203,6 +203,7 @@ model puzzlesEntreprise {
   details    String
   puzzleSend puzzleSend[]
   title      String
+  time       String       @default("600")
 }
 
 model puzzleSend {

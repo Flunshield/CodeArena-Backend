@@ -42,13 +42,16 @@ export class PuzzleService {
       const userID = parseInt(data.user.id, 10);
       const tests =
         typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
+      const time = data.time.toString();
+
       try {
         return await prisma.puzzlesEntreprise.create({
           data: {
             userID: userID,
             tests: tests,
             details: data.details,
-            title: data.title
+            title: data.title,
+            time: time
           }
         });
       } catch (e) {
@@ -83,6 +86,8 @@ export class PuzzleService {
   async updatePuzzlePartially(updatePuzzleDto: any) {
     const data = updatePuzzleDto.data;
     const puzzleID = parseInt(data.id, 10);
+    const time = data.time.toString();
+
     try {
       return await prisma.puzzlesEntreprise.update({
         where: {
@@ -91,7 +96,8 @@ export class PuzzleService {
         data: {
           tests: data.tests,
           details: data.details,
-          title: data.title
+          title: data.title,
+          time: time
         }
       });
     } catch (e) {
