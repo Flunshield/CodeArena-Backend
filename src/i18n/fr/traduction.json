@@ -302,5 +302,7 @@
   "technologiePreference": "Préférence de technologie",
   "all": "Tous",
   "perMonth": "par mois",
-  "selectTimer": "Sélectionner le temps"
+  "selectTimer": "Sélectionner le temps",
+  "presentationUpdated": "Présentation mise à jour",
+  "errorPresentationUpdated": "Erreur lors de la mise à jour de la présentation"
 }

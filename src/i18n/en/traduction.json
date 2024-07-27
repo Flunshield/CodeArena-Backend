@@ -303,5 +303,7 @@
   "technologiePreferences": "Preferred technologies",
   "all": "All",
   "perMonth": "per month",
-  "selectTimer": "Select a time"
+  "selectTimer": "Select a time",
+  "presentationUpdated": "Presentation updated",
+  "errorPresentationUpdated": "Error updating presentation"
 }
