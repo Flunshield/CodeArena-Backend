@@ -304,5 +304,7 @@
   "perMonth": "par mois",
   "selectTimer": "Sélectionner le temps",
   "presentationUpdated": "Présentation mise à jour",
-  "errorPresentationUpdated": "Erreur lors de la mise à jour de la présentation"
+  "errorPresentationUpdated": "Erreur lors de la mise à jour de la présentation",
+  "actionSuccess": "Action effectué avec succès",
+  "actionError": "Action échoué"
 }

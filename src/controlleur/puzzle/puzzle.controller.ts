@@ -115,4 +115,21 @@ export class PuzzleController {
     }
   }
 
+  @Post("/validatePuzzleSend")
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async validatePuzzleSend(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.validatePuzzleSend(data.data);
+      if (result) {
+        response.send(result);
+      } else {
+        response.status(HttpStatus.NOT_FOUND).send("Puzzle not found");
+      }
+    } catch (error) {
+      console.error(error);
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Internal Server Error");
+    }
+  }
+
 }

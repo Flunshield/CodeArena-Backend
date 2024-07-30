@@ -226,6 +226,41 @@ export class PuzzleService {
       }
     });
   }
+
+  async validatePuzzleSend(data) {
+    const puzzleID = parseInt(data.puzzleId, 10);
+    try {
+      // Récupérer la valeur actuelle de 'verified'
+      const currentPuzzle = await prisma.puzzleSend.findUnique({
+        where: {
+          id: puzzleID
+        },
+        select: {
+          verified: true
+        }
+      });
+  
+      if (!currentPuzzle) {
+        throw new Error(`Puzzle with ID ${puzzleID} not found`);
+      }
+  
+      // Inverser la valeur de 'verified'
+      const newVerifiedStatus = !currentPuzzle.verified;
+  
+      // Mettre à jour la colonne 'verified' avec la valeur inversée
+      return await prisma.puzzleSend.update({
+        where: {
+          id: puzzleID
+        },
+        data: {
+          verified: newVerifiedStatus
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 function formatPuzzleData(puzzle) {

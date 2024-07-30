@@ -305,5 +305,7 @@
   "perMonth": "per month",
   "selectTimer": "Select a time",
   "presentationUpdated": "Presentation updated",
-  "errorPresentationUpdated": "Error updating presentation"
+  "errorPresentationUpdated": "Error updating presentation",
+  "actionSuccess": "Action successful",
+  "actionError": "Action failed",
 }

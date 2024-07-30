@@ -218,6 +218,7 @@ model puzzleSend {
   email               String
   commentaire         String
   validated           Boolean           @default(false)
+  verified            Boolean           @default(false)
   result              Json?
   testValidated       Int?
   time                String?
