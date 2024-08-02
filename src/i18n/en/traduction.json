@@ -307,5 +307,5 @@
   "presentationUpdated": "Presentation updated",
   "errorPresentationUpdated": "Error updating presentation",
   "actionSuccess": "Action successful",
-  "actionError": "Action failed",
+  "actionError": "Action failed"
 }
