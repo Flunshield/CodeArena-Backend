@@ -251,6 +251,20 @@ export class PuzzleService {
     });
   }
 
+  async countPuzzleSendInMonth(id: string): Promise<number> {
+    // Obtenir la date du premier jour du mois en cours
+    const firstDayOfMonth = new Date();
+    firstDayOfMonth.setDate(1);
+    return await prisma.puzzleSend.count({
+        where: {
+            userID: parseInt(id),
+            sendDate: {
+                gte: firstDayOfMonth,
+            },
+        },
+    });
+}
+
   async validatePuzzleSend(data) {
     const puzzleID = parseInt(data.puzzleId, 10);
     try {

@@ -132,4 +132,17 @@ export class PuzzleController {
     }
   }
 
+  @Get('/countPuzzleSendInMonth')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async countPuzzleSendInMonth(@Query('id') id: string, @Res() response) {
+    try {
+      const result = await this.puzzleService.countPuzzleSendInMonth(id);
+      response.status(HttpStatus.OK).json({ count: result });
+    } catch (error) {
+      console.error(error);
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Internal Server Error');
+    }
+  }
+
 }

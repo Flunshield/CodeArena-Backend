@@ -724,4 +724,36 @@ export class UserService {
       return [];
     }
   }
+
+  async getRoleUser(id: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+      select: {
+        groupsId: true,
+      },
+    });
+    return user.groupsId;
+  }
+
+  async getIfUSerCanSendMailEntreprise(user) {
+    const id = user.userID ?? '';
+    const nbMailSend = await prisma.puzzleSend.count({
+      where: {
+        userID: parseInt(id),
+        sendDate: {
+          gte: new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0)),
+        },
+      },
+    });
+
+    const lastCommande: any = await this.getLastCommande(id);
+
+    if (nbMailSend < lastCommande.nbCreateTest) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

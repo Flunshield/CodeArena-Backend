@@ -110,14 +110,14 @@
   "identificationTalentDescription": "Découvrez et engagez les meilleurs développeurs en observant leurs performances dans des défis de programmation en temps réel.",
   "essentiel": "Essentiel",
   "essentielDesciption": "Profitez de notre offre gratuite pour démarrer",
-  "essentielFeature1": "10 tests annuels",
+  "essentielFeature1": "10 tests par mois",
   "essentielFeature2": "Accès à une sélection de défis",
   "essentielFeature3": "Support de base par e-mail",
   "essentielIdeaFor": "Parfait pour les petites équipes et les débutants qui veulent explorer Coding Game.",
   "price": "Gratuit",
   "premium": "Premium",
   "premiumDescription": "Débloquez des fonctionnalités avancées pour un prix abordable",
-  "premiumFeature1": "100 tests annuels",
+  "premiumFeature1": "100 tests par mois",
   "premiumFeature2": "Accès à une plus grande variété de défis",
   "premiumFeature3": "Support prioritaire par e-mail",
   "premiumFeature4": "Statistiques détaillées sur les performances",
@@ -308,5 +308,6 @@
   "actionSuccess": "Action effectué avec succès",
   "actionError": "Action échoué",
   "allTitles": "Tous les titres",
-  "statusOfVerification": "Statut de Vérification"
+  "statusOfVerification": "Statut de Vérification",
+  "nbTestSend": "Nombre de test envoyé"
 }

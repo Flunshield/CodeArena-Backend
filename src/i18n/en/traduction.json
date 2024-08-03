@@ -118,7 +118,7 @@
   "price": "Free",
   "premium": "Premium",
   "premiumDescription": "Unlock advanced features for an affordable price",
-  "premiumFeature1": "100 annual tests",
+  "premiumFeature1": "100 tests per month",
   "premiumFeature2": "Access to a wider variety of challenges",
   "premiumFeature3": "Priority email support",
   "premiumFeature4": "Detailed performance statistics",
@@ -309,5 +309,6 @@
   "actionSuccess": "Action successful",
   "actionError": "Action failed",
   "allTitles": "All titles",
-  "statusOfVerification": "Verification status"
+  "statusOfVerification": "Verification status",
+  "nbTestSend": "Number of tests sent"
 }

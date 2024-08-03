@@ -34,9 +34,15 @@ export class EntrepriseController {
   async createPuzzle(@Body() data, @Req() request, @Res() response) {
     try {
       const dataReceive = data.data;
-      const sendEmail =
-        await this.entrepriseService.sendEmailPuzzle(dataReceive);
-      response.send(sendEmail);
+      const canSendMail =
+        await this.userService.getIfUSerCanSendMailEntreprise(dataReceive);
+      if (canSendMail) {
+        const sendEmail =
+          await this.entrepriseService.sendEmailPuzzle(dataReceive);
+        response.send(sendEmail);
+      } else {
+        response.status(HttpStatus.BAD_REQUEST).send();
+      }
     } catch (error) {
       console.log(error);
     }
