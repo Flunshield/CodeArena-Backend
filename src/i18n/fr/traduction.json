@@ -306,5 +306,7 @@
   "presentationUpdated": "Présentation mise à jour",
   "errorPresentationUpdated": "Erreur lors de la mise à jour de la présentation",
   "actionSuccess": "Action effectué avec succès",
-  "actionError": "Action échoué"
+  "actionError": "Action échoué",
+  "allTitles": "Tous les titres",
+  "statusOfVerification": "Statut de Vérification"
 }

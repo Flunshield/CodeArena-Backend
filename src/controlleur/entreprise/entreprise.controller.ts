@@ -88,11 +88,20 @@ export class EntrepriseController {
   async getPuzzlePlaying(
     @Query('id') id: string,
     @Query('page') page: number,
+    @Query('title') title: string,
+    @Query('ascending') ascending: string,
+    @Query('puzzleCheck') puzzleCheck: string,
     @Req() request,
     @Res() response,
   ) {
     try {
-      const result = await this.puzzleService.getPuzzlePlaying(id, page);
+      const result = await this.puzzleService.getPuzzlePlaying(
+        id,
+        page,
+        title,
+        ascending,
+        puzzleCheck,
+      );
       response.send(result);
     } catch (error) {
       response.status(HttpStatus.BAD_REQUEST).send();

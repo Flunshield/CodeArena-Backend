@@ -187,28 +187,52 @@ export class PuzzleService {
     }
   }
 
-  async getPuzzlePlaying(data, page: number, limit: number = 3) {
+  async getPuzzlePlaying(data, page: number, title: string, ascending: string, puzzleCheck: string, limit: number = 3) {
     const offset = (page - 1) * limit;
+    
+    const countPuzzle = await prisma.puzzleSend.count({
+      where: {
+        userID: data.userID,
+        validated: true,
+        puzzlesEntreprise: {
+          title: {
+            contains: title ?? ''
+          }
+        },
+        ...(puzzleCheck !== "undefined" && { verified: puzzleCheck === "true" ? true : false })
+
+      }
+    });
+    
     const puzzle = await prisma.puzzleSend.findMany({
       where: {
         userID: data.userID,
-        validated: true
+        validated: true,
+        puzzlesEntreprise: {
+          title: {
+            contains: title ?? ''
+          }
+        },
+        ...(puzzleCheck !== "undefined" && countPuzzle > 0 && { verified: puzzleCheck === "true" ? true : false })
       },
       include: {
         puzzlesEntreprise: true
       },
+      orderBy: {
+        sendDate: ascending === "true" ? 'asc' : 'desc'
+    },
       take: limit,
-      skip: offset
-    });
+      skip: offset,
+  });
 
-    const countPuzzle = await prisma.puzzleSend.count({
-      where: {
-        userID: data.userID,
-        validated: true
-      }
+    const puzzlesTitle = await prisma.puzzlesEntreprise.findMany({
+      select: {
+        title: true
+      },
+      distinct: ['title']
     });
-
-    return {item: puzzle, total: countPuzzle};
+    
+    return {item: puzzle, total: countPuzzle, titles: puzzlesTitle};
   }
 
   async countPuzzlesPlayed(id) {
