@@ -310,5 +310,6 @@
   "actionError": "Action failed",
   "allTitles": "All titles",
   "statusOfVerification": "Verification status",
-  "nbTestSend": "Number of tests sent"
+  "nbTestSend": "Number of tests sent",
+  "cvName": "CV name"
 }

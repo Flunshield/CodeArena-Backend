@@ -309,5 +309,6 @@
   "actionError": "Action échoué",
   "allTitles": "Tous les titres",
   "statusOfVerification": "Statut de Vérification",
-  "nbTestSend": "Nombre de test envoyé"
+  "nbTestSend": "Nombre de test envoyé",
+  "cvName": "Nom du CV"
 }

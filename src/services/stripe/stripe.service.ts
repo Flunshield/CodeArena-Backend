@@ -247,16 +247,7 @@ export class StripeService {
         },
       });
 
-      const resetGroupUser = await prisma.user.update({
-        where: {
-          id: lastCommande.userID,
-        },
-        data: {
-          groupsId: 1,
-        },
-      });
-
-      if (cancelCommand && resetGroupUser) {
+      if (cancelCommand) {
         return unsuscribe;
       }
     }

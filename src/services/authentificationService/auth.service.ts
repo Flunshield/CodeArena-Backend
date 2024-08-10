@@ -366,14 +366,21 @@ export class AuthService {
    */
   async verifEntrepriseGroups(user: User) {
     if (user && user.id) {
-      const lastCommande = await this.stripeService.getLastCommande(
-        user.id.toString(),
-      );
-      const abonnementValid = await this.stripeService.getSubscriptionStatus(
-        lastCommande.customerId,
-      );
-      if (abonnementValid && !abonnementValid.active) {
-        await resetUserGroup(user);
+      try {
+        // Récupère la dernière commande Stripe associée à l'utilisateur
+        const lastCommande = await this.stripeService.getLastCommande(user.id.toString());
+        if (lastCommande && lastCommande.customerId) {
+          // Vérifie le statut de l'abonnement sur Stripe
+          const abonnementStatus = await this.stripeService.getSubscriptionStatus(lastCommande.customerId);
+          // Si l'abonnement est soit inactif (annulé, expiré, etc.) ou n'existe pas
+          if (!abonnementStatus || !abonnementStatus.active) {
+            // Réinitialise le groupe de l'utilisateur
+            await resetUserGroup(user);
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de l'abonnement :", error);
+        // Gérer les erreurs comme il convient, par exemple en notifiant l'utilisateur ou en logguant l'erreur
       }
     }
   }
