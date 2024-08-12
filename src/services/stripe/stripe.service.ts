@@ -248,7 +248,14 @@ export class StripeService {
       });
 
       if (cancelCommand) {
-        return unsuscribe;
+        const user = await prisma.user.findFirst({
+          where: {
+            id: lastCommande.userID,
+          },
+        });
+
+        const mailSend = this.mailService.prepareMail(undefined, user, 5);
+        return unsuscribe && mailSend;
       }
     }
   }

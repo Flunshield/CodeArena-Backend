@@ -146,14 +146,18 @@ model userMatch {
 }
 
 model events {
-  id          Int         @id @default(autoincrement())
-  startDate   DateTime
-  endDate     DateTime
-  playerMax   Int
-  title       String
-  description String
-  rewards     String
-  organize    String
+  id              Int         @id @default(autoincrement())
+  startDate       DateTime
+  endDate         DateTime
+  playerMax       Int
+  title           String
+  description     String
+  rewards         String
+  organize        String
+  createPuzzles   Boolean
+  priceAdjustment Int
+  basePrice       Float        @default(1000.0)
+  priceDetails    Json? 
   matches     matches[]
   userEvent   userEvent[]
   puzzles     puzzles[]

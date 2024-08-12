@@ -1,9 +1,17 @@
-import { Controller, Get, HttpStatus, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Roles } from '../auth/auth.controller';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
-import { Event } from '../../interfaces/userInterface';
 import { EvenementService } from '../../services/evenement/evenement.service';
+import { Prisma } from '@prisma/client';
 
 @Controller('evenement')
 export class EvenementController {
@@ -14,7 +22,7 @@ export class EvenementController {
   @UseGuards(RolesGuard)
   async findTournaments(@Res() response) {
     try {
-      const events: Event[] = await this.evenementService.findEvent();
+      const events = await this.evenementService.findEvent();
       if (events) {
         response.send(events);
       } else {
@@ -23,5 +31,17 @@ export class EvenementController {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  @Post('/createEvent')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async createEvent(@Body() data) {
+    const eventData: Prisma.eventsCreateInput = data.data;
+    console.log(eventData);
+    // Créer un nouvel événement dans la base de données
+    const newEvent = await this.evenementService.createEvent(eventData);
+
+    return newEvent;
   }
 }

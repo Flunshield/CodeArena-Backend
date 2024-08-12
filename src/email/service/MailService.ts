@@ -157,6 +157,31 @@ export class MailService {
     if (type === 4) {
       return await this.sendConfirmationOrder(data);
     }
+
+    if (type === 5) {
+      // TYPE 5 : Envoie du mail pour l'annulation d'abonnement
+      return await this.sendCancelSubscription(data);
+    }
+  }
+
+  async sendCancelSubscription(data: Mail) {
+    try {
+      await this.mailerService.sendMail({
+        to: data.email,
+        subject: "Annulation de l'abonnement",
+        template: 'cancelSubscription',
+        context: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+        },
+      });
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
   }
 
   async registerMail(data) {
