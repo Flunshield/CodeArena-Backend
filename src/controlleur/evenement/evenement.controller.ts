@@ -11,7 +11,6 @@ import { Roles } from '../auth/auth.controller';
 import { ADMIN, ENTREPRISE, USER } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
 import { EvenementService } from '../../services/evenement/evenement.service';
-import { Prisma } from '@prisma/client';
 
 @Controller('evenement')
 export class EvenementController {
@@ -36,12 +35,22 @@ export class EvenementController {
   @Post('/createEvent')
   @Roles(ADMIN)
   @UseGuards(RolesGuard)
-  async createEvent(@Body() data) {
-    const eventData: Prisma.eventsCreateInput = data.data;
-    console.log(eventData);
+  async createEvent(@Body() data, @Res() response) {
+    const eventData = data.data;
     // Créer un nouvel événement dans la base de données
     const newEvent = await this.evenementService.createEvent(eventData);
 
-    return newEvent;
+    if (newEvent) {
+      const devis = await this.evenementService.createDevis(newEvent);
+
+      if (devis) {
+        response.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'Content-Disposition; filename=devis.pdf',
+          'Content-Length': devis.length,
+        });
+        response.end(devis);
+      }
+    }
   }
 }

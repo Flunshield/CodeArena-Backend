@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import * as PDFDocument from 'pdfkit';
-import { CvUser, SoftSkill, TechnicalSkill, User } from 'src/interfaces/userInterface';
+import { CvUser, Event, priceDetails, SoftSkill, TechnicalSkill, User } from 'src/interfaces/userInterface';
 import * as fs from 'fs';
 
 @Injectable()
@@ -245,6 +245,181 @@ export class PdfService {
       });
     });
   }
+
+  async generateDevisPDF(event: Event): Promise<Buffer> {
+    return await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        margin: 50,
+        bufferPages: true,
+      });
+  
+      // Colors
+      const primaryColor = '#3498db';
+      const secondaryColor = '#2ecc71';
+      const textColor = '#333333';
+      const lightGrey = '#f2f2f2';
+  
+      // Header background
+      doc.rect(0, 0, doc.page.width, 150)
+         .fill(primaryColor)
+         .fillColor('#ffffff');
+  
+      // Add logo to the PDF
+      const logoPath = 'src/images/logo.png';
+      const logoBuffer = fs.readFileSync(logoPath);
+      doc.image(logoBuffer, 50, 20, { width: 60 });
+  
+      // Add Catchphrase
+      doc.font('Helvetica-Bold')
+        .fontSize(18)
+        .text('Votre Événement, Notre Passion', 130, 30, { align: 'right' })
+        .moveDown(1);
+  
+      // Title and Event Info
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(26)
+        .text('Devis pour l\'événement', { align: 'center' })
+        .moveDown(0.5)
+        .fontSize(14)
+        .text(`Titre : ${event.title}`, { align: 'center' })
+        .moveDown(2);
+  
+      // Why Us Section
+      doc
+        .fillColor(secondaryColor)
+        .font('Helvetica-Bold')
+        .fontSize(16)
+        .text('Pourquoi Choisir CodeArena ?', 50, doc.y)
+        .moveDown(0.5);
+  
+      const benefits = [
+        'Une équipe dédiée et passionnée',
+        'Support 24/7 pour vos événements',
+        'Satisfaction garantie ou remboursée',
+        'Personnalisation totale selon vos besoins'
+      ];
+      
+      benefits.forEach((benefit) => {
+        doc
+          .font('Helvetica')
+          .fontSize(12)
+          .fillColor(textColor)
+          .text(`- ${benefit}`, { indent: 20 })
+          .moveDown(0.2);
+      });
+  
+      // Event Details Block
+      doc
+        .fillColor(textColor)
+        .rect(50, doc.y, doc.page.width - 100, 90)
+        .fill(lightGrey)
+        .stroke()
+        .fillColor('#000000')
+        .font('Helvetica')
+        .text(`Date de début : ${event.startDate.toLocaleDateString('fr-FR')}`, 60, doc.y + 10)
+        .text(`Date de fin : ${event.endDate.toLocaleDateString('fr-FR')}`, 60, doc.y + 30)
+        .text(`Participants max : ${event.playerMax}`, 60, doc.y + 50)
+        .moveDown(2);
+  
+      // Description Section
+      doc
+        .font('Helvetica-Oblique')
+        .fontSize(12)
+        .text('Description :', { underline: true })
+        .text(event.description || 'Aucune description fournie.', { indent: 20, lineGap: 6 })
+        .moveDown(2);
+  
+      // Pricing Details Section
+      doc
+        .fillColor(secondaryColor)
+        .font('Helvetica-Bold')
+        .fontSize(14)
+        .text('Détails des prix :', 50, doc.y)
+        .moveDown(0.5);
+  
+      const pricingTable = [];
+      const priceDetail = event.priceDetails as unknown as priceDetails
+
+      if( priceDetail.basePrice) {
+        pricingTable.push(
+          ['Prix de base', `${priceDetail.basePrice.toFixed(2)} €`, 'Inclut : Service complet et support']
+        );
+      }
+
+      if( priceDetail.proximityCharge) {
+        pricingTable.push(
+          ['Majoration Date Proche', `${priceDetail.proximityCharge.toFixed(2)} €`, 'Frais supplémentaires']
+        );
+      }
+      
+      if( priceDetail.puzzlesCharge) {
+        pricingTable.push(
+          ['Frais de puzzles', `${priceDetail.puzzlesCharge.toFixed(2)} €`, 'Frais pour les puzzles']
+        );
+      }
+
+      pricingTable.push(
+        ['TVA', `${(20).toFixed(2)} %`, 'TVA appliquée']
+      );
+
+      pricingTable.push(
+        ['Prix total', `${(priceDetail.finalPrice * 1.20).toFixed(2)} €`, 'Tout inclus avec garanties (TTC)']
+      );
+  
+      this.drawPricingTable(doc, pricingTable, [200, 150, 150], 20, doc.y, lightGrey);
+  
+      // Call to Action
+      doc
+        .font('Helvetica')
+        .fontSize(10)
+        .fillColor(textColor)
+        .text('Contactez-nous dès maintenant pour finaliser ce devis ou si vous avez des questions supplémentaires.', { align: 'center', });
+            
+        // Footer
+      doc
+        .font('Helvetica')
+        .fontSize(10)
+        .fillColor(textColor)
+        .text('Téléphone : 04 27 18 14 40  |  Email : contact@codearena.com  |  Site web : https://codearena.jbertrand.fr/', 50, doc.page.height - 80, { align: 'center' });
+        
+      doc.end();
+  
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+    });
+  }
+  
+  private drawPricingTable(doc, table, columnWidths, cellHeight, startY, backgroundColor) {
+    table.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const x = 50 + colIndex * columnWidths[colIndex];
+        const y = startY + rowIndex * cellHeight;
+  
+        if (rowIndex % 2 === 0) {
+          doc.rect(x - 10, y - 5, columnWidths[colIndex], cellHeight)
+            .fill(backgroundColor)
+            .fillColor('#000000')
+            .stroke();
+        }
+  
+        doc.fillColor('#333333')
+          .font('Helvetica')
+          .text(cell, x, y, {
+            width: columnWidths[colIndex] + 100,
+            align: 'left',
+          });
+      });
+    });
+  
+    doc.moveDown(table.length * 0.5);
+  }
+  
 
   private drawPersonalInfo(doc, cv, primaryColor, textColor) {
     doc

@@ -312,5 +312,22 @@
   "statusOfVerification": "Verification status",
   "nbTestSend": "Number of tests sent",
   "cvName": "CV name",
-  "createEvent": "Create an event"
+  "createEvent": "Create an event",
+  "createEventSuccess": "Event created",
+  "createEventError": "Error creating event",
+  "createNewevent": "Create a new event",
+  "title": "Title",
+  "recompense": "Reward",
+  "organisateur": "Organizer",
+  "createPuzzle": "Create a puzzle",
+  "ajustPrice": "Adjust the price",
+  "detailPrice": "Price details",
+  "basePrice": "Base price",
+  "majorationDateProche": "Close date surcharge",
+  "majorationDuree": "Duration surcharge",
+  "addPlayers": "Add players",
+  "creationPuzzles": "Puzzle creation",
+  "ajustementPrice": "Price adjustment",
+  "totalPrice": "Total price"
+  
 }

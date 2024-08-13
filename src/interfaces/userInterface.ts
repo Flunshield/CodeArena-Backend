@@ -191,6 +191,16 @@ export interface Event {
   puzzles?: PuzzlesEntreprise[];
 }
 
+export interface priceDetails {
+  id: number;
+  basePrice: number;
+  proximityCharge: number;
+  durationCharge: number;
+  puzzlesCharge: number;
+  adjustmentCharge: number;
+  finalPrice: number;
+}
+
 export interface UserEvent {
   id: number;
   userID: number;
