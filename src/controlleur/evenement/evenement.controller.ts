@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -51,6 +52,35 @@ export class EvenementController {
         });
         response.end(devis);
       }
+    }
+  }
+
+  @Get('/findEventEntreprise')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async findEventEntreprise(
+    @Res() response,
+    @Query('order') order,
+    @Query('currentPage') currentPage,
+    @Query('itemPerPage') itemPerPage,
+    @Query('accepted') accepted,
+    @Query('searchTitle') searchTitle,
+  ) {
+    try {
+      const events = await this.evenementService.findEventEntreprise(
+        order,
+        currentPage,
+        itemPerPage,
+        accepted,
+        searchTitle,
+      );
+      if (events) {
+        response.send(events);
+      } else {
+        response.send(HttpStatus.NOT_FOUND);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 }

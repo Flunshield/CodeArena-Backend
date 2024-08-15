@@ -327,5 +327,6 @@
   "addPlayers": "Ajouter des joueurs",
   "creationPuzzles": "Création de puzzles",
   "ajustementPrice": "Ajustement du prix",
-  "totalPrice": "Prix total"
+  "totalPrice": "Prix total",
+  "accepted": "Accepté"
 }

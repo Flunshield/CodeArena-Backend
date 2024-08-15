@@ -189,6 +189,7 @@ export interface Event {
   matches?: Match[];
   userEvent?: UserEvent[];
   puzzles?: PuzzlesEntreprise[];
+  accepted?: boolean;
 }
 
 export interface priceDetails {

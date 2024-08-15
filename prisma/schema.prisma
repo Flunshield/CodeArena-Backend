@@ -157,7 +157,8 @@ model events {
   createPuzzles   Boolean
   priceAdjustment Int
   basePrice       Float        @default(1000.0)
-  priceDetails    Json? 
+  priceDetails    Json?
+  accepted        Boolean      @default(false)
   matches     matches[]
   userEvent   userEvent[]
   puzzles     puzzles[]

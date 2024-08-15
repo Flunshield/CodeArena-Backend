@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'; // Import SortOrder from @prisma/client
 import { PdfService } from '../pdfservice/pdf.service';
 
 const prisma: PrismaClient = new PrismaClient();
@@ -59,5 +59,43 @@ export class EvenementService {
     });
 
     return this.pdfService.generateDevisPDF(eventCreated);
+  }
+
+  async findEventEntreprise(
+    order: 'asc' | 'desc',
+    currentPage: number,
+    itemPerPage: string,
+    accepted: string,
+    searchTitle: string,
+  ) {
+    try {
+      const numberPerPage = parseInt(itemPerPage, 10);
+      const offset = (currentPage - 1) * numberPerPage;
+      const isAccepted =
+        accepted === 'all' ? undefined : accepted === 'oui' ? true : false;
+
+      // Récupère tous les événements planifiés dans le futur depuis la base de données
+      // qui sont associés à une entreprise
+      const events = await prisma.events.findMany({
+        take: numberPerPage,
+        skip: offset,
+        where: {
+          accepted: isAccepted,
+          title: {
+            contains: searchTitle !== undefined ? searchTitle : '',
+          },
+        },
+        orderBy: {
+          startDate: order,
+        },
+      });
+
+      const countEvent = await prisma.events.count({});
+
+      return { items: events, total: countEvent };
+    } catch (error) {
+      console.error(error);
+      throw error; // Renvoyer l'erreur après l'avoir loguée
+    }
   }
 }
