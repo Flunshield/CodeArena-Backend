@@ -55,10 +55,10 @@ export class EvenementController {
     }
   }
 
-  @Get('/findEventEntreprise')
+  @Get('/findEventsEntreprise')
   @Roles(ADMIN)
   @UseGuards(RolesGuard)
-  async findEventEntreprise(
+  async findEventsEntreprise(
     @Res() response,
     @Query('order') order,
     @Query('currentPage') currentPage,
@@ -67,7 +67,7 @@ export class EvenementController {
     @Query('searchTitle') searchTitle,
   ) {
     try {
-      const events = await this.evenementService.findEventEntreprise(
+      const events = await this.evenementService.findEventsEntreprise(
         order,
         currentPage,
         itemPerPage,
@@ -76,6 +76,27 @@ export class EvenementController {
       );
       if (events) {
         response.send(events);
+      } else {
+        response.send(HttpStatus.NOT_FOUND);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('/findEventEntreprise')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async findEventEntreprise(
+    @Res() response,
+    @Query('id') id,
+  ) {
+    try {
+      const event = await this.evenementService.findEventEntreprise(
+        id
+      );
+      if (event) {
+        response.send(event);
       } else {
         response.send(HttpStatus.NOT_FOUND);
       }

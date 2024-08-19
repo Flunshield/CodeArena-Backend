@@ -328,5 +328,6 @@
   "creationPuzzles": "Création de puzzles",
   "ajustementPrice": "Ajustement du prix",
   "totalPrice": "Prix total",
-  "accepted": "Accepté"
+  "accepted": "Accepté",
+  "dashboardEvent": "Dashboard événement"
 }

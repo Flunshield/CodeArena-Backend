@@ -329,6 +329,7 @@
   "creationPuzzles": "Puzzle creation",
   "ajustementPrice": "Price adjustment",
   "totalPrice": "Total price",
-  "accepted": "Accepted"
+  "accepted": "Accepted",
+  "dashboardEvent": "Event dashboard"
   
 }

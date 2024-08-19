@@ -61,7 +61,7 @@ export class EvenementService {
     return this.pdfService.generateDevisPDF(eventCreated);
   }
 
-  async findEventEntreprise(
+  async findEventsEntreprise(
     order: 'asc' | 'desc',
     currentPage: number,
     itemPerPage: string,
@@ -93,6 +93,22 @@ export class EvenementService {
       const countEvent = await prisma.events.count({});
 
       return { items: events, total: countEvent };
+    } catch (error) {
+      console.error(error);
+      throw error; // Renvoyer l'erreur après l'avoir loguée
+    }
+  }
+
+  
+  async findEventEntreprise(id: string) {
+    try {
+      const event = await prisma.events.findFirst({
+        where: {
+          id: parseInt(id, 10),
+        },
+      });
+
+      return event;
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
