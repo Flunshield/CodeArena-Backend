@@ -43,6 +43,7 @@ model user {
   puzzleSend         puzzleSend[]
   siren              String?
   cvUser             cvUser[]
+  events events[]
 }
 
 model Title {
@@ -159,6 +160,11 @@ model events {
   basePrice       Float        @default(1000.0)
   priceDetails    Json?
   accepted        Boolean      @default(false)
+  statusPayment   String       @default("not paid")
+  userIDEntreprise Int
+  commandeId      Int?
+  commande        commandeEntreprise? @relation(fields: [commandeId], references: [id])
+  user        user    @relation(fields: [userIDEntreprise], references: [id])
   matches     matches[]
   userEvent   userEvent[]
   puzzles     puzzles[]
@@ -198,6 +204,7 @@ model commandeEntreprise {
   etatCommande String
   nbCreateTest Int      @default(10)
   customerId   String?
+  events       events[]
 }
 
 model puzzlesEntreprise {

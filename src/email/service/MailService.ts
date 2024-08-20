@@ -2,6 +2,7 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import { PrismaClient } from '@prisma/client';
+import { User } from 'src/interfaces/userInterface';
 
 const prisma = new PrismaClient();
 
@@ -234,6 +235,33 @@ export class MailService {
         ],
       });
       return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  async sendDevisByEmail(user: User, devis: Buffer) {
+    try {
+      const devisBuffer = await devis;
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Devis',
+        template: 'sendDevis',
+        context: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        attachments: [
+          {
+            filename: 'devis.pdf',
+            content: devisBuffer,
+            contentType: 'application/pdf',
+          },
+        ],
+      });
     } catch (error) {
       this.logger.error(
         `Erreur lors de l'envoi de l'e-mail : ${error.message}`,

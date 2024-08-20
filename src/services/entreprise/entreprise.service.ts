@@ -62,4 +62,21 @@ export class EntrepriseService {
       console.log(error);
     }
   }
+
+  async getUserEntreprise(userName: string) {
+    if (userName.length > 4) {
+      return await prisma.user.findMany({
+        where: {
+          groups: {
+            roles: ENTREPRISE,
+          },
+          userName: {
+            contains: userName, // Permet de rechercher une correspondance partielle
+          },
+        },
+      });
+    } else {
+      return [];
+    }
+  }
 }

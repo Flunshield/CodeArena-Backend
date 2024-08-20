@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client'; // Import SortOrder from @prisma/client
 import { PdfService } from '../pdfservice/pdf.service';
+import { MailService } from 'src/email/service/MailService';
 
 const prisma: PrismaClient = new PrismaClient();
 @Injectable()
 export class EvenementService {
-  constructor(private readonly pdfService: PdfService) {}
+  constructor(
+    private readonly pdfService: PdfService,
+    private readonly mailService: MailService,
+  ) {}
   /**
    * Récupère tous les événements planifiés dans le futur.
    *
@@ -34,6 +38,14 @@ export class EvenementService {
 
   async createEvent(eventData) {
     try {
+      const user = await prisma.user.findFirst({
+        where: {
+          userName: eventData.userName,
+        },
+      });
+
+      delete eventData.userName;
+      eventData.userIDEntreprise = user.id;
       // Convertir les dates en objets Date si elles sont sous forme de chaîne
       eventData.startDate = new Date(eventData.startDate);
       eventData.endDate = new Date(eventData.endDate);
@@ -57,8 +69,19 @@ export class EvenementService {
         id: newEvent.id,
       },
     });
+    const user = await prisma.user.findFirst({
+      where: {
+        id: eventCreated.userIDEntreprise,
+      },
+    });
 
-    return this.pdfService.generateDevisPDF(eventCreated);
+    const devis = await this.pdfService.generateDevisPDF(eventCreated);
+
+    if (user.email) {
+      await this.mailService.sendDevisByEmail(user, devis);
+    }
+
+    return devis;
   }
 
   async findEventsEntreprise(
@@ -99,16 +122,37 @@ export class EvenementService {
     }
   }
 
-  
   async findEventEntreprise(id: string) {
     try {
-      const event = await prisma.events.findFirst({
+      const event = id
+        ? await prisma.events.findFirst({
+            where: {
+              id: parseInt(id, 10),
+            },
+          })
+        : '';
+
+      return id ? event : '';
+    } catch (error) {
+      console.error(error);
+      throw error; // Renvoyer l'erreur après l'avoir loguée
+    }
+  }
+
+  async validateEvent(id: any) {
+    try {
+      const event = await prisma.events.update({
         where: {
           id: parseInt(id, 10),
         },
+        data: {
+          accepted: true,
+        },
       });
 
-      return event;
+      if (event) {
+        return HttpStatus.OK;
+      }
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
