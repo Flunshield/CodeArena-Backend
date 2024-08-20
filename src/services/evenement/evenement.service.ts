@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client'; // Import SortOrder from @prisma/client
 import { PdfService } from '../pdfservice/pdf.service';
 import { MailService } from 'src/email/service/MailService';
+import { ADMIN, ENTREPRISE } from 'src/constantes/contante';
 
 const prisma: PrismaClient = new PrismaClient();
 @Injectable()
@@ -90,6 +91,7 @@ export class EvenementService {
     itemPerPage: string,
     accepted: string,
     searchTitle: string,
+    id: string,
   ) {
     try {
       const numberPerPage = parseInt(itemPerPage, 10);
@@ -97,25 +99,47 @@ export class EvenementService {
       const isAccepted =
         accepted === 'all' ? undefined : accepted === 'oui' ? true : false;
 
-      // Récupère tous les événements planifiés dans le futur depuis la base de données
-      // qui sont associés à une entreprise
-      const events = await prisma.events.findMany({
-        take: numberPerPage,
-        skip: offset,
-        where: {
-          accepted: isAccepted,
-          title: {
-            contains: searchTitle !== undefined ? searchTitle : '',
+        const user = await prisma.user.findFirst({
+          where: {
+            id: parseInt(id),
           },
-        },
-        orderBy: {
-          startDate: order,
-        },
-      });
+          include: {
+            groups: true,
+          },
+        });
+        let events = [];
+        let countEvent = 0;
+        
+        const getEvents = async (conditions = {}) => {
+          events = await prisma.events.findMany({
+            take: numberPerPage,
+            skip: offset,
+            where: {
+              accepted: isAccepted,
+              title: {
+                contains: searchTitle || '',
+              },
+              ...conditions,
+            },
+            orderBy: {
+              startDate: order,
+            },
+          });
+        
+          countEvent = await prisma.events.count({
+            where: conditions,
+          });
+        };
+        
+        if (user.groups.roles === ADMIN) {
+          await getEvents();
+        }
+        
+        if (user.groups.roles === ENTREPRISE) {
+          await getEvents({ userIDEntreprise: parseInt(id) });
+        }
 
-      const countEvent = await prisma.events.count({});
-
-      return { items: events, total: countEvent };
+        return { items: events, total: countEvent };
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
@@ -153,6 +177,19 @@ export class EvenementService {
       if (event) {
         return HttpStatus.OK;
       }
+    } catch (error) {
+      console.error(error);
+      throw error; // Renvoyer l'erreur après l'avoir loguée
+    }
+  }
+
+  async findEventsEntrepriseById(id: any) {
+    try {
+      return await prisma.events.findMany({
+        where: {
+          userIDEntreprise: parseInt(id, 10),
+        },
+      });
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
