@@ -1,34 +1,38 @@
+/**
+ * Service fournissant la logique métier pour la gestion des événements.
+ */
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client'; // Import SortOrder from @prisma/client
+import { PrismaClient } from '@prisma/client';
 import { PdfService } from '../pdfservice/pdf.service';
 import { MailService } from '../../email/service/MailService';
 import { ADMIN, ENTREPRISE } from 'src/constantes/contante';
 
 const prisma: PrismaClient = new PrismaClient();
+
 @Injectable()
 export class EvenementService {
+
+  /**
+   * Constructeur pour injecter les dépendances.
+   * @param pdfService - Service pour la génération de PDF.
+   * @param mailService - Service pour l'envoi d'emails.
+   */
   constructor(
     private readonly pdfService: PdfService,
     private readonly mailService: MailService,
   ) {}
+
   /**
    * Récupère tous les événements planifiés dans le futur.
    *
    * @returns Une liste d'objets représentant les événements futurs.
-   *
    * @throws Error si une erreur se produit lors de la récupération des événements.
-   *
-   * @beta
    */
   async findEvent() {
-    /**
-     * Récupère tous les événements planifiés dans le futur depuis la base de données.
-     * Les événements sont triés par date de début par ordre croissant.
-     */
     return prisma.events.findMany({
       where: {
         startDate: {
-          gte: new Date(), // Pour s'assurer que la date est dans le futur
+          gte: new Date(),
         },
       },
       orderBy: {
@@ -37,6 +41,12 @@ export class EvenementService {
     });
   }
 
+  /**
+   * Crée un nouvel événement à partir des données fournies.
+   * @param eventData - Les données de l'événement à créer.
+   * @returns L'événement créé.
+   * @throws Error si une erreur se produit lors de la création de l'événement.
+   */
   async createEvent(eventData) {
     try {
       const user = await prisma.user.findFirst({
@@ -47,11 +57,10 @@ export class EvenementService {
 
       delete eventData.userName;
       eventData.userIDEntreprise = user.id;
-      // Convertir les dates en objets Date si elles sont sous forme de chaîne
       eventData.startDate = new Date(eventData.startDate);
       eventData.endDate = new Date(eventData.endDate);
       eventData.playerMax = parseInt(eventData.playerMax, 10);
-      // Crée un nouvel événement dans la base de données en utilisant les données fournies
+
       const creatEvent = await prisma.events.create({
         data: eventData,
       });
@@ -61,10 +70,16 @@ export class EvenementService {
       }
     } catch (error) {
       console.error(error);
-      throw error; // Renvoyer l'erreur après l'avoir loguée
+      throw error;
     }
   }
 
+  /**
+   * Crée un devis au format PDF pour un événement donné.
+   * @param newEvent - Les données de l'événement pour générer le devis.
+   * @returns Le devis généré en format PDF.
+   * @throws Error si une erreur se produit lors de la génération du devis.
+   */
   async createDevis(newEvent) {
     const eventCreated = await prisma.events.findFirst({
       where: {
@@ -86,6 +101,17 @@ export class EvenementService {
     return devis;
   }
 
+  /**
+   * Récupère les événements d'une entreprise avec pagination et filtres.
+   * @param order - Ordre de tri (ascendant ou descendant).
+   * @param currentPage - Page actuelle pour la pagination.
+   * @param itemPerPage - Nombre d'éléments par page.
+   * @param accepted - Filtre d'événements acceptés ou non.
+   * @param searchTitle - Filtre de titre d'événement.
+   * @param id - Identifiant de l'entreprise.
+   * @returns La liste des événements et le nombre total.
+   * @throws Error si une erreur se produit lors de la récupération des événements.
+   */
   async findEventsEntreprise(
     order: 'asc' | 'desc',
     currentPage: number,
@@ -108,6 +134,7 @@ export class EvenementService {
           groups: true,
         },
       });
+
       let events = [];
       let countEvent = 0;
 
@@ -143,10 +170,16 @@ export class EvenementService {
       return { items: events, total: countEvent };
     } catch (error) {
       console.error(error);
-      throw error; // Renvoyer l'erreur après l'avoir loguée
+      throw error;
     }
   }
 
+  /**
+   * Récupère un événement spécifique d'une entreprise.
+   * @param id - L'identifiant de l'événement.
+   * @returns L'événement correspondant ou une chaîne vide si non trouvé.
+   * @throws Error si une erreur se produit lors de la récupération de l'événement.
+   */
   async findEventEntreprise(id: string) {
     try {
       const event = id
@@ -160,10 +193,16 @@ export class EvenementService {
       return id ? event : '';
     } catch (error) {
       console.error(error);
-      throw error; // Renvoyer l'erreur après l'avoir loguée
+      throw error;
     }
   }
 
+  /**
+   * Valide un événement en le marquant comme accepté.
+   * @param id - L'identifiant de l'événement à valider.
+   * @returns Un objet contenant le statut et l'événement validé.
+   * @throws Error si une erreur se produit lors de la validation de l'événement.
+   */
   async validateEvent(id: any) {
     try {
       const event = await prisma.events.update({
@@ -180,10 +219,16 @@ export class EvenementService {
       }
     } catch (error) {
       console.error(error);
-      throw error; // Renvoyer l'erreur après l'avoir loguée
+      throw error;
     }
   }
 
+  /**
+   * Récupère tous les événements associés à une entreprise par son identifiant.
+   * @param id - L'identifiant de l'entreprise.
+   * @returns Une liste d'événements associés à l'entreprise.
+   * @throws Error si une erreur se produit lors de la récupération des événements.
+   */
   async findEventsEntrepriseById(id: any) {
     try {
       return await prisma.events.findMany({
@@ -193,7 +238,7 @@ export class EvenementService {
       });
     } catch (error) {
       console.error(error);
-      throw error; // Renvoyer l'erreur après l'avoir loguée
+      throw error;
     }
   }
 }

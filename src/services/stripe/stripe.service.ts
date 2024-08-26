@@ -321,6 +321,16 @@ export class StripeService {
     });
   }
 
+  /**
+ * Récupère la dernière facture payée d'un client et génère un PDF.
+ *
+ * @param customerId - L'identifiant du client dans Stripe.
+ * @param id - Optionnel, l'identifiant de l'utilisateur si l'objet utilisateur n'est pas fourni.
+ * @param user - Optionnel, l'objet `User` représentant l'utilisateur, sinon sera récupéré depuis la base de données.
+ * @returns Un `Buffer` contenant la facture au format PDF.
+ *
+ * @throws Error si une erreur se produit lors de la récupération de la facture ou de la génération du PDF.
+ */
   async getLatestInvoice(
     customerId: string,
     id?: string,
