@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Post,
@@ -123,6 +124,24 @@ export class EvenementController {
   async validateEvent(@Body() data, @Res() response) {
     const id = data.data.id;
     const event = await this.evenementService.validateEvent(id);
+    if (event.status === HttpStatus.OK) {
+      response.sendStatus(event.status);
+    } else {
+      response.send(HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Delete('deleteEvent')
+  @Roles(ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async deleteEvent(@Body() data, @Res() response) {
+    console.log(data);
+    const userId = data.userId;
+    const idElementToDelete = data.idElementToDelete;
+    const event = await this.evenementService.deleteEvent(
+      userId,
+      idElementToDelete,
+    );
     if (event.status === HttpStatus.OK) {
       response.sendStatus(event.status);
     } else {

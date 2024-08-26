@@ -11,6 +11,40 @@ const prisma: PrismaClient = new PrismaClient();
 
 @Injectable()
 export class EvenementService {
+  async deleteEvent(userId: string, idElementToDelete: string) {
+    try {
+      let event = undefined;
+      const userGroup = await prisma.user.findFirst({
+        where: {
+          id: parseInt(userId, 10),
+        },
+        include: {
+          groups: true,
+        },
+      });
+      if (userGroup.groups.roles === ADMIN) {
+        event = await prisma.events.delete({
+          where: {
+            id: parseInt(idElementToDelete, 10),
+          },
+        });
+      } else if (userGroup.groups.roles === ENTREPRISE) {
+        event = await prisma.events.delete({
+          where: {
+            id: parseInt(idElementToDelete, 10),
+            userIDEntreprise: parseInt(userId, 10),
+          },
+        });
+
+        if (event) {
+          return { status: HttpStatus.OK, event: event };
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
   /**
    * Constructeur pour injecter les dépendances.
    * @param pdfService - Service pour la génération de PDF.

@@ -337,10 +337,10 @@
   "valider": "Validate",
   "adminEventDashboard": "Admin event dashboard",
   "entrepriseEventDashboard": "Enterprise event dashboard",
-  "finalPriceIsMissing": "The final price is missing"
-
-  "cvName": "CV name",
+  "finalPriceIsMissing": "The final price is missing",
   "week": "Week",
   "day": "Day",
-  "today": "Today"
+  "today": "Today",
+  "eventDeleted": "Event deleted",
+  "errorEventDeleted": "Error deleting event"
 }

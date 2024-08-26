@@ -336,9 +336,10 @@
   "valider": "Valider",
   "adminEventDashboard": "Dashboard événement administrateur",
   "entrepriseEventDashboard": "Dashboard événement entreprise",
-  "finalPriceIsMissing": "Le prix final est manquant"
-  "cvName": "Nom du CV",
+  "finalPriceIsMissing": "Le prix final est manquant",
   "week": "Semaine",
   "day": "Jour",
-  "today": "Aujourd'hui"
+  "today": "Aujourd'hui",
+  "eventDeleted": "Événement supprimé",
+  "errorEventDeleted": "Erreur lors de la suppression de l'événement"
 }
