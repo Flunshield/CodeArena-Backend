@@ -269,4 +269,29 @@ export class MailService {
       );
     }
   }
+  async sendFactureByEmail(user: User, facture: unknown) {
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Facture',
+        template: 'sendFacture',
+        context: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        attachments: [
+          {
+            filename: 'facture.pdf',
+            content: facture,
+            contentType: 'application/pdf',
+          },
+        ],
+      });
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
 }

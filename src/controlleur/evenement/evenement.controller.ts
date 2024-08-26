@@ -93,7 +93,6 @@ export class EvenementController {
     try {
       const event = await this.evenementService.findEventEntreprise(id);
       if (event) {
-        console.log(event);
         response.send(event);
       } else {
         response.send(HttpStatus.NOT_FOUND);
@@ -119,13 +118,14 @@ export class EvenementController {
   }
 
   @Post('validateEvent')
-  @Roles(ADMIN)
+  @Roles(ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
   async validateEvent(@Body() data, @Res() response) {
     const id = data.data.id;
     const event = await this.evenementService.validateEvent(id);
-    if (event) {
-      response.sendStatus(event);
+    if (event.status === HttpStatus.OK) {
+      await this.evenementService.sendFacture(event.event);
+      response.sendStatus(event.status);
     } else {
       response.send(HttpStatus.NOT_FOUND);
     }

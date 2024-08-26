@@ -99,47 +99,47 @@ export class EvenementService {
       const isAccepted =
         accepted === 'all' ? undefined : accepted === 'oui' ? true : false;
 
-        const user = await prisma.user.findFirst({
+      const user = await prisma.user.findFirst({
+        where: {
+          id: parseInt(id),
+        },
+        include: {
+          groups: true,
+        },
+      });
+      let events = [];
+      let countEvent = 0;
+
+      const getEvents = async (conditions = {}) => {
+        events = await prisma.events.findMany({
+          take: numberPerPage,
+          skip: offset,
           where: {
-            id: parseInt(id),
+            accepted: isAccepted,
+            title: {
+              contains: searchTitle || '',
+            },
+            ...conditions,
           },
-          include: {
-            groups: true,
+          orderBy: {
+            startDate: order,
           },
         });
-        let events = [];
-        let countEvent = 0;
-        
-        const getEvents = async (conditions = {}) => {
-          events = await prisma.events.findMany({
-            take: numberPerPage,
-            skip: offset,
-            where: {
-              accepted: isAccepted,
-              title: {
-                contains: searchTitle || '',
-              },
-              ...conditions,
-            },
-            orderBy: {
-              startDate: order,
-            },
-          });
-        
-          countEvent = await prisma.events.count({
-            where: conditions,
-          });
-        };
-        
-        if (user.groups.roles === ADMIN) {
-          await getEvents();
-        }
-        
-        if (user.groups.roles === ENTREPRISE) {
-          await getEvents({ userIDEntreprise: parseInt(id) });
-        }
 
-        return { items: events, total: countEvent };
+        countEvent = await prisma.events.count({
+          where: conditions,
+        });
+      };
+
+      if (user.groups.roles === ADMIN) {
+        await getEvents();
+      }
+
+      if (user.groups.roles === ENTREPRISE) {
+        await getEvents({ userIDEntreprise: parseInt(id) });
+      }
+
+      return { items: events, total: countEvent };
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
@@ -175,7 +175,7 @@ export class EvenementService {
       });
 
       if (event) {
-        return HttpStatus.OK;
+        return { status: HttpStatus.OK, event: event };
       }
     } catch (error) {
       console.error(error);
@@ -190,6 +190,35 @@ export class EvenementService {
           userIDEntreprise: parseInt(id, 10),
         },
       });
+    } catch (error) {
+      console.error(error);
+      throw error; // Renvoyer l'erreur après l'avoir loguée
+    }
+  }
+
+  async sendFacture(event) {
+    try {
+      const eventCreated = await prisma.events.findFirst({
+        where: {
+          id: parseInt(event.id),
+        },
+      });
+      const user = await prisma.user.findFirst({
+        where: {
+          id: eventCreated.userIDEntreprise,
+        },
+      });
+
+      const facture = await this.pdfService.generateFacturePDF(
+        user,
+        eventCreated,
+      );
+
+      if (user.email) {
+        await this.mailService.sendFactureByEmail(user, facture);
+      }
+
+      return facture;
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
