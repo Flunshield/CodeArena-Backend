@@ -564,7 +564,7 @@ export class PdfService {
       doc
         .font('Helvetica-Bold')
         .fontSize(26)
-        .text('Facture pour l\'événement', { align: 'center' })
+        .text('Facture a payer pour l\'événement', { align: 'center' })
         .moveDown(0.5)
         .fontSize(14)
         .text(`Titre : ${event.title}`, { align: 'center' })

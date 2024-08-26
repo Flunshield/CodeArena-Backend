@@ -119,9 +119,9 @@ export class UserController {
   @UseGuards(RolesGuard)
   async getUser(@Query('id') id: string, @Query('isEntreprise') isEntreprise: string, @Query('username') username: string,  @Req() request, @Res() response) {
     try {
-      const testEntreprise = isEntreprise === 'true' ? true : false;
+      const isEntrepriseBool = isEntreprise === 'true' ? true : false;
 
-      if(testEntreprise) {
+      if(isEntrepriseBool) {
         const user = await this.userService.getUserByUserName(username.toString());
         response.send(user);
       } else {

@@ -21,3 +21,5 @@ export const PRODUCT = [
     nbCreate: 99999,
   },
 ];
+
+export const YOUR_DOMAIN = process.env.URL_FRONT;

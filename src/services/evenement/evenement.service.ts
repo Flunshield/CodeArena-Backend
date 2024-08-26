@@ -50,6 +50,7 @@ export class EvenementService {
       // Convertir les dates en objets Date si elles sont sous forme de chaîne
       eventData.startDate = new Date(eventData.startDate);
       eventData.endDate = new Date(eventData.endDate);
+      eventData.playerMax = parseInt(eventData.playerMax, 10);
       // Crée un nouvel événement dans la base de données en utilisant les données fournies
       const creatEvent = await prisma.events.create({
         data: eventData,
@@ -175,7 +176,7 @@ export class EvenementService {
       });
 
       if (event) {
-        return {status: HttpStatus.OK, event: event};
+        return { status: HttpStatus.OK, event: event };
       }
     } catch (error) {
       console.error(error);
@@ -209,7 +210,10 @@ export class EvenementService {
         },
       });
 
-      const facture = await this.pdfService.generateFacturePDF(user,eventCreated);
+      const facture = await this.pdfService.generateFacturePDF(
+        user,
+        eventCreated,
+      );
 
       if (user.email) {
         await this.mailService.sendFactureByEmail(user, facture);

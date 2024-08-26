@@ -290,6 +290,11 @@ export class UserService {
             orderBy: {
               dateCommande: 'desc', // Trie par dateCommande décroissante pour obtenir la dernière commande
             },
+            where: {
+              customerId: {
+                not: null,
+              },
+            },
           },
           titles: {
             select: {
