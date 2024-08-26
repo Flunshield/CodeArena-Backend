@@ -337,4 +337,8 @@
   "adminEventDashboard": "Dashboard événement administrateur",
   "entrepriseEventDashboard": "Dashboard événement entreprise",
   "finalPriceIsMissing": "Le prix final est manquant"
+  "cvName": "Nom du CV",
+  "week": "Semaine",
+  "day": "Jour",
+  "today": "Aujourd'hui"
 }

@@ -338,5 +338,9 @@
   "adminEventDashboard": "Admin event dashboard",
   "entrepriseEventDashboard": "Enterprise event dashboard",
   "finalPriceIsMissing": "The final price is missing"
-  
+
+  "cvName": "CV name",
+  "week": "Week",
+  "day": "Day",
+  "today": "Today"
 }
