@@ -175,7 +175,7 @@ export class EvenementService {
       });
 
       if (event) {
-        return { status: HttpStatus.OK, event: event };
+        return {status: HttpStatus.OK, event: event};
       }
     } catch (error) {
       console.error(error);
@@ -209,10 +209,7 @@ export class EvenementService {
         },
       });
 
-      const facture = await this.pdfService.generateFacturePDF(
-        user,
-        eventCreated,
-      );
+      const facture = await this.pdfService.generateFacturePDF(user,eventCreated);
 
       if (user.email) {
         await this.mailService.sendFactureByEmail(user, facture);
@@ -221,7 +218,7 @@ export class EvenementService {
       return facture;
     } catch (error) {
       console.error(error);
-      throw error; // Renvoyer l'erreur après l'avoir loguée
+      throw error;
     }
   }
 }
