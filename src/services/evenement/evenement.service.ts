@@ -11,7 +11,6 @@ const prisma: PrismaClient = new PrismaClient();
 
 @Injectable()
 export class EvenementService {
-
   /**
    * Constructeur pour injecter les dépendances.
    * @param pdfService - Service pour la génération de PDF.

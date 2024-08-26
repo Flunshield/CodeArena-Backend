@@ -330,6 +330,13 @@
   "ajustementPrice": "Price adjustment",
   "totalPrice": "Total price",
   "accepted": "Accepted",
-  "dashboardEvent": "Event dashboard"
+  "dashboardEvent": "Event dashboard",
+  "statusPayment": "Payment status",
+  "paid": "Paid",
+  "notpaid": "Not paid",
+  "valider": "Validate",
+  "adminEventDashboard": "Admin event dashboard",
+  "entrepriseEventDashboard": "Enterprise event dashboard",
+  "finalPriceIsMissing": "The final price is missing"
   
 }
