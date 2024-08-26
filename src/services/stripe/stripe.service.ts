@@ -169,6 +169,14 @@ export class StripeService {
             return HttpStatus.NOT_MODIFIED;
           }
         } else if (isEvent && updateEvent) {
+          user.url = eventId;
+          await this.mailService.prepareMail(
+            undefined,
+            undefined,
+            6,
+            undefined,
+            user,
+          );
           return HttpStatus.CREATED;
         }
       }

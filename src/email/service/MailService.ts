@@ -3,6 +3,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import { PrismaClient } from '@prisma/client';
 import { User } from 'src/interfaces/userInterface';
+import { PdfService } from 'src/services/pdfservice/pdf.service';
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,7 @@ export class MailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly refreshTokenService: RefreshTokenService,
+    private readonly pdfService: PdfService,
   ) {}
 
   async sendActiveAccount(data: Mail, urlActive: string): Promise<boolean> {
@@ -116,6 +118,7 @@ export class MailService {
     data?: Mail,
     type?: number,
     mailID?: number,
+    user?: User,
   ) {
     // TYPE 1 : Envoie du mail pour valider l'adresse mail.
     if (type === 1) {
@@ -162,6 +165,32 @@ export class MailService {
     if (type === 5) {
       // TYPE 5 : Envoie du mail pour l'annulation d'abonnement
       return await this.sendCancelSubscription(data);
+    }
+    if (type === 6) {
+      // TYPE 6 : Envoie du mail pour la confirmation de l'achat de l'event
+      return await this.sendConfirmationBuyEvent(user);
+    }
+  }
+
+  async sendConfirmationBuyEvent(user) {
+    try {
+      // Récupérer l'événement associé à l'utilisateur (Je l'ai stocké temporairement dans url) Pas le temps pour une meilleure solution
+      const event = await prisma.events.findFirst({
+        where: {
+          id: parseInt(user.url, 10),
+        },
+      });
+
+      if (user.email) {
+        const facture = await this.pdfService.generateFacturePDF(user, event);
+        await this.sendFactureByEmail(user, facture);
+      }
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
     }
   }
 

@@ -124,7 +124,6 @@ export class EvenementController {
     const id = data.data.id;
     const event = await this.evenementService.validateEvent(id);
     if (event.status === HttpStatus.OK) {
-      await this.evenementService.sendFacture(event.event);
       response.sendStatus(event.status);
     } else {
       response.send(HttpStatus.NOT_FOUND);

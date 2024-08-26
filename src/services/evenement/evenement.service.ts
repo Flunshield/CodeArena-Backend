@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client'; // Import SortOrder from @prisma/client
 import { PdfService } from '../pdfservice/pdf.service';
-import { MailService } from 'src/email/service/MailService';
+import { MailService } from '../../email/service/MailService';
 import { ADMIN, ENTREPRISE } from 'src/constantes/contante';
 
 const prisma: PrismaClient = new PrismaClient();
@@ -194,35 +194,6 @@ export class EvenementService {
     } catch (error) {
       console.error(error);
       throw error; // Renvoyer l'erreur après l'avoir loguée
-    }
-  }
-
-  async sendFacture(event) {
-    try {
-      const eventCreated = await prisma.events.findFirst({
-        where: {
-          id: parseInt(event.id),
-        },
-      });
-      const user = await prisma.user.findFirst({
-        where: {
-          id: eventCreated.userIDEntreprise,
-        },
-      });
-
-      const facture = await this.pdfService.generateFacturePDF(
-        user,
-        eventCreated,
-      );
-
-      if (user.email) {
-        await this.mailService.sendFactureByEmail(user, facture);
-      }
-
-      return facture;
-    } catch (error) {
-      console.error(error);
-      throw error;
     }
   }
 }
