@@ -311,5 +311,8 @@
   "allTitles": "All titles",
   "statusOfVerification": "Verification status",
   "nbTestSend": "Number of tests sent",
-  "cvName": "CV name"
+  "cvName": "CV name",
+  "week": "Week",
+  "day": "Day", 
+  "today": "Today"
 }

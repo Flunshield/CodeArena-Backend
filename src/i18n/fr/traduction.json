@@ -310,5 +310,8 @@
   "allTitles": "Tous les titres",
   "statusOfVerification": "Statut de Vérification",
   "nbTestSend": "Nombre de test envoyé",
-  "cvName": "Nom du CV"
+  "cvName": "Nom du CV",
+  "week": "Semaine",
+  "day": "Jour", 
+  "today": "Aujourd'hui"
 }
