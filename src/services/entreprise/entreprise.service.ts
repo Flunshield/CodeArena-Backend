@@ -126,14 +126,10 @@ export class EntrepriseService {
           commandeId: commande.id,
         },
       });
-
-      console.log(commande);
-
-      return {event: eventAssociated, commande: commande};
+      return { event: eventAssociated, commande: commande };
     } catch (error) {
       console.error('Erreur lors de la récupération de la commande :', error);
-      throw error
-    
+      throw error;
+    }
   }
-}
 }

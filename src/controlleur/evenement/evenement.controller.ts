@@ -135,7 +135,6 @@ export class EvenementController {
   @Roles(ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
   async deleteEvent(@Body() data, @Res() response) {
-    console.log(data);
     const userId = data.userId;
     const idElementToDelete = data.idElementToDelete;
     const event = await this.evenementService.deleteEvent(
