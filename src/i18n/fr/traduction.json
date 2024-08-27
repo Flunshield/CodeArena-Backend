@@ -341,5 +341,13 @@
   "day": "Jour",
   "today": "Aujourd'hui",
   "eventDeleted": "Événement supprimé",
-  "errorEventDeleted": "Erreur lors de la suppression de l'événement"
+  "errorEventDeleted": "Erreur lors de la suppression de l'événement",
+  "news": "Nouveauté disponibles",
+  "noNews": "Aucune nouveauté",
+  "title1": "Nouveauté 1",
+  "description1": "Découvrez notre nouvelle fonctionnalité de tableau de bord !",
+  "title2": "Mise à jour 2",
+  "description2": "Nous avons ajouté de nouvelles options de personnalisation.",
+  "title3": "Annonce 3",
+  "description3": "Lancement de notre concours de codage avec des prix à gagner."
 }
