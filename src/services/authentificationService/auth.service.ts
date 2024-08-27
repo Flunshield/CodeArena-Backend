@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
+import { HttpStatus, Injectable, Res } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import {
   DecodedTokenMail,
@@ -134,15 +134,12 @@ export class AuthService {
             id: number;
           };
           if (decodedToken) {
-            new HttpException(
-              'Utilisateur déjà connecté',
-              HttpStatus.NOT_FOUND,
-            );
+            return HttpStatus.UNAUTHORIZED;
           } else {
-            new HttpException('Token erroné', HttpStatus.BAD_REQUEST);
+            return HttpStatus.BAD_REQUEST;
           }
         } catch (verifyError) {
-          new HttpException('Vérification erronée', HttpStatus.BAD_REQUEST);
+          return HttpStatus.BAD_REQUEST;
         }
       }
 
@@ -167,28 +164,28 @@ export class AuthService {
             const tokenGenerated =
               await this.refreshTokenService.generateRefreshToken(user.id, res);
             if (tokenGenerated) {
+              await prisma.user.update({
+                where: {
+                  id: user.id,
+                  userName: user.userName,
+                },
+                data: {
+                  lastLogin: new Date(),
+                },
+              });
               return await this.refreshTokenService.generateAccessTokenFromRefreshToken(
                 tokenGenerated,
               );
             }
           } catch (readFileError) {
             console.error('Error reading private key file:', readFileError);
-            new HttpException(
-              'Erreur sur la lecture de la clé privée',
-              HttpStatus.EXPECTATION_FAILED,
-            );
+            return HttpStatus.BAD_REQUEST;
           }
         } else {
-          new HttpException(
-            'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
-            HttpStatus.BAD_REQUEST,
-          );
+          return HttpStatus.BAD_REQUEST;
         }
       } else {
-        new HttpException(
-          'Le nom de compte et/ou le mot de passe est/sont erroné(s)',
-          HttpStatus.BAD_REQUEST,
-        );
+        return HttpStatus.BAD_REQUEST;
       }
     } catch (error) {
       return HttpStatus.INTERNAL_SERVER_ERROR;
@@ -369,14 +366,29 @@ export class AuthService {
    */
   async verifEntrepriseGroups(user: User) {
     if (user && user.id) {
-      const lastCommande = await this.stripeService.getLastCommande(
-        user.id.toString(),
-      );
-      const abonnementValid = await this.stripeService.getSubscriptionStatus(
-        lastCommande.customerId,
-      );
-      if (abonnementValid && !abonnementValid.active) {
-        await resetUserGroup(user);
+      try {
+        // Récupère la dernière commande Stripe associée à l'utilisateur
+        const lastCommande = await this.stripeService.getLastCommande(
+          user.id.toString(),
+        );
+        if (lastCommande && lastCommande.customerId) {
+          // Vérifie le statut de l'abonnement sur Stripe
+          const abonnementStatus =
+            await this.stripeService.getSubscriptionStatus(
+              lastCommande.customerId,
+            );
+          // Si l'abonnement est soit inactif (annulé, expiré, etc.) ou n'existe pas
+          if (!abonnementStatus || !abonnementStatus.active) {
+            // Réinitialise le groupe de l'utilisateur
+            await resetUserGroup(user);
+          }
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la vérification de l'abonnement :",
+          error,
+        );
+        // Gérer les erreurs comme il convient, par exemple en notifiant l'utilisateur ou en logguant l'erreur
       }
     }
   }

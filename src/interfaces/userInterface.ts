@@ -175,15 +175,31 @@ export interface UserMatch {
 
 export interface Event {
   id?: number;
-  startDate?: Date;
-  endDate?: Date;
-  playerMax?: number;
-  title?: string;
-  description?: string;
-  rewards?: string;
-  organize?: string;
+  startDate: Date;
+  endDate: Date;
+  playerMax: number;
+  title: string;
+  description: string;
+  rewards: string;
+  organize: string;
+  createPuzzles?: boolean;
+  priceAdjustment?: number;
+  basePrice?: number;
+  priceDetails?: JsonValue;
   matches?: Match[];
   userEvent?: UserEvent[];
+  puzzles?: PuzzlesEntreprise[];
+  accepted?: boolean;
+}
+
+export interface priceDetails {
+  id: number;
+  basePrice: number;
+  proximityCharge: number;
+  durationCharge: number;
+  puzzlesCharge: number;
+  adjustmentCharge: number;
+  finalPrice: number;
 }
 
 export interface UserEvent {
@@ -228,7 +244,7 @@ export interface CommandeEntreprise {
   dateCommande: Date;
   etatCommande: string;
   nbCreateTest: number;
-  customerId: string;
+  customerId?: string;
 }
 
 export interface PuzzlesEntreprise {
@@ -237,4 +253,45 @@ export interface PuzzlesEntreprise {
   user?: User;
   tests: JSON;
   details: string;
+}
+
+export interface CvUser {
+  id: number;
+  cvName: string;
+  userID: number;
+  user: User;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  summary: string;
+  experiences: Experience[];
+  educations: Education[];
+  technicalSkills: TechnicalSkill[];
+  softSkills: SoftSkill[];
+}
+
+interface Experience {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+}
+
+interface Education {
+  institution: string;
+  degree: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+}
+
+export interface TechnicalSkill {
+  name: string;
+}
+
+export interface SoftSkill {
+  name: string;
 }

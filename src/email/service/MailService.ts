@@ -2,6 +2,8 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { RefreshTokenService } from '../../services/authentificationService/RefreshTokenService';
 import { PrismaClient } from '@prisma/client';
+import { User } from 'src/interfaces/userInterface';
+import { PdfService } from 'src/services/pdfservice/pdf.service';
 
 const prisma = new PrismaClient();
 
@@ -21,6 +23,7 @@ export class MailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly refreshTokenService: RefreshTokenService,
+    private readonly pdfService: PdfService,
   ) {}
 
   async sendActiveAccount(data: Mail, urlActive: string): Promise<boolean> {
@@ -115,6 +118,7 @@ export class MailService {
     data?: Mail,
     type?: number,
     mailID?: number,
+    user?: User,
   ) {
     // TYPE 1 : Envoie du mail pour valider l'adresse mail.
     if (type === 1) {
@@ -156,6 +160,57 @@ export class MailService {
     // TYPE 4 : Envoie d'un mail de confirmation d'achat avec facture
     if (type === 4) {
       return await this.sendConfirmationOrder(data);
+    }
+
+    if (type === 5) {
+      // TYPE 5 : Envoie du mail pour l'annulation d'abonnement
+      return await this.sendCancelSubscription(data);
+    }
+    if (type === 6) {
+      // TYPE 6 : Envoie du mail pour la confirmation de l'achat de l'event
+      return await this.sendConfirmationBuyEvent(user);
+    }
+  }
+
+  async sendConfirmationBuyEvent(user) {
+    try {
+      // Récupérer l'événement associé à l'utilisateur (Je l'ai stocké temporairement dans url) Pas le temps pour une meilleure solution
+      const event = await prisma.events.findFirst({
+        where: {
+          id: parseInt(user.url, 10),
+        },
+      });
+
+      if (user.email) {
+        const facture = await this.pdfService.generateFacturePDF(user, event);
+        await this.sendFactureByEmail(user, facture);
+      }
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  async sendCancelSubscription(data: Mail) {
+    try {
+      await this.mailerService.sendMail({
+        to: data.email,
+        subject: "Annulation de l'abonnement",
+        template: 'cancelSubscription',
+        context: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+        },
+      });
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
     }
   }
 
@@ -209,6 +264,58 @@ export class MailService {
         ],
       });
       return true;
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  async sendDevisByEmail(user: User, devis: Buffer) {
+    try {
+      const devisBuffer = await devis;
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Devis',
+        template: 'sendDevis',
+        context: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        attachments: [
+          {
+            filename: 'devis.pdf',
+            content: devisBuffer,
+            contentType: 'application/pdf',
+          },
+        ],
+      });
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de l'envoi de l'e-mail : ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+  async sendFactureByEmail(user: User, facture: unknown) {
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Facture',
+        template: 'sendFacture',
+        context: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        attachments: [
+          {
+            filename: 'facture.pdf',
+            content: facture,
+            contentType: 'application/pdf',
+          },
+        ],
+      });
     } catch (error) {
       this.logger.error(
         `Erreur lors de l'envoi de l'e-mail : ${error.message}`,

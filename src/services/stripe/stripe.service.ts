@@ -93,11 +93,23 @@ export class StripeService {
    * @throws {HttpException} Une erreur est levée si une erreur interne survient lors du processus de création de la commande.
    */
 
-  async createCommande(session, user: User) {
+  async createCommande(
+    session,
+    userId: number,
+    isEvent?: boolean,
+    eventId?: string,
+  ) {
     try {
-      const nbCreateTest = PRODUCT.find((elem) => {
-        return elem.id === (session ? session.line_items.data[0].price.id : '');
-      });
+      let userUpdate = undefined;
+      let updateEvent = undefined;
+
+      const nbCreateTest = !isEvent
+        ? PRODUCT.find((elem) => {
+            return (
+              elem.id === (session ? session.line_items.data[0].price.id : '')
+            );
+          })
+        : 0;
 
       const createCommand = await prisma.commandeEntreprise.create({
         data: {
@@ -105,16 +117,36 @@ export class StripeService {
           objetSession: [session],
           idPayment: session.payment_intent ?? session.subscription,
           item: session.line_items.data[0].price.id ?? '',
-          userID: user.id,
+          userID: userId,
           customerId: session.customer,
           dateCommande: new Date(),
           etatCommande: session.payment_status,
-          nbCreateTest: nbCreateTest.nbCreate,
+          nbCreateTest: nbCreateTest !== 0 ? nbCreateTest.nbCreate : 0,
         },
       });
+
       if (createCommand) {
-        const userUpdate = await this.attributeEntrepriseRole(user);
-        if (userUpdate) {
+        const user = await prisma.user.findFirst({
+          where: {
+            id: userId,
+          },
+        });
+
+        if (!isEvent) {
+          userUpdate = await this.attributeEntrepriseRole(user);
+        } else if (isEvent) {
+          updateEvent = await prisma.events.update({
+            where: {
+              id: parseInt(eventId),
+            },
+            data: {
+              commandeId: createCommand.id,
+              statusPayment: session.payment_status,
+            },
+          });
+        }
+
+        if (userUpdate && !isEvent) {
           const getInvoice: Promise<Buffer> = this.getLatestInvoice(
             session.customer,
             '',
@@ -126,7 +158,6 @@ export class StripeService {
             lastName: user.lastName,
             pdfBuffer: getInvoice,
           };
-          // Realise les actions necessaire à l'envoie du mail de création de compte.
           const responseSendMail = await this.mailService.prepareMail(
             undefined,
             data,
@@ -137,9 +168,20 @@ export class StripeService {
           } else {
             return HttpStatus.NOT_MODIFIED;
           }
+        } else if (isEvent && updateEvent) {
+          user.url = eventId;
+          await this.mailService.prepareMail(
+            undefined,
+            undefined,
+            6,
+            undefined,
+            user,
+          );
+          return HttpStatus.CREATED;
         }
       }
     } catch (e) {
+      console.log(e);
       throw new HttpException(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -242,17 +284,15 @@ export class StripeService {
         },
       });
 
-      const resetGroupUser = await prisma.user.update({
-        where: {
-          id: lastCommande.userID,
-        },
-        data: {
-          groupsId: 1,
-        },
-      });
+      if (cancelCommand) {
+        const user = await prisma.user.findFirst({
+          where: {
+            id: lastCommande.userID,
+          },
+        });
 
-      if (cancelCommand && resetGroupUser) {
-        return unsuscribe;
+        const mailSend = this.mailService.prepareMail(undefined, user, 5);
+        return unsuscribe && mailSend;
       }
     }
   }
@@ -274,6 +314,7 @@ export class StripeService {
     return prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
+        customerId: { not: null },
       },
       orderBy: {
         dateCommande: 'desc',
@@ -281,6 +322,16 @@ export class StripeService {
     });
   }
 
+  /**
+   * Récupère la dernière facture payée d'un client et génère un PDF.
+   *
+   * @param customerId - L'identifiant du client dans Stripe.
+   * @param id - Optionnel, l'identifiant de l'utilisateur si l'objet utilisateur n'est pas fourni.
+   * @param user - Optionnel, l'objet `User` représentant l'utilisateur, sinon sera récupéré depuis la base de données.
+   * @returns Un `Buffer` contenant la facture au format PDF.
+   *
+   * @throws Error si une erreur se produit lors de la récupération de la facture ou de la génération du PDF.
+   */
   async getLatestInvoice(
     customerId: string,
     id?: string,
@@ -303,5 +354,63 @@ export class StripeService {
       latestInvoice.data[0],
       user,
     );
+  }
+
+  /**
+   * Crée un produit, un prix pour ce produit, et génère une session de paiement Stripe.
+   *
+   * @param productName - Le nom du produit.
+   * @param amount - Le montant du prix en centimes (ex: 1000 pour 10.00 EUR).
+   * @param currency - La devise du prix (ex: 'eur' pour euros).
+   * @param successUrl - L'URL vers laquelle rediriger après un paiement réussi.
+   * @param cancelUrl - L'URL vers laquelle rediriger après une annulation.
+   * @returns Une promesse avec l'URL de la session de paiement Stripe.
+   */
+  async createProductAndCheckoutSession(
+    productName: string,
+    amount: number,
+    currency: string,
+    successUrl: string,
+    cancelUrl: string,
+  ): Promise<string> {
+    try {
+      // 1. Créer le produit
+      const product = await this.stripe.products.create({
+        name: productName,
+      });
+
+      // 2. Créer un prix pour ce produit
+      const price = await this.stripe.prices.create({
+        unit_amount: amount,
+        currency: currency,
+        product: product.id,
+      });
+
+      // 3. Créer une session de paiement Stripe (Checkout)
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: price.id,
+            quantity: 1,
+          },
+        ],
+        mode: 'payment', // 'payment' pour un paiement unique
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+
+      // Retourner l'URL de la session de paiement
+      return session.url;
+    } catch (error) {
+      console.error(
+        'Erreur lors de la création du produit ou de la session de paiement:',
+        error,
+      );
+      throw new HttpException(
+        'Erreur lors de la création de la session de paiement',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
