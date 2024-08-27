@@ -233,7 +233,7 @@
   "dateCommande": "Order date",
   "idPayment": "Payment ID",
   "etatCommande": "Order status",
-  "historiqueAchat": "Purchase history",  
+  "historiqueAchat": "Purchase history",
   "errorFormatAdresse": "The address is incorrect, please follow the format: [ADDRESS], [POSTAL CODE] [CITY]",
   "errorSiren": "The SIREN number is incorrect",
   "succesMajEntreprise": "The company has been successfully updated",
@@ -342,5 +342,13 @@
   "day": "Day",
   "today": "Today",
   "eventDeleted": "Event deleted",
-  "errorEventDeleted": "Error deleting event"
+  "errorEventDeleted": "Error deleting event",
+  "news": "News available",
+  "noNews": "No news",
+  "title1": "New Feature 1",
+  "description1": "Discover our new dashboard feature!",
+  "title2": "Update 2",
+  "description2": "We added new customization options.",
+  "title3": "Announcement 3",
+  "description3": "Launch of our coding contest with prizes to be won."
 }
