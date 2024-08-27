@@ -314,6 +314,7 @@ export class StripeService {
     return prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
+        customerId: { not: null },
       },
       orderBy: {
         dateCommande: 'desc',

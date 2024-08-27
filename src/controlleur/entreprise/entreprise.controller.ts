@@ -167,4 +167,11 @@ export class EntrepriseController {
   async getUserEntreprise(@Query('userName') userName: string) {
     return await this.entrepriseService.getUserEntreprise(userName);
   }
+
+  @Get('getCommande')
+  @Roles(ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getCommande(@Query('id') id: string, @Query('userId') userId: string) {
+    return await this.entrepriseService.getCommande(id, userId);
+  }
 }

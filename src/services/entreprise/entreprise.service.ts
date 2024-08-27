@@ -111,4 +111,29 @@ export class EntrepriseService {
       return [];
     }
   }
+
+  async getCommande(id: string, userId: string) {
+    try {
+      const commande = await prisma.commandeEntreprise.findFirst({
+        where: {
+          id: parseInt(id),
+          userID: parseInt(userId),
+        },
+      });
+
+      const eventAssociated = await prisma.events.findFirst({
+        where: {
+          commandeId: commande.id,
+        },
+      });
+
+      console.log(commande);
+
+      return {event: eventAssociated, commande: commande};
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la commande :', error);
+      throw error
+    
+  }
+}
 }
