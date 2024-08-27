@@ -56,42 +56,80 @@ export class RoomService {
     return room ? room.puzzle : null;
   }
 
+  getRoomStartTimestamp(roomId: string): number | null {
+    const room = this.rooms.find((room) => room.roomId === roomId);
+    return room ? room.startTimestamp : null;
+  }
+
   leaveRoom(userId: number): boolean {
     const roomIndex = this.rooms.findIndex(
       (room) => room.user1 === userId || room.user2 === userId,
     );
-    if (roomIndex === -1) {
-      return false;
-    }
-    const room = this.rooms[roomIndex];
-    let winnerId: number | null = null;
+    if (roomIndex === -1) return false;
 
-    if (room.user1 === userId) {
-      winnerId = room.user2;
-      room.user1 = null;
-    } else {
-      winnerId = room.user1;
-      room.user2 = null;
-    }
+    const room = this.rooms[roomIndex];
+    const leavingUser = room.user1 === userId ? 'user1' : 'user2';
+    const winnerId = leavingUser === 'user1' ? room.user2 : room.user1;
+
+    room[leavingUser] = null;
 
     this.chatGateway.notifyUserLeft(room.roomId, userId);
 
     if (winnerId !== null) {
-      const matchDuration = (Date.now() - room.startTimestamp) / 1000;
-      this.endMatch(
-        room.roomId,
-        userId,
-        winnerId,
-        matchDuration,
-        room.startTimestamp,
-      );
+      this.handleMatchEnd(room, userId, winnerId, false, 'Abandon');
     }
 
     if (room.user1 === null || room.user2 === null) {
       this.rooms.splice(roomIndex, 1);
     }
-
     return true;
+  }
+
+  endRoomByTimer(roomId: string): boolean {
+    const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+    if (roomIndex === -1) return false;
+
+    const room = this.rooms[roomIndex];
+    this.handleMatchEnd(room, room.user1, room.user2, true, 'Temps écoulé');
+    if (room.user1 === null || room.user2 === null) {
+      this.rooms.splice(roomIndex, 1);
+    }
+    this.rooms.splice(roomIndex, 1);
+    return true;
+  }
+
+  endRoomByWinner(roomId: string, winnerId: number): boolean {
+    const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+    if (roomIndex === -1) return false;
+
+    const room = this.rooms[roomIndex];
+    const loserId = room.user1 === winnerId ? room.user2 : room.user1;
+
+    if (loserId !== null) {
+      room.user1 === winnerId ? (room.user1 = null) : (room.user2 = null);
+      this.handleMatchEnd(room, loserId, winnerId, false, 'Terminer');
+    }
+    this.rooms.splice(roomIndex, 1);
+    return true;
+  }
+
+  private handleMatchEnd(
+    room: any,
+    loserId: number,
+    winnerId: number,
+    egality: boolean,
+    status: string,
+  ): void {
+    const matchDuration = (Date.now() - room.startTimestamp) / 1000;
+    this.endMatch(
+      room.roomId,
+      loserId,
+      winnerId,
+      matchDuration,
+      room.startTimestamp,
+      egality,
+      status,
+    );
   }
 
   /*
@@ -105,6 +143,8 @@ export class RoomService {
     winnerId: number,
     matchDuration: number,
     startTimestamp: number,
+    egality: boolean,
+    status: string,
   ): Promise<void> {
     const points = PointsCalculator.calculatePoints(matchDuration, '0-0');
     const startDate = new Date(startTimestamp).toISOString();
@@ -116,7 +156,7 @@ export class RoomService {
         date: startDate,
         time: matchDuration.toString(),
         location: roomId,
-        status: 'Completed',
+        status: status,
         score: `(${points.winnerPoints}) / (${points.loserPoints})`,
         tournamentID: null,
         rankingsID: winnerRankingsId,
@@ -125,6 +165,7 @@ export class RoomService {
         winnerPoints: points.winnerPoints,
         loserId: loserId,
         loserPoints: points.loserPoints,
+        //egality: egality,
       },
     });
 
