@@ -353,5 +353,12 @@
   "title2": "Update 2",
   "description2": "We added new customization options.",
   "title3": "Announcement 3",
-  "description3": "Launch of our coding contest with prizes to be won."
+  "description3": "Launch of our coding contest with prizes to be won.",
+  "historyMatch": "Match history",
+  "Statut": "Status",
+  "duree": "Duration",
+  "score": "Score",
+  "winner": "Winner",
+  "loser": "Loser",
+  "pointSWin": "Points won"
 }

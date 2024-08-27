@@ -761,4 +761,80 @@ export class UserService {
       return false;
     }
   }
+
+  async getHistoriqueMatch(id: string) {
+    // Trouver les matchs auxquels l'utilisateur a participé
+    const matches = await prisma.matches.findMany({
+      take: 10,
+      orderBy: {
+        date: 'desc',
+      },
+      where: {
+        userMatch: {
+          some: {
+            userID: parseInt(id),
+          },
+        },
+      },
+      select: {
+        id: true,
+        date: true,
+        time: true,
+        location: true,
+        status: true,
+        score: true,
+        loserPoints: true,
+        winnerPoints: true,
+        // Sélection des utilisateurs impliqués dans le match
+        userMatch: {
+          select: {
+            userID: true,
+            user: {
+              select: {
+                userName: true,
+              },
+            },
+          },
+        },
+        // Sélection des informations sur le gagnant
+        winnerId: true, // On récupère uniquement l'ID du gagnant
+        loserId: true, // On récupère uniquement l'ID du perdant
+      },
+    });
+  
+    // Pour chaque match, récupérer les détails du gagnant
+    const matchesWithWinnerDetails = await Promise.all(matches.map(async (match) => {
+      let winner = null;
+      let loser = null;
+      if (match.winnerId) {
+        winner = await prisma.user.findUnique({
+          where: {
+            id: match.winnerId,
+          },
+          select: {
+            userName: true,
+          },
+        });
+      }
+      if(match.loserId) {
+        loser = await prisma.user.findUnique({
+          where: {
+            id: match.loserId,
+          },
+          select: {
+            userName: true,
+          },
+        });
+      }
+  
+      return {
+        ...match,
+        winner: winner,
+        loser: loser,
+      };
+    }));
+  
+    return matchesWithWinnerDetails;
+  }
+  
 }

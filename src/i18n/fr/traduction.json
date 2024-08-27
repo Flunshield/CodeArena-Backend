@@ -352,5 +352,12 @@
   "title2": "Mise à jour 2",
   "description2": "Nous avons ajouté de nouvelles options de personnalisation.",
   "title3": "Annonce 3",
-  "description3": "Lancement de notre concours de codage avec des prix à gagner."
+  "description3": "Lancement de notre concours de codage avec des prix à gagner.",
+  "historyMatch": "Historique des Matchs",
+  "Statut": "Statut",
+  "duree": "Durée",
+  "score": "Score",
+  "winner": "Gagnant",
+  "loser": "Perdant",
+  "pointSWin": "Points gagnés"
 }
