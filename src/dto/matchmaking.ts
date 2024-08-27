@@ -41,6 +41,6 @@ export class MatchFoundDto {
 
 export class CreateRoomDto {
   firstUser: number;
-  puzzleId: number;
+  puzzle: object;
   startTimestamp: number;
 }
