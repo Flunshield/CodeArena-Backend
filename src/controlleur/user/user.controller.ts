@@ -290,4 +290,18 @@ export class UserController {
       console.log(error);
     }
   }
+
+  @Get('getHistoriqueMatch')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getHistoriqueMatch(@Query('id') id: string, @Req() request, @Res() response) {
+    try {
+      const historiqueMatch = await this.userService.getHistoriqueMatch(id);
+      if(historiqueMatch) {
+        response.send(historiqueMatch);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
