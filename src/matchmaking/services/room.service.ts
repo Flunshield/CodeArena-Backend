@@ -27,7 +27,7 @@ export class RoomService {
       roomId,
       user1,
       user2: matchData.firstUser,
-      puzzleId: matchData.puzzleId,
+      puzzle: matchData.puzzle,
       startTimestamp: matchData.startTimestamp,
     };
     this.rooms.push(room);
@@ -36,7 +36,7 @@ export class RoomService {
       user1,
       matchData.firstUser,
       roomId,
-      matchData.puzzleId,
+      matchData.puzzle,
       matchData.startTimestamp,
     );
   }
@@ -50,6 +50,10 @@ export class RoomService {
     return this.rooms.some(
       (room) => room.user1 === userId || room.user2 === userId,
     );
+  }
+  getRoomPuzzle(roomId: string): object | null {
+    const room = this.rooms.find((room) => room.roomId === roomId);
+    return room ? room.puzzle : null;
   }
 
   leaveRoom(userId: number): boolean {

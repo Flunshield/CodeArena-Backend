@@ -60,18 +60,18 @@ export class ChatGateway
     userId1: number,
     userId2: number,
     roomId: string,
-    puzzleId: number,
+    puzzle: object,
     startTimestamp: number,
   ): void {
     this.server.emit('matchFound', {
       userId1,
       userId2,
       roomId,
-      puzzleId,
+      puzzle,
       startTimestamp,
     });
     this.logger.log(
-      `Match found: User ${userId1} and User ${userId2} in room ${roomId} with puzzle ${puzzleId}`,
+      `Match found: User ${userId1} and User ${userId2} in room ${roomId} with puzzle ${puzzle}`,
     );
   }
 
