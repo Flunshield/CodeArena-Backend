@@ -110,12 +110,19 @@ export class MatchmakingController {
       return { success: false, message: 'Invalid user ID.' };
     }
     const isInRoom = this.roomService.isUserInRoom(parseInt(userId));
+    const roomId = this.roomService.getRoomIdByUserId(parseInt(userId));
+    const puzzle = this.roomService.getRoomPuzzle(roomId);
     return {
       success: true,
       isInRoom,
-      roomId: isInRoom
-        ? this.roomService.getRoomIdByUserId(parseInt(userId))
-        : null,
+      puzzle: puzzle,
+      roomId: isInRoom ? roomId : null,
     };
+  }
+
+  @Get('findPuzzleById')
+  findPuzzleById(@Query('roomId') roomId: string) {
+    const puzzle = this.roomService.getRoomPuzzle(roomId);
+    return { success: true, puzzle };
   }
 }
