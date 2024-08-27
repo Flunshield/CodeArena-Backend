@@ -100,6 +100,7 @@ CREATE TABLE `matches` (
     `eventsID` INTEGER NULL,
     `winnerId` INTEGER NULL,
     `winnerPoints` DOUBLE NULL,
+    `egality` BOOLEAN NULL,
     `loserId` INTEGER NULL,
     `loserPoints` DOUBLE NULL,
 
