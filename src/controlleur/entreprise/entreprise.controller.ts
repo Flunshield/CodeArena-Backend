@@ -160,4 +160,11 @@ export class EntrepriseController {
       response.status(500).send('Error generating CV');
     }
   }
+
+  @Get('getUserEntreprise')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async getUserEntreprise(@Query('userName') userName: string) {
+    return await this.entrepriseService.getUserEntreprise(userName);
+  }
 }

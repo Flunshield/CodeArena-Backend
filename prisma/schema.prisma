@@ -43,6 +43,7 @@ model user {
   puzzleSend         puzzleSend[]
   siren              String?
   cvUser             cvUser[]
+  events events[]
 }
 
 model Title {
@@ -146,14 +147,24 @@ model userMatch {
 }
 
 model events {
-  id          Int         @id @default(autoincrement())
-  startDate   DateTime
-  endDate     DateTime
-  playerMax   Int
-  title       String
-  description String
-  rewards     String
-  organize    String
+  id              Int         @id @default(autoincrement())
+  startDate       DateTime
+  endDate         DateTime
+  playerMax       Int
+  title           String
+  description     String
+  rewards         String
+  organize        String
+  createPuzzles   Boolean
+  priceAdjustment Int
+  basePrice       Float        @default(1000.0)
+  priceDetails    Json?
+  accepted        Boolean      @default(false)
+  statusPayment   String       @default("not paid")
+  userIDEntreprise Int
+  commandeId      Int?
+  commande        commandeEntreprise? @relation(fields: [commandeId], references: [id])
+  user        user    @relation(fields: [userIDEntreprise], references: [id])
   matches     matches[]
   userEvent   userEvent[]
   puzzles     puzzles[]
@@ -193,6 +204,7 @@ model commandeEntreprise {
   etatCommande String
   nbCreateTest Int      @default(10)
   customerId   String?
+  events       events[]
 }
 
 model puzzlesEntreprise {
