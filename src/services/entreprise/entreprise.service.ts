@@ -126,6 +126,12 @@ export class EntrepriseService {
           commandeId: commande.id,
         },
       });
+<<<<<<< Updated upstream
+=======
+
+      console.log(commande);
+
+>>>>>>> Stashed changes
       return { event: eventAssociated, commande: commande };
     } catch (error) {
       console.error('Erreur lors de la récupération de la commande :', error);
