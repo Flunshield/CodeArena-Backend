@@ -360,5 +360,6 @@
   "winner": "Gagnant",
   "loser": "Perdant",
   "pointSWin": "Points gagnés",
-  "creatorCv": "Création du CV"
+  "creatorCv": "Création du CV",
+  "TitlesUpdate": "Mise à jour des titres"
 }

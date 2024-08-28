@@ -299,6 +299,45 @@ export class PuzzleService {
       throw e;
     }
   }
+  
+  async updatePuzzleAdmin(data: any) {
+    const puzzleID = parseInt(data.id, 10);
+    try {
+      return await prisma.puzzles.update({
+        where: {
+          id: puzzleID
+        },
+        data: {
+          tests: data.tests,
+          details: data.details,
+          title: data.title,
+          rankingsID: data.rankingId,
+          eventsID: data.eventId
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  async createPuzzleAdmin(data: any) {
+    const tests = typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
+    try {
+      return await prisma.puzzles.create({
+        data: {
+          tests: tests,
+          details: data.details,
+          title: data.title,
+          rankingsID: parseInt(data.rankingId),
+          eventsID: parseInt(data.eventId)
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 function formatPuzzleData(puzzle) {
