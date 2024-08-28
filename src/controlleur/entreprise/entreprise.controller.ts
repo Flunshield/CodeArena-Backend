@@ -36,6 +36,7 @@ export class EntrepriseController {
       const dataReceive = data.data;
       const canSendMail =
         await this.userService.getIfUSerCanSendMailEntreprise(dataReceive);
+
       if (canSendMail) {
         const sendEmail =
           await this.entrepriseService.sendEmailPuzzle(dataReceive);
