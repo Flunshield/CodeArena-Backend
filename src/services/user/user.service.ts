@@ -801,40 +801,41 @@ export class UserService {
         loserId: true, // On récupère uniquement l'ID du perdant
       },
     });
-  
+
     // Pour chaque match, récupérer les détails du gagnant
-    const matchesWithWinnerDetails = await Promise.all(matches.map(async (match) => {
-      let winner = null;
-      let loser = null;
-      if (match.winnerId) {
-        winner = await prisma.user.findUnique({
-          where: {
-            id: match.winnerId,
-          },
-          select: {
-            userName: true,
-          },
-        });
-      }
-      if(match.loserId) {
-        loser = await prisma.user.findUnique({
-          where: {
-            id: match.loserId,
-          },
-          select: {
-            userName: true,
-          },
-        });
-      }
-  
-      return {
-        ...match,
-        winner: winner,
-        loser: loser,
-      };
-    }));
-  
+    const matchesWithWinnerDetails = await Promise.all(
+      matches.map(async (match) => {
+        let winner = null;
+        let loser = null;
+        if (match.winnerId) {
+          winner = await prisma.user.findUnique({
+            where: {
+              id: match.winnerId,
+            },
+            select: {
+              userName: true,
+            },
+          });
+        }
+        if (match.loserId) {
+          loser = await prisma.user.findUnique({
+            where: {
+              id: match.loserId,
+            },
+            select: {
+              userName: true,
+            },
+          });
+        }
+
+        return {
+          ...match,
+          winner: winner,
+          loser: loser,
+        };
+      }),
+    );
+
     return matchesWithWinnerDetails;
   }
-  
 }
