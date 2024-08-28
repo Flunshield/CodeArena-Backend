@@ -17,6 +17,7 @@ export class ChatGateway
   @WebSocketServer()
   server: Server;
   private readonly logger = new Logger(ChatGateway.name);
+  roomService: any;
 
   /*
    ****************************
@@ -79,6 +80,11 @@ export class ChatGateway
     this.server.to(roomId).emit('userLeft', { userId });
     this.logger.log(`User ${userId} left room ${roomId}`);
   }
+
+  // notifyOpponentToLeave(roomId: string, opponentId: number): void {
+  //   this.server.to(roomId).emit('opponentLeft', { opponentId });
+  //   this.logger.log(`User ${opponentId} notified to leave room ${roomId}`);
+  // }
 
   /*
    ****************************
