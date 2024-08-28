@@ -362,5 +362,7 @@
   "loser": "Loser",
   "pointSWin": "Points won",
   "creatorCv": "CV creator",
-  "TitlesUpdated": "Titles updated"
+  "TitlesUpdated": "Titles updated",
+  "updateSuccess": "Update successful",
+  "updateError": "Update failed"
 }
