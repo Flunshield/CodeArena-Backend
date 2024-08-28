@@ -359,5 +359,6 @@
   "score": "Score",
   "winner": "Gagnant",
   "loser": "Perdant",
-  "pointSWin": "Points gagnés"
+  "pointSWin": "Points gagnés",
+  "creatorCv": "Création du CV"
 }
