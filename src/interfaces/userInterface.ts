@@ -190,6 +190,7 @@ export interface Event {
   userEvent?: UserEvent[];
   puzzles?: PuzzlesEntreprise[];
   accepted?: boolean;
+  numberRegistered?: number;
 }
 
 export interface priceDetails {
@@ -209,6 +210,7 @@ export interface UserEvent {
   eventsID: number;
   events: Event;
   points: number;
+  numberRegistered: number;
 }
 
 export interface ResponseCreateUser {
