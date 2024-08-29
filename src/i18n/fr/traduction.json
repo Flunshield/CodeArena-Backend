@@ -388,5 +388,9 @@
   "homedevServiceListTitle2": "Développeur d'application mobile",
   "homedevServiceListTitle3": "Développeur de jeux vidéo",
   "competition": "Compétition",
-  "puzzle": "Puzzle"
+  "puzzle": "Puzzle",
+  "adminDashboard": "Tableau de bord administrateur",
+  "sujetPuzzle": "Sujet du puzzle",
+  "listPuzzle": "Liste des puzzles",
+  "listOfTitle": "Liste des titres"
 }

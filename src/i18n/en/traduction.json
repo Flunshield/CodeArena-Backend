@@ -389,5 +389,8 @@
   "homedevServiceListTitle2": "Application Developer",
   "homedevServiceListTitle3": "Video Game Developer",
   "competition": "Competition",
-  "puzzle": "Puzzle"
+  "puzzle": "Puzzle",
+  "sujetPuzzle": "Puzzle subject",
+  "listPuzzle": "List of puzzles",
+  "listOfTitles": "List of titles"
 }
