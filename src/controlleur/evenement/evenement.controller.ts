@@ -56,6 +56,7 @@ export class EvenementController {
   @UseGuards(RolesGuard)
   async createEvent(@Body() data, @Res() response) {
     const eventData = data.data;
+
     // Créer un nouvel événement dans la base de données
     const newEvent = await this.evenementService.createEvent(eventData);
 
@@ -154,6 +155,7 @@ export class EvenementController {
   async deleteEvent(@Body() data, @Res() response) {
     const userId = data.userId;
     const idElementToDelete = data.idElementToDelete;
+
     const event = await this.evenementService.deleteEvent(
       userId,
       idElementToDelete,

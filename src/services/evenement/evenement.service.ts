@@ -23,6 +23,7 @@ export class EvenementService {
           groups: true,
         },
       });
+
       if (userGroup.groups.roles === ADMIN) {
         event = await prisma.events.delete({
           where: {
@@ -36,11 +37,12 @@ export class EvenementService {
             userIDEntreprise: parseInt(userId, 10),
           },
         });
+      }
 
         if (event) {
           return { status: HttpStatus.OK, event: event };
         }
-      }
+      
     } catch (error) {
       console.error(error);
       throw error;

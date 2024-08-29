@@ -392,5 +392,6 @@
   "adminDashboard": "Tableau de bord administrateur",
   "sujetPuzzle": "Sujet du puzzle",
   "listPuzzle": "Liste des puzzles",
-  "listOfTitle": "Liste des titres"
+  "listOfTitle": "Liste des titres",
+  "eventAcepted": "Événement accepté"
 }
