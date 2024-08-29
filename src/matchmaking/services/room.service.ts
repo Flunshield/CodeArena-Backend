@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatGateway } from './matchmaking.gateway';
 import { PrismaClient } from '@prisma/client';
@@ -13,6 +13,7 @@ export class RoomService {
 
   constructor(
     private readonly prisma: PrismaClient,
+    @Inject(forwardRef(() => ChatGateway))
     private readonly chatGateway: ChatGateway,
   ) {}
 
@@ -107,7 +108,7 @@ export class RoomService {
 
     if (loserId !== null) {
       room.user1 === winnerId ? (room.user1 = null) : (room.user2 = null);
-      this.handleMatchEnd(room, loserId, winnerId, false, 'Terminer');
+      this.handleMatchEnd(room, loserId, winnerId, false, 'Terminé');
     }
     this.rooms.splice(roomIndex, 1);
     return true;
