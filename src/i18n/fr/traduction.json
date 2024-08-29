@@ -361,7 +361,7 @@
   "loser": "Perdant",
   "pointSWin": "Points gagnés",
   "creatorCv": "Création du CV",
-  "TitlesUpdate": "Mise à jour des titres",
+  "titlesUpdate": "Mise à jour des titres",
   "updateSuccess": "Mise à jour réussie",
   "updateError": "Erreur lors de la mise à jour",
   "Dev": "Développeur",
@@ -393,5 +393,7 @@
   "sujetPuzzle": "Sujet du puzzle",
   "listPuzzle": "Liste des puzzles",
   "listOfTitle": "Liste des titres",
-  "eventAcepted": "Événement accepté"
+  "eventAcepted": "Événement accepté",
+  "disconnect": "Déconnexion",
+  "addTitle": "Ajouter un titre"
 }

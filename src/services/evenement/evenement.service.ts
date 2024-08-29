@@ -39,10 +39,9 @@ export class EvenementService {
         });
       }
 
-        if (event) {
-          return { status: HttpStatus.OK, event: event };
-        }
-      
+      if (event) {
+        return { status: HttpStatus.OK, event: event };
+      }
     } catch (error) {
       console.error(error);
       throw error;

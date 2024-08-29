@@ -282,10 +282,10 @@
   "addCompetence": "Add skill",
   "softSkills": "Interpersonal Skills",
   "deleteThisSoftSkill": "Delete this interpersonal skill",
-  "createCv": "Créer un CV",
+  "createCv": "Create a CV",
   "visualiser": "Visualiser",
   "action": "Action",
-  "voscvs": "Vos CVs",
+  "voscvs": "Your CVs",
   "cvActivated": "CV activated",
   "cvDesactived": "CV desactivated",
   "listUtilisateurs": "List of users",
@@ -362,7 +362,7 @@
   "loser": "Loser",
   "pointSWin": "Points won",
   "creatorCv": "CV creator",
-  "TitlesUpdated": "Titles updated",
+  "titlesUpdate": "Titles updated",
   "updateSuccess": "Update successful",
   "updateError": "Update failed",
   "Dev": "Developer",
@@ -393,5 +393,7 @@
   "sujetPuzzle": "Puzzle subject",
   "listPuzzle": "List of puzzles",
   "listOfTitles": "List of titles",
-  "eventAcepted": "Event accepted"
+  "eventAcepted": "Event accepted",
+  "addTitle": "Add a title"
+  
 }
