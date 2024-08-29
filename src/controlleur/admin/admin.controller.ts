@@ -5,6 +5,7 @@ import {
   Get,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -88,5 +89,35 @@ export class AdminController {
   async patchPointsUser(@Body() data, @Res() response): Promise<void> {
     const patchPointsUser = await this.adminService.patchPointsUser(data.user);
     response.send(patchPointsUser);
+  }
+
+  @Get('getPuzzles')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async getPuzzles(
+    @Req() request,
+    @Res() response,
+    @Query('currentPage') currentPage,
+  ) {
+    const puzzles = await this.adminService.getPuzzles(currentPage);
+    response.send(puzzles);
+  }
+
+  @Delete('deletePuzzle')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async deletePuzzle(@Body() data, @Res() response) {
+    const deletePuzzle = await this.adminService.deletePuzzle(data.puzzleId);
+    response.send(deletePuzzle);
+  }
+
+  @Post('updatePuzzleAdmin')
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async updatePuzzleAdmin(@Body() data, @Res() response) {
+    const updatePuzzleAdmin = await this.adminService.updatePuzzleAdmin(
+      data.data.value,
+    );
+    response.send(updatePuzzleAdmin);
   }
 }

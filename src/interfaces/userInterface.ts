@@ -221,14 +221,14 @@ export interface ResponseCreateUser {
 export interface puzzles {
   id: number;
   rankingsID: number;
-  coucou: string;
-  tuture: string;
   rankings: Ranking;
   tournamentID: number;
   tournament: Tournament;
   eventID: number;
   events: Event;
   tests: JsonValue;
+  title: string;
+  details: string;
 }
 
 export interface Puzzle {
