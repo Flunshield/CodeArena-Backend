@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Titles, User } from '../../interfaces/userInterface';
+import { puzzles, Titles, User } from '../../interfaces/userInterface';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -124,6 +124,44 @@ export class AdminService {
       data: {
         points: 0,
         rankingsID: 1,
+      },
+    });
+  }
+
+  async getPuzzles(pageNumber) {
+    const offset = (pageNumber - 1) * 10;
+    const puzzles = await prisma.puzzles.findMany({
+      take: 10,
+      skip: offset,
+      include: {
+        rankings: true,
+        events: true,
+      },
+    });
+    const count = await prisma.puzzles.count();
+    return { items: puzzles, count: count };
+  }
+
+  async deletePuzzle(puzzleId: string) {
+    return prisma.puzzles.delete({
+      where: {
+        id: parseInt(puzzleId),
+      },
+    });
+  }
+
+  async updatePuzzleAdmin(data: puzzles) {
+    return prisma.puzzles.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        title: data.title,
+        details: data.details,
+        tests: data.tests,
+        rankingsID: data.rankingsID
+          ? parseInt(data.rankingsID.toString())
+          : undefined,
       },
     });
   }

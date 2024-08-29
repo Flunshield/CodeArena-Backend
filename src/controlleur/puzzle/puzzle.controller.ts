@@ -60,6 +60,40 @@ export class PuzzleController {
     }
   }
 
+  @Patch("updatePuzzleAdmin")
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async updatePuzzleAdmin(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.updatePuzzleAdmin(data.data);
+      if (result) {
+        response.send(result);
+      } else {
+        response.sendStatus(HttpStatus.NOT_FOUND);
+      }
+    } catch (error) {
+      console.error(error);
+      response.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post("createPuzzleAdmin")
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async createPuzzleAdmin(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.createPuzzleAdmin(data.data);
+      if (result) {
+        response.send(result);
+      } else {
+        response.sendStatus(HttpStatus.NOT_FOUND);
+      }
+    } catch (error) {
+      console.error(error);
+      response.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Delete("deletePuzzle")
   @Roles(ENTREPRISE, ADMIN)
   @UseGuards(RolesGuard)

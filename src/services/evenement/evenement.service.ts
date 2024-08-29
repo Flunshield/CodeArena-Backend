@@ -6,6 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import { PdfService } from '../pdfservice/pdf.service';
 import { MailService } from '../../email/service/MailService';
 import { ADMIN, ENTREPRISE } from 'src/constantes/contante';
+import { UserEvent, Event } from 'src/interfaces/userInterface';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -62,7 +63,7 @@ export class EvenementService {
    * @throws Error si une erreur se produit lors de la récupération des événements.
    */
   async findEvent() {
-    return prisma.events.findMany({
+    const event = await prisma.events.findMany({
       where: {
         startDate: {
           gte: new Date(),
@@ -72,6 +73,17 @@ export class EvenementService {
         startDate: 'asc',
       },
     });
+    return event;
+  }
+
+  async findEventSingle(id: string) {
+    const event: Event = await prisma.events.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    event.numberRegistered = await playerRegisteredFunction(parseInt(id));
+    return event;
   }
 
   /**
@@ -274,4 +286,98 @@ export class EvenementService {
       throw error;
     }
   }
+
+  /**
+   * Met à jour la participation d'un utilisateur à un tournoi.
+   * @param user Les détails de l'utilisateur et du tournoi pour la mise à jour.
+   * @returns Le code d'état HTTP correspondant au résultat de la mise à jour.
+   */
+  async updateUserEvent(user: UserEvent) {
+    try {
+      // Vérifier si l'utilisateur est déjà inscrit au tournoi
+      const isUserRegistered = await prisma.userEvent.findFirst({
+        where: {
+          userID: user.userID,
+          eventsID: user.eventsID,
+        },
+      });
+
+      // Si l'utilisateur est déjà inscrit, renvoyer une erreur
+      if (isUserRegistered) {
+        return HttpStatus.BAD_REQUEST;
+      }
+
+      const event = await prisma.events.findFirst({
+        where: {
+          id: user.eventsID,
+        },
+      });
+      const playerRegistered = await playerRegisteredFunction(user.eventsID);
+      if (playerRegistered < event.playerMax) {
+        // Si l'utilisateur n'est pas déjà inscrit, créer une nouvelle entrée dans la table userTournament
+        const eventUpdate = await prisma.userEvent.create({
+          data: {
+            user: {
+              connect: { id: user.userID },
+            },
+            events: {
+              connect: { id: user.eventsID },
+            },
+            points: user.points,
+          },
+        });
+
+        // Vérifiez si la création a réussi et renvoyez le code approprié
+        if (eventUpdate) {
+          return HttpStatus.CREATED;
+        } else {
+          return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+      } else {
+        return HttpStatus.NOT_ACCEPTABLE;
+      }
+    } catch (e) {
+      console.error('Error:', e);
+      return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+  }
+
+  /**
+   * Met à jour la participation d'un utilisateur à un tournoi.
+   * @param user Les détails de l'utilisateur et du tournoi pour la mise à jour.
+   * @returns Le code d'état HTTP correspondant au résultat de la mise à jour.
+   */
+  async deleteUserEvent(user: UserEvent) {
+    const userInEvent = await prisma.userEvent.findFirst({
+      where: {
+        userID: user.userID,
+        eventsID: user.eventsID,
+      },
+    });
+    if (userInEvent) {
+      try {
+        await prisma.userEvent.delete({
+          where: {
+            id: userInEvent.id,
+          },
+        });
+        return HttpStatus.OK;
+      } catch (e) {}
+    } else {
+      return HttpStatus.NOT_FOUND;
+    }
+  }
+}
+
+/**
+ * Compte le nombre de joueurs inscrits à un tournoi.
+ * @param id L'identifiant du tournoi pour lequel on compte les joueurs inscrits.
+ * @returns Le nombre de joueurs inscrits au tournoi.
+ */
+async function playerRegisteredFunction(id: number) {
+  return prisma.userEvent.count({
+    where: {
+      eventsID: id,
+    },
+  });
 }

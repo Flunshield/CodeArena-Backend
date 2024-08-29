@@ -190,6 +190,7 @@ export interface Event {
   userEvent?: UserEvent[];
   puzzles?: PuzzlesEntreprise[];
   accepted?: boolean;
+  numberRegistered?: number;
 }
 
 export interface priceDetails {
@@ -209,6 +210,7 @@ export interface UserEvent {
   eventsID: number;
   events: Event;
   points: number;
+  numberRegistered: number;
 }
 
 export interface ResponseCreateUser {
@@ -219,14 +221,14 @@ export interface ResponseCreateUser {
 export interface puzzles {
   id: number;
   rankingsID: number;
-  coucou: string;
-  tuture: string;
   rankings: Ranking;
   tournamentID: number;
   tournament: Tournament;
   eventID: number;
   events: Event;
   tests: JsonValue;
+  title: string;
+  details: string;
 }
 
 export interface Puzzle {

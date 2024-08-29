@@ -562,6 +562,9 @@ export class UserService {
     const lastCommande = prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
+        customerId: {
+          not: null,
+        },
       },
       orderBy: {
         dateCommande: 'desc',
