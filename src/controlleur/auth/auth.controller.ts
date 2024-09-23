@@ -138,19 +138,19 @@ export class AuthController {
   async logout(@Req() request, @Res() response): Promise<void> {
     try {
       const refreshToken = request.cookies['frenchcodeareatoken'];
-      if (refreshToken) {
-        // Suppression du cookie côté serveur
-        response.clearCookie('frenchcodeareatoken', {
-          path: '/', // accessible from the entire domain
-          domain: process.env.DOMAINE, // parent domain
-          secure: true, // cookie accessible via HTTPS only
-          httpOnly: true, // cookie accessible via HTTP only, not JavaScript
-          sameSite: 'none', // 'None' avec une majuscule pour respecter la syntaxe du SameSite
-        });
+      console.log('refreshToken:', refreshToken);
 
-        // Envoyez une réponse pour confirmer la suppression du cookie
-        response.send('Cookie supprimé avec succès');
-      }
+      // Suppression du cookie côté serveur
+      response.clearCookie('frenchcodeareatoken', {
+        path: '/', // accessible from the entire domain
+        domain: process.env.DOMAINE, // parent domain
+        secure: true, // cookie accessible via HTTPS only
+        httpOnly: true, // cookie accessible via HTTP only, not JavaScript
+        sameSite: 'none', // 'None' avec une majuscule pour respecter la syntaxe du SameSite
+      });
+
+      // Envoyez une réponse pour confirmer la suppression du cookie
+      response.send('Cookie supprimé avec succès');
     } catch (error: any) {
       console.error("Erreur lors de la récupération de l'accesToken :", error);
       throw new HttpException(
