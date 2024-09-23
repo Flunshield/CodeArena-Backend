@@ -61,39 +61,89 @@ export class AdminService {
    * @returns Une promesse résolue avec l'objet utilisateur supprimé.
    */
   async deleteUser(user: User) {
-    await prisma.userRanking.deleteMany({
-      where: {
-        userID: user.id,
-      },
-    });
+    try {
+      // Supprimer les entrées liées dans userRanking
+      await prisma.userRanking.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
 
-    // Supprimer les entrées liées dans userTournament
-    await prisma.userTournament.deleteMany({
-      where: {
-        userID: user.id,
-      },
-    });
+      // Supprimer les entrées liées dans userTournament
+      await prisma.userTournament.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
 
-    // Supprimer les entrées liées dans userMatch
-    await prisma.userMatch.deleteMany({
-      where: {
-        userID: user.id,
-      },
-    });
+      // Supprimer les entrées liées dans userMatch
+      await prisma.userMatch.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
 
-    // Supprimer les entrées liées dans userEvent
-    await prisma.userEvent.deleteMany({
-      where: {
-        userID: user.id,
-      },
-    });
+      // Supprimer les entrées liées dans userEvent
+      await prisma.userEvent.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
 
-    // Supprimer l'utilisateur lui-même
-    return prisma.user.delete({
-      where: {
-        id: user.id,
-      },
-    });
+      // Supprimer les entrées liées dans commandeEntreprise
+      await prisma.commandeEntreprise.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
+
+      // Supprimer les entrées liées dans puzzlesEntreprise
+      await prisma.puzzlesEntreprise.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
+
+      // Supprimer les entrées liées dans puzzleSend
+      await prisma.puzzleSend.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
+
+      // Supprimer les entrées liées dans cvUser
+      await prisma.cvUser.deleteMany({
+        where: {
+          userID: user.id,
+        },
+      });
+
+      // Ajouter une entrée dans histories avant de supprimer l'utilisateur
+      await prisma.histories.create({
+        data: {
+          modificationType: 'DELETE',
+          details: `Suppression de l'utilisateur ${user.userName}`,
+          modificationDate: new Date(),
+          oldValue: JSON.stringify(user), // Sauvegarder les informations de l'utilisateur supprimé
+          newValue: 'Utilisateur supprimé', // Pas de nouvelle valeur, car l'utilisateur est supprimé
+        },
+      });
+
+      // Supprimer l'utilisateur lui-même
+      const deletedUser = await prisma.user.delete({
+        where: {
+          id: user.id,
+        },
+      });
+
+      return deletedUser;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la suppression de l'utilisateur et des relations associées :",
+        error,
+      );
+      throw error;
+    }
   }
 
   /**

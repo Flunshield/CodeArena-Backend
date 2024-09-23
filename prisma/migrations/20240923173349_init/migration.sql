@@ -50,7 +50,7 @@ CREATE TABLE `groups` (
 -- CreateTable
 CREATE TABLE `histories` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userID` INTEGER NOT NULL,
+    `userID` INTEGER NULL,
     `modificationType` VARCHAR(191) NOT NULL,
     `details` VARCHAR(191) NOT NULL,
     `modificationDate` DATETIME(3) NOT NULL,
@@ -100,7 +100,6 @@ CREATE TABLE `matches` (
     `eventsID` INTEGER NULL,
     `winnerId` INTEGER NULL,
     `winnerPoints` DOUBLE NULL,
-    `egality` BOOLEAN NULL,
     `loserId` INTEGER NULL,
     `loserPoints` DOUBLE NULL,
 
@@ -147,6 +146,14 @@ CREATE TABLE `events` (
     `description` VARCHAR(191) NOT NULL,
     `rewards` VARCHAR(191) NOT NULL,
     `organize` VARCHAR(191) NOT NULL,
+    `createPuzzles` BOOLEAN NOT NULL,
+    `priceAdjustment` INTEGER NOT NULL,
+    `basePrice` DOUBLE NOT NULL DEFAULT 1000.0,
+    `priceDetails` JSON NULL,
+    `accepted` BOOLEAN NOT NULL DEFAULT false,
+    `statusPayment` VARCHAR(191) NOT NULL DEFAULT 'not paid',
+    `userIDEntreprise` INTEGER NOT NULL,
+    `commandeId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -250,7 +257,7 @@ ALTER TABLE `user` ADD CONSTRAINT `user_titlesId_fkey` FOREIGN KEY (`titlesId`) 
 ALTER TABLE `user` ADD CONSTRAINT `user_groupsId_fkey` FOREIGN KEY (`groupsId`) REFERENCES `groups`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `histories` ADD CONSTRAINT `histories_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `histories` ADD CONSTRAINT `histories_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `matches` ADD CONSTRAINT `matches_tournamentID_fkey` FOREIGN KEY (`tournamentID`) REFERENCES `tournaments`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -278,6 +285,12 @@ ALTER TABLE `userMatch` ADD CONSTRAINT `userMatch_userID_fkey` FOREIGN KEY (`use
 
 -- AddForeignKey
 ALTER TABLE `userMatch` ADD CONSTRAINT `userMatch_matchID_fkey` FOREIGN KEY (`matchID`) REFERENCES `matches`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `events` ADD CONSTRAINT `events_commandeId_fkey` FOREIGN KEY (`commandeId`) REFERENCES `commandeEntreprise`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `events` ADD CONSTRAINT `events_userIDEntreprise_fkey` FOREIGN KEY (`userIDEntreprise`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `userEvent` ADD CONSTRAINT `userEvent_userID_fkey` FOREIGN KEY (`userID`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
