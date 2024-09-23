@@ -11,7 +11,13 @@ import { Socket, Server } from 'socket.io';
 import { RoomService } from './room.service';
 import { AddMessageDto } from '../../interfaces/matchmaking';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({
+  cors: {
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  },
+})
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
