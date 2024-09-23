@@ -13,7 +13,7 @@ import { AddMessageDto } from '../../interfaces/matchmaking';
 
 @WebSocketGateway({
   cors: {
-    origin: true,
+    origin: process.env.URL_FRONT,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },
