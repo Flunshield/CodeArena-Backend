@@ -60,6 +60,40 @@ export class PuzzleController {
     }
   }
 
+  @Patch("updatePuzzleAdmin")
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async updatePuzzleAdmin(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.updatePuzzleAdmin(data.data);
+      if (result) {
+        response.send(result);
+      } else {
+        response.sendStatus(HttpStatus.NOT_FOUND);
+      }
+    } catch (error) {
+      console.error(error);
+      response.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post("createPuzzleAdmin")
+  @Roles(ADMIN)
+  @UseGuards(RolesGuard)
+  async createPuzzleAdmin(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.createPuzzleAdmin(data.data);
+      if (result) {
+        response.send(result);
+      } else {
+        response.sendStatus(HttpStatus.NOT_FOUND);
+      }
+    } catch (error) {
+      console.error(error);
+      response.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Delete("deletePuzzle")
   @Roles(ENTREPRISE, ADMIN)
   @UseGuards(RolesGuard)
@@ -112,6 +146,36 @@ export class PuzzleController {
       }
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  @Post("/validatePuzzleSend")
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async validatePuzzleSend(@Body() data, @Res() response) {
+    try {
+      const result = await this.puzzleService.validatePuzzleSend(data.data);
+      if (result) {
+        response.send(result);
+      } else {
+        response.status(HttpStatus.NOT_FOUND).send("Puzzle not found");
+      }
+    } catch (error) {
+      console.error(error);
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Internal Server Error");
+    }
+  }
+
+  @Get('/countPuzzleSendInMonth')
+  @Roles(ENTREPRISE, ADMIN)
+  @UseGuards(RolesGuard)
+  async countPuzzleSendInMonth(@Query('id') id: string, @Res() response) {
+    try {
+      const result = await this.puzzleService.countPuzzleSendInMonth(id);
+      response.status(HttpStatus.OK).json({ count: result });
+    } catch (error) {
+      console.error(error);
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
   }
 

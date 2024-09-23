@@ -67,12 +67,12 @@ export class MatchmakingService {
 
     const match = await this.findMatchingUser(userId, userRanking);
     if (match) {
-      const puzzleId = await this.getRandomPuzzle(userRanking);
+      const puzzle = await this.getRandomPuzzle(userRanking);
       this.queueService.removeUser(userId);
       this.queueService.removeUser(match.userId);
       return {
         firstUser: match.userId,
-        puzzleId,
+        puzzle,
         startTimestamp: Date.now(),
       };
     }
@@ -132,7 +132,7 @@ export class MatchmakingService {
     }
   }
 
-  async getRandomPuzzle(rankingsId: number): Promise<number> {
+  async getRandomPuzzle(rankingsId: number): Promise<object> {
     const puzzles = await this.prisma.puzzles.findMany({
       where: { rankingsID: rankingsId },
     });
@@ -143,6 +143,6 @@ export class MatchmakingService {
     }
 
     const randomIndex = Math.floor(Math.random() * puzzles.length);
-    return puzzles[randomIndex].id;
+    return puzzles[randomIndex];
   }
 }

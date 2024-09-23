@@ -4,23 +4,13 @@ export const ADMIN = 'Admin';
 export const ENTREPRISE = 'Entreprise';
 export const INVITE = 'Invite';
 
-export const PREMIUM_PRICE = 'price_1PE16WFoLa8m0nzy08YNvhvc';
-export const ENTREPRISE_PRICE = 'price_1PE1LmFoLa8m0nzymnwISkaF';
-export const PREMIUM_PRICE_ABONNEMENT = 'price_1PKGuGFoLa8m0nzy88vB7lvd';
-export const ENTREPRISE_PRICE_ABONNEMENT = 'price_1PKHKWFoLa8m0nzyAWLDMBlQ';
+export const PREMIUM_PRICE_ABONNEMENT = 'price_1PjFrZFoLa8m0nzy2vEhq1TG';
+export const ENTREPRISE_PRICE_ABONNEMENT = 'price_1PjFxQFoLa8m0nzylaifhB6O';
 
 export const PRODUCT = [
   {
     id: '',
     nbCreate: 10,
-  },
-  {
-    id: PREMIUM_PRICE,
-    nbCreate: 100,
-  },
-  {
-    id: ENTREPRISE_PRICE,
-    nbCreate: 99999,
   },
   {
     id: PREMIUM_PRICE_ABONNEMENT,
@@ -31,3 +21,5 @@ export const PRODUCT = [
     nbCreate: 99999,
   },
 ];
+
+export const YOUR_DOMAIN = process.env.URL_FRONT;

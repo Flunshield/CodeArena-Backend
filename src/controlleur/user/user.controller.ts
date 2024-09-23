@@ -2,6 +2,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -92,9 +93,9 @@ export class UserController {
   @Get('/getUsers')
   @Roles(ADMIN, ENTREPRISE, USER)
   @UseGuards(RolesGuard)
-  async getUsers(@Query('page') page: string, @Query('itemPerPage') itemPerPage: string, @Query('isEntreprise') isEntreprise: string, @Req() request, @Res() response) {
+  async getUsers(@Query('page') page: string, @Query('itemPerPage') itemPerPage: string, @Query('isEntreprise') isEntreprise: string, @Query('languagePreference') languagePreference: string, @Req() request, @Res() response) {
     try {
-      const users = await this.userService.getUsers(parseInt(page), parseInt(itemPerPage), isEntreprise);
+      const users = await this.userService.getUsers(parseInt(page), parseInt(itemPerPage), isEntreprise, languagePreference);
       response.send(users);
     } catch (error) {
       console.log(error);
@@ -116,10 +117,17 @@ export class UserController {
   @Get('/getUser')
   @Roles(USER, ADMIN, ENTREPRISE)
   @UseGuards(RolesGuard)
-  async getUser(@Query('id') id: string, @Req() request, @Res() response) {
+  async getUser(@Query('id') id: string, @Query('isEntreprise') isEntreprise: string, @Query('username') username: string,  @Req() request, @Res() response) {
     try {
+      const isEntrepriseBool = isEntreprise === 'true' ? true : false;
+
+      if(isEntrepriseBool) {
+        const user = await this.userService.getUserByUserName(username.toString());
+        response.send(user);
+      } else {
       const user = await this.userService.getUserById(parseInt(id));
       response.send(user);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -197,6 +205,100 @@ export class UserController {
         response.send({ message: 'Aucune commande trouvée' });
       } else {
         response.send(lastCommande);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Post('createCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async createCv(@Body() data: any, @Req() request, @Res() response) {
+    try {
+      const nbCv = await this.userService.getNbCv(data.data.userId);
+      if(nbCv <= 4) {
+      const createCv = await this.userService.createCv(data.data);
+      if (createCv) {
+      response.send(createCv);
+      }
+    } else {
+      response.send({message: 'Vous avez atteint le nombre maximal de cv', status: 400});
+    }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('getCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getCv(@Query('id') id: string, @Req() request, @Res() response) {
+    try {
+      const cv = await this.userService.getCv(id);
+      if(cv) {
+        response.send(cv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Delete('deleteCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async deleteCv(@Req() request, @Res() response, @Body() data: any) {
+    try {
+      const deleteCv = await this.userService.deleteCv(data.idElementToDelete, data.userId);
+      if(deleteCv) {
+        response.send(deleteCv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('pdfCvUser')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async cvUser(@Query('id') id: string, @Query('idCv') idCv: string, @Req() request, @Res() response) {
+    try {
+      const cv = await this.userService.generateCvPDF(id, false, "", idCv);
+      if(cv) {
+        response.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'Content-Disposition; filename=cv.pdf',
+          'Content-Length': cv.length,
+        });
+        response.end(cv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Post('activateCv')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async activateCv(@Body() data: any, @Req() request, @Res() response) {
+    try {
+      const activateCv = await this.userService.activateCv(data.data.idElementToActivate, data.data.userId);
+      if(activateCv) {
+        response.send(activateCv);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  @Get('getHistoriqueMatch')
+  @Roles(USER, ADMIN, ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async getHistoriqueMatch(@Query('id') id: string, @Req() request, @Res() response) {
+    try {
+      const historiqueMatch = await this.userService.getHistoriqueMatch(id);
+      if(historiqueMatch) {
+        response.send(historiqueMatch);
       }
     } catch (error) {
       console.log(error);

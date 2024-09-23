@@ -98,6 +98,32 @@ export class MatchmakingController {
     };
   }
 
+  @Post('endMatchByTimer')
+  async endMatchByTimer(@Body() data: { data: LeaveRoomDto }) {
+    const userId = data.data.id;
+    const roomId = this.roomService.getRoomIdByUserId(userId);
+
+    if (!roomId) {
+      return { success: false, message: 'Room not found.' };
+    }
+
+    this.roomService.endRoomByTimer(roomId);
+    return { success: true, message: 'Match ended.' };
+  }
+
+  @Post('endMatchByWinner')
+  async endMatchByWinner(@Body() data: { data: LeaveRoomDto }) {
+    const userId = data.data.id;
+    const roomId = this.roomService.getRoomIdByUserId(userId);
+
+    if (!roomId) {
+      return { success: false, message: 'Room not found.' };
+    }
+
+    this.roomService.endRoomByWinner(roomId, userId);
+    return { success: true, message: 'Match ended.' };
+  }
+
   @Get('getRooms')
   getRooms() {
     const rooms = this.roomService.getRooms();
@@ -110,12 +136,21 @@ export class MatchmakingController {
       return { success: false, message: 'Invalid user ID.' };
     }
     const isInRoom = this.roomService.isUserInRoom(parseInt(userId));
+    const roomId = this.roomService.getRoomIdByUserId(parseInt(userId));
+    const puzzle = this.roomService.getRoomPuzzle(roomId);
+    const startTimestamp = this.roomService.getRoomStartTimestamp(roomId);
     return {
       success: true,
       isInRoom,
-      roomId: isInRoom
-        ? this.roomService.getRoomIdByUserId(parseInt(userId))
-        : null,
+      puzzle: puzzle,
+      startTimestamp: startTimestamp,
+      roomId: isInRoom ? roomId : null,
     };
+  }
+
+  @Get('findPuzzleById')
+  findPuzzleById(@Query('roomId') roomId: string) {
+    const puzzle = this.roomService.getRoomPuzzle(roomId);
+    return { success: true, puzzle };
   }
 }

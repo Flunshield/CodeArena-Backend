@@ -9,11 +9,10 @@ import {
 } from '@nestjs/common';
 import { Stripe } from 'stripe';
 import { StripeService } from '../../services/stripe/stripe.service';
-import { ENTREPRISE, USER } from '../../constantes/contante';
+import { ENTREPRISE, USER, YOUR_DOMAIN } from '../../constantes/contante';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../auth/auth.controller';
 
-const YOUR_DOMAIN = process.env.URL_FRONT;
 const stripe = new Stripe(
   'sk_test_51P1YCzFoLa8m0nzyi1YXY5DWNpDYc89lZ0oa17ueukKAwuJkhUMP1Ig1XRtuveCVaMJBcxXq1dVuD1p1UtHEqZNd007GVNqPQx',
   {
@@ -57,18 +56,22 @@ export class StripeController {
     if (session && session.payment_status === 'paid') {
       const checkIfOrderExist =
         await this.stripeService.checkIfOrderExist(session);
+
       if (checkIfOrderExist) {
         // Passer le customerId à la méthode de création de commande
         const status = await this.stripeService.createCommande(
           session,
-          data.user.data,
+          data.userId,
+          data.isEvent,
+          data.eventId,
         );
+
         response.sendStatus(status);
       }
     }
     if (!session) {
       response.send(
-        await this.stripeService.createCommande('', data.user.data),
+        await this.stripeService.createCommande('', parseInt(data.userId)),
       );
     }
   }
@@ -91,5 +94,26 @@ export class StripeController {
       'Content-Length': latestInvoice.length,
     });
     res.end(latestInvoice);
+  }
+
+  @Post('create-checkout-session-event')
+  @Roles(ENTREPRISE)
+  @UseGuards(RolesGuard)
+  async createCheckoutSessionEntreprise(@Req() req, @Res() res) {
+    const data = req.body.data;
+
+    const success_url = `${YOUR_DOMAIN}/successEvent?session_id={CHECKOUT_SESSION_ID}`;
+    const cancel_url = `${YOUR_DOMAIN}/cancel`;
+
+    const checkoutUrl =
+      await this.stripeService.createProductAndCheckoutSession(
+        data.productName,
+        data.amount,
+        data.currency,
+        success_url,
+        cancel_url,
+      );
+
+    res.send({ message: checkoutUrl, eventId: data.id }); // Retourner l'URL de la page de paiement
   }
 }

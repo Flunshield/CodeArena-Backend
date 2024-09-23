@@ -42,13 +42,16 @@ export class PuzzleService {
       const userID = parseInt(data.user.id, 10);
       const tests =
         typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
+      const time = data.time.toString();
+
       try {
         return await prisma.puzzlesEntreprise.create({
           data: {
             userID: userID,
             tests: tests,
             details: data.details,
-            title: data.title
+            title: data.title,
+            time: time
           }
         });
       } catch (e) {
@@ -83,6 +86,8 @@ export class PuzzleService {
   async updatePuzzlePartially(updatePuzzleDto: any) {
     const data = updatePuzzleDto.data;
     const puzzleID = parseInt(data.id, 10);
+    const time = data.time.toString();
+
     try {
       return await prisma.puzzlesEntreprise.update({
         where: {
@@ -91,7 +96,8 @@ export class PuzzleService {
         data: {
           tests: data.tests,
           details: data.details,
-          title: data.title
+          title: data.title,
+          time: time
         }
       });
     } catch (e) {
@@ -181,28 +187,52 @@ export class PuzzleService {
     }
   }
 
-  async getPuzzlePlaying(data, page: number, limit: number = 3) {
+  async getPuzzlePlaying(data, page: number, title: string, ascending: string, puzzleCheck: string, limit: number = 3) {
     const offset = (page - 1) * limit;
+    
+    const countPuzzle = await prisma.puzzleSend.count({
+      where: {
+        userID: data.userID,
+        validated: true,
+        puzzlesEntreprise: {
+          title: {
+            contains: title ?? ''
+          }
+        },
+        ...(puzzleCheck !== "undefined" && { verified: puzzleCheck === "true" ? true : false })
+
+      }
+    });
+    
     const puzzle = await prisma.puzzleSend.findMany({
       where: {
         userID: data.userID,
-        validated: true
+        validated: true,
+        puzzlesEntreprise: {
+          title: {
+            contains: title ?? ''
+          }
+        },
+        ...(puzzleCheck !== "undefined" && countPuzzle > 0 && { verified: puzzleCheck === "true" ? true : false })
       },
       include: {
         puzzlesEntreprise: true
       },
+      orderBy: {
+        sendDate: ascending === "true" ? 'asc' : 'desc'
+    },
       take: limit,
-      skip: offset
-    });
+      skip: offset,
+  });
 
-    const countPuzzle = await prisma.puzzleSend.count({
-      where: {
-        userID: data.userID,
-        validated: true
-      }
+    const puzzlesTitle = await prisma.puzzlesEntreprise.findMany({
+      select: {
+        title: true
+      },
+      distinct: ['title']
     });
-
-    return {item: puzzle, total: countPuzzle};
+    
+    return {item: puzzle, total: countPuzzle, titles: puzzlesTitle};
   }
 
   async countPuzzlesPlayed(id) {
@@ -219,6 +249,94 @@ export class PuzzleService {
         userID: parseInt(id)
       }
     });
+  }
+
+  async countPuzzleSendInMonth(id: string): Promise<number> {
+    // Obtenir la date du premier jour du mois en cours
+    const firstDayOfMonth = new Date();
+    firstDayOfMonth.setDate(1);
+    return await prisma.puzzleSend.count({
+        where: {
+            userID: parseInt(id),
+            sendDate: {
+                gte: firstDayOfMonth,
+            },
+        },
+    });
+}
+
+  async validatePuzzleSend(data) {
+    const puzzleID = parseInt(data.puzzleId, 10);
+    try {
+      // Récupérer la valeur actuelle de 'verified'
+      const currentPuzzle = await prisma.puzzleSend.findUnique({
+        where: {
+          id: puzzleID
+        },
+        select: {
+          verified: true
+        }
+      });
+  
+      if (!currentPuzzle) {
+        throw new Error(`Puzzle with ID ${puzzleID} not found`);
+      }
+  
+      // Inverser la valeur de 'verified'
+      const newVerifiedStatus = !currentPuzzle.verified;
+  
+      // Mettre à jour la colonne 'verified' avec la valeur inversée
+      return await prisma.puzzleSend.update({
+        where: {
+          id: puzzleID
+        },
+        data: {
+          verified: newVerifiedStatus
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+  
+  async updatePuzzleAdmin(data: any) {
+    const puzzleID = parseInt(data.id, 10);
+    try {
+      return await prisma.puzzles.update({
+        where: {
+          id: puzzleID
+        },
+        data: {
+          tests: data.tests,
+          details: data.details,
+          title: data.title,
+          rankingsID: data.rankingId,
+          eventsID: data.eventId
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  async createPuzzleAdmin(data: any) {
+    const tests = typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
+    try {
+      return await prisma.puzzles.create({
+        data: {
+          tests: tests,
+          details: data.details,
+          title: data.title,
+          rankingsID: parseInt(data.rankingId),
+          eventsID: parseInt(data.eventId)
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   }
 }
 

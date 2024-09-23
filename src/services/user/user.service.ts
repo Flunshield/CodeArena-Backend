@@ -1,9 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { AuthService } from '../authentificationService/auth.service';
-import { ResponseCreateUser, User } from '../../interfaces/userInterface';
+import {
+  CvUser,
+  ResponseCreateUser,
+  User,
+} from '../../interfaces/userInterface';
 import { Dto } from '../../dto/Dto';
 import { MailService } from '../../email/service/MailService';
+import { PdfService } from '../pdfservice/pdf.service';
 
 const prisma: PrismaClient = new PrismaClient();
 
@@ -26,7 +31,10 @@ const prisma: PrismaClient = new PrismaClient();
  */
 @Injectable()
 export class UserService {
-  constructor(private readonly mailService: MailService) {}
+  constructor(
+    private readonly mailService: MailService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   /**
    * Crée un nouvel utilisateur avec des vérifications d'existence et hachage sécurisé du mot de passe.
@@ -138,6 +146,7 @@ export class UserService {
         firstName: user.firstName,
         titlesId: parseInt(String(user.titlesId)),
         siren: user.siren,
+        languagePreference: user.languagePreference,
       },
     });
 
@@ -198,6 +207,7 @@ export class UserService {
     pageNumber: number,
     itemPerPage: number,
     isEntreprise: string,
+    languagePreference: string,
   ) {
     const offset = (pageNumber - 1) * itemPerPage;
     const testEntreprise = isEntreprise === 'true' ? true : false;
@@ -205,12 +215,31 @@ export class UserService {
       const users = await prisma.user.findMany({
         take: itemPerPage,
         skip: offset,
+        where: {
+          // Si testEntreprise est vrai, on cherche les utilisateurs avec les préférences de langue spécifiées si elles existent
+          languagePreference: testEntreprise
+            ? languagePreference === 'all'
+              ? undefined
+              : languagePreference
+            : undefined,
+        },
         select: {
           id: true,
           firstName: testEntreprise,
           lastName: testEntreprise,
           userName: true,
           email: testEntreprise,
+          languagePreference: testEntreprise,
+          cvUser: testEntreprise
+            ? {
+                select: {
+                  id: true,
+                },
+                where: {
+                  activate: true, // Condition pour sélectionner uniquement activate === true
+                },
+              }
+            : undefined, // Si testEntreprise est faux, exclure cvUser
           nbGames: true,
           userRanking: {
             include: {
@@ -233,7 +262,12 @@ export class UserService {
         return sumB - sumA; // Pour un tri décroissant
       });
 
-      const countUser = await prisma.user.count();
+      const countUser = await prisma.user.count({
+        where: {
+          languagePreference:
+            languagePreference === 'all' ? undefined : languagePreference,
+        },
+      });
 
       return { item: userSorted, total: countUser };
     } catch (error) {
@@ -255,6 +289,11 @@ export class UserService {
             take: 1, // Limite à un seul enregistrement
             orderBy: {
               dateCommande: 'desc', // Trie par dateCommande décroissante pour obtenir la dernière commande
+            },
+            where: {
+              customerId: {
+                not: null,
+              },
             },
           },
           titles: {
@@ -335,6 +374,45 @@ export class UserService {
         userNameSubstring,
         error,
       );
+      throw error;
+    }
+  }
+
+  async getUserByUserName(username: string) {
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          userName: username,
+        },
+        include: {
+          Histories: true,
+          groups: true,
+          titles: {
+            select: {
+              id: true,
+              label: true,
+              value: true,
+            },
+          },
+          userRanking: true,
+          userTournament: true,
+          userEvent: true,
+          _count: {
+            select: {
+              userRanking: true,
+              userTournament: true,
+              userEvent: true,
+            },
+          },
+        },
+      });
+
+      if (user) {
+        delete user.password;
+        return user;
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'utilisateur :", error);
       throw error;
     }
   }
@@ -484,6 +562,9 @@ export class UserService {
     const lastCommande = prisma.commandeEntreprise.findFirst({
       where: {
         userID: parseInt(id),
+        customerId: {
+          not: null,
+        },
       },
       orderBy: {
         dateCommande: 'desc',
@@ -495,5 +576,269 @@ export class UserService {
     } else {
       return [];
     }
+  }
+
+  async createCv(data: any) {
+    const userExist = await prisma.user.findFirst({
+      where: {
+        id: data.id,
+      },
+    });
+
+    if (userExist) {
+      try {
+        const createCv = await prisma.cvUser.create({
+          data: {
+            userID: data.id,
+            cvName: data.cvName,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+            summary: data.summary,
+            experiences: data.experiences,
+            educations: data.educations,
+            softSkills: data.softSkills,
+            technicalSkills: data.technicalSkills,
+            activate: data.activated ?? false,
+          },
+        });
+        if (createCv) {
+          return HttpStatus.CREATED;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la création du CV :', error);
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  }
+
+  async getCv(id: string) {
+    const cv: any[] = await prisma.cvUser.findMany({
+      where: {
+        userID: parseInt(id),
+      },
+    });
+    if (cv) {
+      return cv;
+    } else {
+      return [];
+    }
+  }
+
+  async getNbCv(userId: any) {
+    const nbCv = await prisma.cvUser.count({
+      where: {
+        userID: userId,
+      },
+    });
+    return nbCv;
+  }
+
+  async deleteCv(idElementToDelete: any, userId: any) {
+    const cvExist = await prisma.cvUser.findFirst({
+      where: {
+        id: idElementToDelete,
+        userID: userId,
+      },
+    });
+
+    if (cvExist) {
+      try {
+        const deleteCv = await prisma.cvUser.delete({
+          where: {
+            id: idElementToDelete,
+          },
+        });
+        if (deleteCv) {
+          return HttpStatus.OK;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la suppression du CV :', error);
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  }
+
+  async generateCvPDF(
+    id: string,
+    isEntreprise: boolean,
+    userId?: string,
+    idCv?: string,
+  ) {
+    let cv;
+    if (isEntreprise) {
+      cv = await prisma.cvUser.findFirst({
+        where: {
+          userID: parseInt(userId),
+          activate: true,
+        },
+      });
+    } else {
+      cv = await prisma.cvUser.findFirst({
+        where: {
+          id: parseInt(idCv),
+          userID: parseInt(id),
+        },
+      });
+    }
+    return await this.pdfService.generateCvPDF(cv as unknown as CvUser);
+  }
+
+  async activateCv(idCv: any, userId: any) {
+    const cvExist = await prisma.cvUser.findFirst({
+      where: {
+        id: idCv,
+        userID: userId,
+      },
+    });
+
+    if (cvExist) {
+      try {
+        const desactivAllCv = await prisma.cvUser.updateMany({
+          where: {
+            userID: userId,
+          },
+          data: {
+            activate: false,
+          },
+        });
+
+        if (desactivAllCv && cvExist.activate === false) {
+          const activateCv = await prisma.cvUser.update({
+            where: {
+              id: idCv,
+            },
+            data: {
+              activate: true,
+            },
+          });
+          if (activateCv) {
+            return HttpStatus.OK;
+          }
+        } else {
+          return HttpStatus.ACCEPTED;
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'activation du CV :", error);
+        throw error;
+      }
+    } else {
+      return [];
+    }
+  }
+
+  async getRoleUser(id: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+      select: {
+        groupsId: true,
+      },
+    });
+    return user.groupsId;
+  }
+
+  async getIfUSerCanSendMailEntreprise(user) {
+    const id = user.userID ?? '';
+    const nbMailSend = await prisma.puzzleSend.count({
+      where: {
+        userID: parseInt(id),
+        sendDate: {
+          gte: new Date(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0)),
+        },
+      },
+    });
+
+    const lastCommande: any = await this.getLastCommande(id);
+
+    if (nbMailSend < lastCommande.nbCreateTest) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async getHistoriqueMatch(id: string) {
+    // Trouver les matchs auxquels l'utilisateur a participé
+    const matches = await prisma.matches.findMany({
+      take: 10,
+      orderBy: {
+        date: 'desc',
+      },
+      where: {
+        userMatch: {
+          some: {
+            userID: parseInt(id),
+          },
+        },
+      },
+      select: {
+        id: true,
+        date: true,
+        time: true,
+        location: true,
+        status: true,
+        score: true,
+        loserPoints: true,
+        winnerPoints: true,
+        // Sélection des utilisateurs impliqués dans le match
+        userMatch: {
+          select: {
+            userID: true,
+            user: {
+              select: {
+                userName: true,
+              },
+            },
+          },
+        },
+        // Sélection des informations sur le gagnant
+        winnerId: true, // On récupère uniquement l'ID du gagnant
+        loserId: true, // On récupère uniquement l'ID du perdant
+      },
+    });
+
+    // Pour chaque match, récupérer les détails du gagnant
+    const matchesWithWinnerDetails = await Promise.all(
+      matches.map(async (match) => {
+        let winner = null;
+        let loser = null;
+        if (match.winnerId) {
+          winner = await prisma.user.findUnique({
+            where: {
+              id: match.winnerId,
+            },
+            select: {
+              userName: true,
+            },
+          });
+        }
+        if (match.loserId) {
+          loser = await prisma.user.findUnique({
+            where: {
+              id: match.loserId,
+            },
+            select: {
+              userName: true,
+            },
+          });
+        }
+
+        return {
+          ...match,
+          winner: winner,
+          loser: loser,
+        };
+      }),
+    );
+
+    return matchesWithWinnerDetails;
   }
 }

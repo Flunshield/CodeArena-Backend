@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatGateway } from './matchmaking.gateway';
 import { PrismaClient } from '@prisma/client';
@@ -13,6 +13,7 @@ export class RoomService {
 
   constructor(
     private readonly prisma: PrismaClient,
+    @Inject(forwardRef(() => ChatGateway))
     private readonly chatGateway: ChatGateway,
   ) {}
 
@@ -27,7 +28,7 @@ export class RoomService {
       roomId,
       user1,
       user2: matchData.firstUser,
-      puzzleId: matchData.puzzleId,
+      puzzle: matchData.puzzle,
       startTimestamp: matchData.startTimestamp,
     };
     this.rooms.push(room);
@@ -36,7 +37,7 @@ export class RoomService {
       user1,
       matchData.firstUser,
       roomId,
-      matchData.puzzleId,
+      matchData.puzzle,
       matchData.startTimestamp,
     );
   }
@@ -51,43 +52,85 @@ export class RoomService {
       (room) => room.user1 === userId || room.user2 === userId,
     );
   }
+  getRoomPuzzle(roomId: string): object | null {
+    const room = this.rooms.find((room) => room.roomId === roomId);
+    return room ? room.puzzle : null;
+  }
+
+  getRoomStartTimestamp(roomId: string): number | null {
+    const room = this.rooms.find((room) => room.roomId === roomId);
+    return room ? room.startTimestamp : null;
+  }
 
   leaveRoom(userId: number): boolean {
     const roomIndex = this.rooms.findIndex(
       (room) => room.user1 === userId || room.user2 === userId,
     );
-    if (roomIndex === -1) {
-      return false;
-    }
-    const room = this.rooms[roomIndex];
-    let winnerId: number | null = null;
+    if (roomIndex === -1) return false;
 
-    if (room.user1 === userId) {
-      winnerId = room.user2;
-      room.user1 = null;
-    } else {
-      winnerId = room.user1;
-      room.user2 = null;
-    }
+    const room = this.rooms[roomIndex];
+    const leavingUser = room.user1 === userId ? 'user1' : 'user2';
+    const winnerId = leavingUser === 'user1' ? room.user2 : room.user1;
+
+    room[leavingUser] = null;
 
     this.chatGateway.notifyUserLeft(room.roomId, userId);
 
     if (winnerId !== null) {
-      const matchDuration = (Date.now() - room.startTimestamp) / 1000;
-      this.endMatch(
-        room.roomId,
-        userId,
-        winnerId,
-        matchDuration,
-        room.startTimestamp,
-      );
+      this.handleMatchEnd(room, userId, winnerId, false, 'Abandon');
     }
 
     if (room.user1 === null || room.user2 === null) {
       this.rooms.splice(roomIndex, 1);
     }
-
     return true;
+  }
+
+  endRoomByTimer(roomId: string): boolean {
+    const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+    if (roomIndex === -1) return false;
+
+    const room = this.rooms[roomIndex];
+    this.handleMatchEnd(room, room.user1, room.user2, true, 'Temps écoulé');
+    if (room.user1 === null || room.user2 === null) {
+      this.rooms.splice(roomIndex, 1);
+    }
+    this.rooms.splice(roomIndex, 1);
+    return true;
+  }
+
+  endRoomByWinner(roomId: string, winnerId: number): boolean {
+    const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+    if (roomIndex === -1) return false;
+
+    const room = this.rooms[roomIndex];
+    const loserId = room.user1 === winnerId ? room.user2 : room.user1;
+
+    if (loserId !== null) {
+      room.user1 === winnerId ? (room.user1 = null) : (room.user2 = null);
+      this.handleMatchEnd(room, loserId, winnerId, false, 'Terminé');
+    }
+    this.rooms.splice(roomIndex, 1);
+    return true;
+  }
+
+  private handleMatchEnd(
+    room: any,
+    loserId: number,
+    winnerId: number,
+    egality: boolean,
+    status: string,
+  ): void {
+    const matchDuration = (Date.now() - room.startTimestamp) / 1000;
+    this.endMatch(
+      room.roomId,
+      loserId,
+      winnerId,
+      matchDuration,
+      room.startTimestamp,
+      egality,
+      status,
+    );
   }
 
   /*
@@ -101,6 +144,8 @@ export class RoomService {
     winnerId: number,
     matchDuration: number,
     startTimestamp: number,
+    egality: boolean,
+    status: string,
   ): Promise<void> {
     const points = PointsCalculator.calculatePoints(matchDuration, '0-0');
     const startDate = new Date(startTimestamp).toISOString();
@@ -112,8 +157,8 @@ export class RoomService {
         date: startDate,
         time: matchDuration.toString(),
         location: roomId,
-        status: 'Completed',
-        score: '0-0', //TODO: Implement score calculation
+        status: status,
+        score: `(${points.winnerPoints}) / (${points.loserPoints})`,
         tournamentID: null,
         rankingsID: winnerRankingsId,
         eventsID: null,
@@ -121,6 +166,7 @@ export class RoomService {
         winnerPoints: points.winnerPoints,
         loserId: loserId,
         loserPoints: points.loserPoints,
+        //egality: egality,
       },
     });
 

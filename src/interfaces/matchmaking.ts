@@ -9,6 +9,6 @@ export interface Room {
   roomId: string;
   user1: number;
   user2: number;
-  puzzleId: number;
+  puzzle: object;
   startTimestamp: number;
 }
