@@ -137,9 +137,6 @@ export class AuthController {
   @Post('logout')
   async logout(@Req() request, @Res() response): Promise<void> {
     try {
-      const refreshToken = request.cookies['frenchcodeareatoken'];
-      console.log('refreshToken:', refreshToken);
-
       // Suppression du cookie côté serveur
       response.clearCookie('frenchcodeareatoken', {
         path: '/', // accessible from the entire domain
