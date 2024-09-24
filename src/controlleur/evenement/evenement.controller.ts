@@ -172,7 +172,6 @@ export class EvenementController {
   @UseGuards(RolesGuard)
   async update(@Body() data, @Res() response) {
     const user: UserEvent = data.data;
-    console.log(user);
     const res: HttpStatus = await this.evenementService.updateUserEvent(user);
     if (res === HttpStatus.CREATED) {
       response.send(res);
