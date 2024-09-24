@@ -114,13 +114,13 @@ export class RoomService {
     return true;
   }
 
-  private handleMatchEnd(
+  private async handleMatchEnd(
     room: any,
     loserId: number,
     winnerId: number,
     egality: boolean,
     status: string,
-  ): void {
+  ): Promise<void> {
     const matchDuration = (Date.now() - room.startTimestamp) / 1000;
     this.endMatch(
       room.roomId,
@@ -131,6 +131,20 @@ export class RoomService {
       egality,
       status,
     );
+    const user1 = await this.getUserName(winnerId);
+    const user2 = await this.getUserName(loserId);
+    const messageBody = egality
+      ? `Match terminé avec une égalité!`
+      : `Match terminé. ${user1.toUpperCase()} a gagné contre ${user2.toUpperCase()}.`;
+    const payload = {
+      userId: 0,
+      username: 'System',
+      body: messageBody,
+      timestamp: Date.now(),
+      roomId: room.roomId,
+      end: true,
+    };
+    this.chatGateway.handleMessage(null, payload);
   }
 
   /*
@@ -221,6 +235,27 @@ export class RoomService {
       return userRanking.userRanking[0].rankingsID;
     } catch (error) {
       this.logger.error('Error fetching user ranking:', error);
+      return null;
+    }
+  }
+
+  private async getUserName(userId: number): Promise<string | null> {
+    if (!userId) {
+      this.logger.error('User ID is not defined');
+      return null;
+    }
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { userName: true },
+      });
+      if (!user) {
+        this.logger.warn(`No user found for user ID ${userId}`);
+        return null;
+      }
+      return user.userName;
+    } catch (error) {
+      this.logger.error('Error fetching user name:', error);
       return null;
     }
   }
