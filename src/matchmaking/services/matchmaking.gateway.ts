@@ -36,7 +36,6 @@ export class ChatGateway
   // Gestion des messages
   @SubscribeMessage('message')
   handleMessage(client: Socket, payload: AddMessageDto): void {
-    this.logger.log(`Message from ${payload.userId}: ${payload.body}`);
     this.server.to(payload.roomId).emit('message', payload);
   }
 
@@ -58,9 +57,6 @@ export class ChatGateway
       username: string;
     },
   ): void {
-    this.logger.log(
-      `User ${payload.userId} is typing in room ${payload.roomId}`,
-    );
     this.server.to(payload.roomId).emit('typing', payload);
   }
 
