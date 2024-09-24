@@ -62,15 +62,15 @@ export class ChatGateway
 
   // Gestion de la fin de match par le gagnant
   @SubscribeMessage('endMatchByWinner')
-  handleEndMatchByWinner(
+  async handleEndMatchByWinner(
     client: Socket,
     payload: { userId: number; roomId: string },
-  ): void {
+  ): Promise<void> {
     this.logger.log(
       `Match ended by winner in room ${payload.roomId} with winner ID ${payload.userId}`,
     );
-
-    // Vérifiez que le client est bien dans la salle
+    await this.roomService.endRoomByWinner(payload.roomId, payload.userId);
+    //Vérifiez que le client est bien dans la salle
     const clientsInRoom = this.server.sockets.adapter.rooms.get(payload.roomId);
     if (!clientsInRoom || !clientsInRoom.has(client.id)) {
       this.logger.warn(
@@ -104,8 +104,6 @@ export class ChatGateway
         }
       }
     });
-
-    this.roomService.endRoomByWinner(payload.roomId, payload.userId);
   }
 
   /*

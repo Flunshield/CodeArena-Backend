@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { CreateRoomDto } from '../../dto/matchmaking';
 import { Room } from '../../interfaces/matchmaking';
 import { PointsCalculator } from '../utils/points-calculator';
+import { GameService } from './game.service';
 
 @Injectable()
 export class RoomService {
@@ -15,6 +16,7 @@ export class RoomService {
     private readonly prisma: PrismaClient,
     @Inject(forwardRef(() => ChatGateway))
     private readonly chatGateway: ChatGateway,
+    private readonly gameService: GameService,
   ) {}
 
   /*
@@ -92,14 +94,11 @@ export class RoomService {
 
     const room = this.rooms[roomIndex];
     this.handleMatchEnd(room, room.user1, room.user2, true, 'Temps écoulé');
-    if (room.user1 === null || room.user2 === null) {
-      this.rooms.splice(roomIndex, 1);
-    }
     this.rooms.splice(roomIndex, 1);
     return true;
   }
 
-  endRoomByWinner(roomId: string, winnerId: number): boolean {
+  async endRoomByWinner(roomId: string, winnerId: number): Promise<boolean> {
     const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
     if (roomIndex === -1) return false;
 
@@ -108,7 +107,8 @@ export class RoomService {
 
     if (loserId !== null) {
       room.user1 === winnerId ? (room.user1 = null) : (room.user2 = null);
-      this.handleMatchEnd(room, loserId, winnerId, false, 'Terminé');
+      console.log('la');
+      await this.handleMatchEnd(room, loserId, winnerId, false, 'Terminé');
     }
     this.rooms.splice(roomIndex, 1);
     return true;
@@ -122,7 +122,7 @@ export class RoomService {
     status: string,
   ): Promise<void> {
     const matchDuration = (Date.now() - room.startTimestamp) / 1000;
-    this.endMatch(
+    await this.endMatch(
       room.roomId,
       loserId,
       winnerId,
@@ -165,7 +165,6 @@ export class RoomService {
     const startDate = new Date(startTimestamp).toISOString();
     const winnerRankingsId = await this.getUserRanking(winnerId);
     const loserRankingsId = await this.getUserRanking(loserId);
-
     const match = await this.prisma.matches.create({
       data: {
         date: startDate,
@@ -184,32 +183,24 @@ export class RoomService {
       },
     });
 
-    await this.prisma.userRanking.update({
-      where: {
-        userID_rankingsID: { userID: winnerId, rankingsID: winnerRankingsId },
-      },
-      data: { points: { increment: points.winnerPoints } },
-    });
+    //Update user rankings and matches
+    await this.gameService.updateUserRanking(
+      winnerId,
+      winnerRankingsId,
+      points.winnerPoints,
+    );
+    await this.gameService.updateUserRanking(
+      loserId,
+      loserRankingsId,
+      points.loserPoints,
+    );
 
-    await this.prisma.userRanking.update({
-      where: {
-        userID_rankingsID: { userID: loserId, rankingsID: loserRankingsId },
-      },
-      data: { points: { increment: points.loserPoints } },
-    });
+    //Create user matches
+    await this.gameService.createUserMatch(winnerId, match.id);
+    await this.gameService.createUserMatch(loserId, match.id);
 
-    await this.prisma.userMatch.create({
-      data: {
-        userID: winnerId,
-        matchID: match.id,
-      },
-    });
-    await this.prisma.userMatch.create({
-      data: {
-        userID: loserId,
-        matchID: match.id,
-      },
-    });
+    //Update user games
+    await this.gameService.updateUserGames(winnerId, loserId);
   }
 
   /*
