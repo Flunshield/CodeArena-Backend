@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { ChatGateway } from './services/matchmaking.gateway';
 import { QueueService } from './services/queue.service';
 import { RoomService } from './services/room.service';
+import { GameService } from './services/game.service';
 
 @Module({
   providers: [
@@ -13,6 +14,7 @@ import { RoomService } from './services/room.service';
     ChatGateway,
     QueueService,
     RoomService,
+    GameService,
   ],
   controllers: [MatchmakingController],
 })

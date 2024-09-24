@@ -4,6 +4,7 @@ export interface AddMessageDto {
   body: string;
   timestamp: number;
   roomId: string;
+  end: boolean;
 }
 export interface Room {
   roomId: string;
