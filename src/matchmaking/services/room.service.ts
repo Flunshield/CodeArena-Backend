@@ -161,7 +161,11 @@ export class RoomService {
     egality: boolean,
     status: string,
   ): Promise<void> {
-    const points = PointsCalculator.calculatePoints(matchDuration, '0-0');
+    const points = PointsCalculator.calculatePoints(
+      matchDuration,
+      '0-0',
+      status,
+    );
     const startDate = new Date(startTimestamp).toISOString();
     const winnerRankingsId = await this.getUserRanking(winnerId);
     const loserRankingsId = await this.getUserRanking(loserId);
