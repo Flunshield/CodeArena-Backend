@@ -189,6 +189,7 @@ model puzzles {
   events       events?     @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
+  example      String
   title        String
 }
 
