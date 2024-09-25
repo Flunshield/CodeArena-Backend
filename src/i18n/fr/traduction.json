@@ -411,5 +411,21 @@
   "matchQuitter": "Quitter le match",
   "matchLoading": "Recherche d'un match en cours...",
   "chatNothing": "Pas de message ici",
-  "chatTyping": "Tape ton message"
+  "chatTyping": "Tape ton message",
+  "testValider": "Tests valides",
+  "testEchec": "Tests ratés",
+  "testMessage": "Le code n'a pas passé tous les tests.",
+  "example": "Exemple",
+  "puzzleTitle1": "Convertir en Camel Case",
+  "puzzleDetails1": "Écrivez une fonction `toCamelCase` qui convertit une chaîne avec des espaces ou des tirets en notation camel case.",
+  "puzzleTitle2": "Inverser un chaîne",
+  "puzzleDetails2": "Écrivez une fonction `reverseString` qui prend une chaîne et la renvoie inversée.",
+  "puzzleTitle3": "Trouver le nombre maximum dans un tableau",
+  "puzzleDetails3": "Écrivez une fonction `findMax` qui prend un tableau de nombres et renvoie le plus grand nombre.",
+  "updatePuzzle": "Mettre à jour le puzzle",
+  "searchByTitre": "Recherche par titre",
+  "descriptionCompetition": "Combattez vos adversaires pour devenir le meilleur",
+  "eventDescription": "Participer à des événement en tout genre pour vous démarquez au prés des particuliers",
+  "puzzleDescription": "Entrainez vous à la résolution de puzzle et stimulez votre cerveau pour les résoudre !"
+
 }

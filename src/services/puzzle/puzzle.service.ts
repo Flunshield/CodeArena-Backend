@@ -323,6 +323,7 @@ export class PuzzleService {
 
   async createPuzzleAdmin(data: any) {
     const tests = typeof data.tests === "string" ? JSON.parse(data.tests) : data.tests;
+
     try {
       return await prisma.puzzles.create({
         data: {
@@ -330,9 +331,11 @@ export class PuzzleService {
           details: data.details,
           title: data.title,
           rankingsID: parseInt(data.rankingId),
-          eventsID: parseInt(data.eventId)
+          eventsID: parseInt(data.eventId),
+          example: data.example ?? ""
         }
       });
+
     } catch (e) {
       console.error(e);
       throw e;
