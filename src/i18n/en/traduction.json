@@ -418,5 +418,6 @@
   "puzzleTitle2": "Reverse a String",
   "puzzleDetails2": "Write a function `reverseString` that takes a string and returns it reversed.",
   "puzzleTitle3": "Find the Maximum Number in an Array",
-  "puzzleDetails3": "Write a function `findMax` that takes an array of numbers and returns the largest number."
+  "puzzleDetails3": "Write a function `findMax` that takes an array of numbers and returns the largest number.",
+  "updatePuzzle": "Update the puzzle"
 }

@@ -47,14 +47,14 @@ export class UserService {
     const regexPassword =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-      const regexUsername = /^[a-zA-Z0-9_]{3,30}$/; // Regex pour le nom d'utilisateur (3 à 30 caractères alphanumériques)
+    const regexUsername = /^[a-zA-Z0-9_]{3,30}$/; // Regex pour le nom d'utilisateur (3 à 30 caractères alphanumériques)
     try {
       if (!regexPassword.test(data.password)) {
         // Si le mot de passe n'est pas conforme.
         return { bool: false, type: 'password' };
       }
 
-      if(!regexUsername.test(data.userName)){
+      if (!regexUsername.test(data.userName)) {
         return { bool: false, type: 'username' };
       }
 

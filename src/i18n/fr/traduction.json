@@ -418,5 +418,6 @@
   "puzzleTitle2": "Inverser un chaîne",
   "puzzleDetails2": "Écrivez une fonction `reverseString` qui prend une chaîne et la renvoie inversée.",
   "puzzleTitle3": "Trouver le nombre maximum dans un tableau",
-  "puzzleDetails3": "Écrivez une fonction `findMax` qui prend un tableau de nombres et renvoie le plus grand nombre."
+  "puzzleDetails3": "Écrivez une fonction `findMax` qui prend un tableau de nombres et renvoie le plus grand nombre.",
+  "updatePuzzle": "Mettre à jour le puzzle"
 }
