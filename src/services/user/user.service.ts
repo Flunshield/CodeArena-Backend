@@ -46,10 +46,16 @@ export class UserService {
   public async create(data: Dto): Promise<ResponseCreateUser> {
     const regexPassword =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      const regexUsername = /^[a-zA-Z0-9_]{3,30}$/; // Regex pour le nom d'utilisateur (3 à 30 caractères alphanumériques)
     try {
       if (!regexPassword.test(data.password)) {
         // Si le mot de passe n'est pas conforme.
         return { bool: false, type: 'password' };
+      }
+
+      if(!regexUsername.test(data.userName)){
+        return { bool: false, type: 'username' };
       }
 
       const userExist = await prisma.user.findFirst({
