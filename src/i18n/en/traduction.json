@@ -411,5 +411,12 @@
   "matchQuitter": "Leave the match",
   "matchLoading": "Searching for a match...",
   "chatNothing": "No message here",
-  "chatTyping": "Type your message"
+  "chatTyping": "Type your message",
+  "example": "Example",
+  "puzzleTitle1": "Convert to Camel Case",
+  "puzzleDetails1": "Write a function `toCamelCase` that converts a string with spaces or hyphens into camel case.",
+  "puzzleTitle2": "Reverse a String",
+  "puzzleDetails2": "Write a function `reverseString` that takes a string and returns it reversed.",
+  "puzzleTitle3": "Find the Maximum Number in an Array",
+  "puzzleDetails3": "Write a function `findMax` that takes an array of numbers and returns the largest number."
 }
