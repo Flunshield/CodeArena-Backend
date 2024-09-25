@@ -411,5 +411,6 @@
   "matchQuitter": "Leave the match",
   "matchLoading": "Searching for a match...",
   "chatNothing": "No message here",
-  "chatTyping": "Type your message"
+  "chatTyping": "Type your message",
+  "updatePuzzle": "Update the puzzle"
 }

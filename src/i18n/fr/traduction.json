@@ -411,5 +411,6 @@
   "matchQuitter": "Quitter le match",
   "matchLoading": "Recherche d'un match en cours...",
   "chatNothing": "Pas de message ici",
-  "chatTyping": "Tape ton message"
+  "chatTyping": "Tape ton message",
+  "updatePuzzle": "Mettre à jour le puzzle"
 }
