@@ -394,6 +394,22 @@
   "listPuzzle": "List of puzzles",
   "listOfTitles": "List of titles",
   "eventAcepted": "Event accepted",
-  "addTitle": "Add a title"
-  
+  "addTitle": "Add a title",
+  "matchMobile": "Matches are not available on mobile. Please log in from a computer or tablet to continue.",
+  "matchTitle1": "Ranked Mode Overview",
+  "matchText1": "Ranked is a 1v1 game mode where you face an opponent of your skill level. The goal is to improve your programming skills by solving puzzles, while earning points to climb the leaderboard.",
+  "matchTitle2": "How does the ranking system work ?",
+  "matchText2": "The ranking system is quite simple : the more matches you win, the more points you accumulate, and once you reach a certain threshold, you move up to the next division. However, be careful, as losing matches can also cause you to lose points and get demoted to a lower division.",
+  "matchValider": "Validate",
+  "matchProgression": "My progress",
+  "matchProgressionJouer": "Matches played",
+  "matchClassement": "My ranking",
+  "matchBadge": "My Badges",
+  "matchBadgeDesc": "You do not have any badges.",
+  "matchQuitterFile": "Leave the queue",
+  "matchRecherche": "Search for a match",
+  "matchQuitter": "Leave the match",
+  "matchLoading": "Searching for a match...",
+  "chatNothing": "No message here",
+  "chatTyping": "Type your message"
 }

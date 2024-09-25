@@ -394,5 +394,22 @@
   "listPuzzle": "Liste des puzzles",
   "listOfTitle": "Liste des titres",
   "eventAccepted": "Événement accepté",
-  "addTitle": "Ajouter un titre"
+  "addTitle": "Ajouter un titre",
+  "matchMobile": "Les matchs ne sont pas accessibles sur mobile. Merci de vous connecter depuis un ordinateur ou une tablette pour continuer.",
+  "matchTitle1": "Présentation du mode Ranked ?",
+  "matchText1": "La Ranked est un mode de jeu 1 contre 1 où vous affrontez un adversaire de votre niveau. Le but est d'améliorer vos compétences en programmation en résolvant des puzzles, tout en gagnant des points pour monter dans le classement.",
+  "matchTitle2": "Comment fonctionne le classement ?",
+  "matchText2": "Le fonctionnement du classement est assez simple : plus vous gagnez de matchs, plus vous accumulez de points, et une fois un certain seuil atteint, vous passez à la division supérieure. Cependant, attention, car si vous perdez des matchs, vous pouvez également perdre des points et rétrograder de division.",
+  "matchValider": "Valider",
+  "matchProgression": "Ma progression",
+  "matchProgressionJouer": "Matchs joués",
+  "matchClassement": "Mon classement",
+  "matchBadge": "Mes Badges",
+  "matchBadgeDesc": "Vous ne possédez aucun badge.",
+  "matchQuitterFile": "Quitter la file d'attente",
+  "matchRecherche": "Rechercher un match",
+  "matchQuitter": "Quitter le match",
+  "matchLoading": "Recherche d'un match en cours...",
+  "chatNothing": "Pas de message ici",
+  "chatTyping": "Tape ton message"
 }
