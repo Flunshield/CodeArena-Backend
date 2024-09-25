@@ -176,6 +176,7 @@ CREATE TABLE `puzzles` (
     `eventsID` INTEGER NULL,
     `tests` JSON NOT NULL,
     `details` VARCHAR(191) NOT NULL,
+    `example` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
