@@ -445,5 +445,9 @@
   "descriptionCompetition": "Fight your opponents to become the best.",
   "eventDescription": "Participate in all kinds of events to stand out to individuals.",
   "puzzleDescription": "Train yourself in puzzle-solving and stimulate your brain to solve them !",
-  "detailPuzzle": "Puzzle details"
+  "detailPuzzle": "Puzzle details",
+  "invalidEmailDomain": "Invalide email",
+  "invalidPassword": "Invalid password",
+  "invalidUserName": "Invalid username",
+  "requiredField": "This field is required"
 }
