@@ -229,6 +229,7 @@ export interface puzzles {
   tests: JsonValue;
   title: string;
   details: string;
+  example?: string;
 }
 
 export interface Puzzle {

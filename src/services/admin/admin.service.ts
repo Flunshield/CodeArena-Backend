@@ -209,6 +209,7 @@ export class AdminService {
         title: data.title,
         details: data.details,
         tests: data.tests,
+        example: data.example,
         rankingsID: data.rankingsID
           ? parseInt(data.rankingsID.toString())
           : undefined,
