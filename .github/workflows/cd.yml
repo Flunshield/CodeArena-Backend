@@ -25,6 +25,7 @@ jobs:
             git switch main
             git pull origin main
             docker compose -f docker-compose-prod.yml up --build -d
+            docker exec -it nest npx prisma migrate deploy
 
       - name: 🚀 Deploy
         run: echo "🚀 Deployed!"
