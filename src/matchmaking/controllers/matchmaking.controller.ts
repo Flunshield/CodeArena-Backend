@@ -1,12 +1,12 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
-import { MatchmakingService } from '../services/matchmaking.service';
-import { QueueService } from '../services/queue.service';
-import { RoomService } from '../services/room.service';
 import {
   JoinQueueDto,
   LeaveQueueDto,
   LeaveRoomDto,
 } from '../../dto/matchmaking';
+import { MatchmakingService } from '../services/matchmaking.service';
+import { QueueService } from '../services/queue.service';
+import { RoomService } from '../services/room.service';
 @Controller('matchmaking')
 export class MatchmakingController {
   constructor(

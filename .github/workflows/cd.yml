@@ -3,7 +3,7 @@ name: CD - Déploiement de l'application
 on:
   push:
     branches:
-      - main
+      - aDefinir
 
 jobs:
   deploy:

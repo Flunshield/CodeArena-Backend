@@ -160,7 +160,7 @@ export class RefreshTokenService {
       puzzleID?: string;
       mailID?: number;
     },
-    expiresIn?: string,
+    expiresIn?: any,
   ): Promise<string> {
     const options: SignOptions = {
       algorithm: 'RS256',

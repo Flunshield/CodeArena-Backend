@@ -32,7 +32,7 @@ services:
     networks:
       - rcr_network
     ports:
-      - '3000:3000'
+      - '4000:4000'
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - MAIL=${MAIL}
@@ -43,12 +43,9 @@ services:
       - URL_BACK=${URL_BACK}
       - URL_FRONT=${URL_FRONT}
       - DOMAINE=${DOMAINE}
+      - NODE_ENV=production
     depends_on:
       - mariadb
-    volumes:
-      - ./src:/usr/src/app/src
-      - ./prisma:/usr/src/app/prisma
-    command: npm run start:dev
 
 #   networks:
 #       - rcr_network

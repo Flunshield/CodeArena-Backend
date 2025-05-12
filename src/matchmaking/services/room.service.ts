@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatGateway } from './matchmaking.gateway';
 import { PrismaClient } from '@prisma/client';
@@ -54,6 +54,7 @@ export class RoomService {
       (room) => room.user1 === userId || room.user2 === userId,
     );
   }
+
   getRoomPuzzle(roomId: string): object | null {
     const room = this.rooms.find((room) => room.roomId === roomId);
     return room ? room.puzzle : null;
@@ -182,8 +183,7 @@ export class RoomService {
         winnerId: winnerId,
         winnerPoints: points.winnerPoints,
         loserId: loserId,
-        loserPoints: points.loserPoints,
-        //egality: egality,
+        loserPoints: points.loserPoints, //egality: egality,
       },
     });
 

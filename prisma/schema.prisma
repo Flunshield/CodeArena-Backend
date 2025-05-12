@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -43,7 +44,7 @@ model user {
   puzzleSend         puzzleSend[]
   siren              String?
   cvUser             cvUser[]
-  events events[]
+  events             events[]
 }
 
 model Title {
@@ -63,7 +64,7 @@ model groups {
 model histories {
   id               Int      @id @default(autoincrement())
   userID           Int?
-  user             user?     @relation(fields: [userID], references: [id])
+  user             user?    @relation(fields: [userID], references: [id])
   modificationType String
   details          String
   modificationDate DateTime
@@ -99,7 +100,7 @@ model rankings {
 }
 
 model matches {
-  id           Int         @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   date         String
   time         String
   location     String
@@ -147,27 +148,27 @@ model userMatch {
 }
 
 model events {
-  id              Int         @id @default(autoincrement())
-  startDate       DateTime
-  endDate         DateTime
-  playerMax       Int
-  title           String
-  description     String
-  rewards         String
-  organize        String
-  createPuzzles   Boolean
-  priceAdjustment Int
-  basePrice       Float        @default(1000.0)
-  priceDetails    Json?
-  accepted        Boolean      @default(false)
-  statusPayment   String       @default("not paid")
+  id               Int                 @id @default(autoincrement())
+  startDate        DateTime
+  endDate          DateTime
+  playerMax        Int
+  title            String
+  description      String
+  rewards          String
+  organize         String
+  createPuzzles    Boolean
+  priceAdjustment  Int
+  basePrice        Float               @default(1000.0)
+  priceDetails     Json?
+  accepted         Boolean             @default(false)
+  statusPayment    String              @default("not paid")
   userIDEntreprise Int
-  commandeId      Int?
-  commande        commandeEntreprise? @relation(fields: [commandeId], references: [id])
-  user        user    @relation(fields: [userIDEntreprise], references: [id])
-  matches     matches[]
-  userEvent   userEvent[]
-  puzzles     puzzles[]
+  commandeId       Int?
+  commande         commandeEntreprise? @relation(fields: [commandeId], references: [id])
+  user             user                @relation(fields: [userIDEntreprise], references: [id])
+  matches          matches[]
+  userEvent        userEvent[]
+  puzzles          puzzles[]
 }
 
 model userEvent {
@@ -180,13 +181,13 @@ model userEvent {
 }
 
 model puzzles {
-  id           Int         @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   rankingsID   Int?
-  rankings     rankings?   @relation(fields: [rankingsID], references: [id])
+  rankings     rankings?    @relation(fields: [rankingsID], references: [id])
   tournamentID Int?
   tournaments  tournaments? @relation(fields: [tournamentID], references: [id])
   eventsID     Int?
-  events       events?     @relation(fields: [eventsID], references: [id])
+  events       events?      @relation(fields: [eventsID], references: [id])
   tests        Json
   details      String
   example      String
@@ -238,19 +239,19 @@ model puzzleSend {
 }
 
 model cvUser {
-  id                  Int               @id @default(autoincrement())
-  cvName              String?
-  userID              Int
-  user                user              @relation(fields: [userID], references: [id])
-  firstName           String?
-  lastName            String?
-  email               String?
-  phone               String?
-  address             String?
-  summary             String?
-  experiences         Json?
-  educations          Json?
-  technicalSkills     Json?
-  softSkills          Json?
-  activate            Boolean?    @default(false)
+  id              Int      @id @default(autoincrement())
+  cvName          String?
+  userID          Int
+  user            user     @relation(fields: [userID], references: [id])
+  firstName       String?
+  lastName        String?
+  email           String?
+  phone           String?
+  address         String?
+  summary         String?
+  experiences     Json?
+  educations      Json?
+  technicalSkills Json?
+  softSkills      Json?
+  activate        Boolean? @default(false)
 }
