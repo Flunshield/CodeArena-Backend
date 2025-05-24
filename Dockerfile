@@ -27,6 +27,9 @@ COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/private_key.pem ./
+COPY --from=builder /usr/src/app/public_key.pem ./
+COPY --from=builder /usr/src/app/templates/ ./templates
 
 EXPOSE 4000
 
